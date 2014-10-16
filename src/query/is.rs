@@ -1,21 +1,12 @@
 
-use std::sync::Arc;
-pub use field::{NamedField};
-
-pub trait Query: Sync + Send { 
-    fn upcast(self) -> RcQuery {
-        Arc::new(box self as BoxedQuery)
-    }
-}
+use query::Query;
+use field::NamedField;
+use to_sql::ToSql;
 
 #[deriving(Send, Clone)]
 pub struct IsQuery<F, T> {
     pub field: F,
     pub value: T
-}
-
-impl<F: Send+Sync, T: Send+Sync> Query for IsQuery<F, T> {
-
 }
 
 pub trait ToIsQuery<F, T> {
@@ -31,5 +22,4 @@ impl<T: Clone> ToIsQuery<NamedField<T>, T> for NamedField<T> {
     }
 }
 
-pub type BoxedQuery = Box<Query + Send + Sync>;
-pub type RcQuery = Arc<BoxedQuery>;
+impl Query for IsQuery<NamedField<String>, String> { }

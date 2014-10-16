@@ -21,3 +21,9 @@ impl<T> Field for NamedField<T> {
 
 #[deriving(Clone)]
 pub struct FieldDef(String);
+
+impl FieldDef {
+    pub fn name(&self) -> &str {
+        self.0.as_slice()
+    }
+}
