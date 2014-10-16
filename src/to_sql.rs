@@ -3,7 +3,7 @@ use time::Timespec;
 
 use data_set::SelectDataSet;
 use {Select, SelectOnly, SelectAll, From, NamedFrom, DataSetFrom};
-use query::{RcQuery, IsQuery};
+use query::{RcQuery, IsQuery, OrQuery, AndQuery};
 use field::{
     Field, 
     FieldDef,
@@ -90,6 +90,18 @@ impl<T: ToQueryValue> ToSql for IsQuery<NamedField<T>, T> {
 
 impl ToSql for RcQuery {
     fn to_sql(&self) -> String {
-        (***self).to_sql()
+        (**self).to_sql()
+    }
+}
+
+impl ToSql for OrQuery {
+    fn to_sql(&self) -> String {
+        format!("({}) OR ({})", self.left.to_sql(), self.right.to_sql())
+    }
+}
+
+impl ToSql for AndQuery {
+    fn to_sql(&self) -> String {
+        format!("({}) AND ({})", self.left.to_sql(), self.right.to_sql())
     }
 }

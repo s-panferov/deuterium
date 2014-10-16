@@ -7,8 +7,30 @@ extern crate time;
 
 use std::rc::Rc;
 
-pub use field::{FieldDef, NamedField, Field};
-pub use query::{Query, RcQuery, ToIsQuery};
+pub use field::{
+    FieldDef, 
+    NamedField, 
+    Field,
+
+    BoolField,
+    I8Field,
+    I16Field,
+    I32Field,
+    I64Field,
+    F32Field,
+    F64Field,
+    StringField,
+    ByteListField,
+    JsonField,
+    TimespecField,
+};
+pub use query::{
+    Query, 
+    RcQuery, 
+    IsQuery, ToIsQuery, 
+    OrQuery, ToOrQuery,
+    AndQuery, ToAndQuery,
+};
 pub use data_set::{SelectDataSet};
 pub use to_sql::{ToSql};
 
@@ -45,11 +67,17 @@ impl DT {
 #[test]
 fn it_works() {
 
-    let name = NamedField::<String> { name: "name".to_string() };
+    let name = StringField { name: "name".to_string() };
+    let is_admin = BoolField { name: "is_admin".to_string() };
+    let is_open = BoolField { name: "is_open".to_string() };
+
     let mut dset = DT::select(&[&name], NamedFrom("table".to_string()));
 
-    let query = name.is("test".to_string()).upcast();
-    dset = dset.where_(&query);
+    let query = name.is("test".to_string()).upcast().or(
+        is_admin.is(true).upcast().and(is_open.is(true).upcast()).upcast()
+    );
+
+    dset = dset.where_(&query.upcast());
 
     println!("{}", dset.to_sql());
     fail!("")
