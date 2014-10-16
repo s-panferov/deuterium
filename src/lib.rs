@@ -1,5 +1,9 @@
 
 #![feature(tuple_indexing)]
+#![feature(macro_rules)]
+
+extern crate serialize;
+extern crate time;
 
 use std::rc::Rc;
 
