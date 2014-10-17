@@ -8,7 +8,7 @@ pub struct AndQuery {
 }
 
 pub trait ToAndQuery {
-    fn and(&self, val: RcQuery) -> AndQuery;
+    fn and(&self, val: RcQuery) -> RcQuery;
 }
 
 impl Query for AndQuery { }

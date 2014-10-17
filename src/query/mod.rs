@@ -7,7 +7,10 @@ pub use self::is::{IsQuery, ToIsQuery};
 pub use self::or::{OrQuery, ToOrQuery};
 pub use self::and::{AndQuery, ToAndQuery};
 pub use self::within::{
-    InQuery, ToInQuery,
+    InQuery, ToInQuery
+};
+
+pub use self::range::{
     InRangeQuery, ToInRangeQuery,
     InRangeBounds, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft
 };
@@ -20,6 +23,7 @@ pub use self::inequality::{
 mod is;
 mod or;
 mod within;
+mod range;
 mod and;
 mod inequality;
 
@@ -30,14 +34,14 @@ pub trait Query: Sync + Send + ToSql {
 }
 
 impl ToOrQuery for RcQuery {
-    fn or(&self, query: RcQuery) -> OrQuery {
-        OrQuery{ left: self.clone(), right: query }
+    fn or(&self, query: RcQuery) -> RcQuery {
+        OrQuery{ left: self.clone(), right: query }.upcast()
     }
 }
 
 impl ToAndQuery for RcQuery {
-    fn and(&self, query: RcQuery) -> AndQuery {
-        AndQuery{ left: self.clone(), right: query }
+    fn and(&self, query: RcQuery) -> RcQuery {
+        AndQuery{ left: self.clone(), right: query }.upcast()
     }
 }
 

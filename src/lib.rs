@@ -79,15 +79,15 @@ fn it_works() {
 
     let mut dset = DT::select(&[&name], NamedFrom("table".to_string()));
 
-    let query = name.is("test".to_string()).upcast().or(
-        is_admin.is(true).upcast().and(is_open.is(true).upcast()).upcast().and(
-            name.within(vec!["Marcus".to_string(), "Jane".to_string()]).upcast()
-        ).upcast()
-    ).upcast().or(counter.in_range(100, 200).upcast()).upcast().and(
-        counter.lte(100).upcast()
+    let query = name.is("test".to_string()).or(
+        is_admin.is(true).and(is_open.is(true)).and(
+            name.within(vec!["Marcus".to_string(), "Jane".to_string()])
+        )
+    ).or(counter.in_range(100, 200)).and(
+        counter.lte(100)
     );
 
-    dset = dset.where_(&query.upcast());
+    dset = dset.where_(&query);
 
     println!("{}", dset.to_sql());
     fail!("")

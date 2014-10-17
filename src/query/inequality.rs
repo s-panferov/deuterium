@@ -3,7 +3,7 @@
 use serialize::json::Json;
 use time::Timespec;
 
-use query::Query;
+use query::{Query, RcQuery};
 use field::{
     NamedField,
 
@@ -37,51 +37,57 @@ pub struct InequalityQuery<F, T> {
 }
 
 pub trait ToInequalityQuery<F, T> {
-    fn lt(&self, val: T) -> InequalityQuery<F, T>;
-    fn lte(&self, val: T) -> InequalityQuery<F, T>;
-    fn gt(&self, val: T) -> InequalityQuery<F, T>;
-    fn gte(&self, val: T) -> InequalityQuery<F, T>;
+    fn lt(&self, val: T) -> RcQuery;
+    fn lte(&self, val: T) -> RcQuery;
+    fn gt(&self, val: T) -> RcQuery;
+    fn gte(&self, val: T) -> RcQuery;
 }
 
-impl<T: Clone> ToInequalityQuery<NamedField<T>, T> for NamedField<T> {
-    fn lt(&self, val: T) -> InequalityQuery<NamedField<T>, T> {
-        InequalityQuery {
-            field: self.clone(),
-            value: val,
-            inequality: LessThan
-        }
-    }
+macro_rules! impl_for(
+    ($field:ty, $v:ty) => (
+        impl Query for InequalityQuery<$field, $v> { }
 
-    fn lte(&self, val: T) -> InequalityQuery<NamedField<T>, T> {
-        InequalityQuery {
-            field: self.clone(),
-            value: val,
-            inequality: LessThanEqual
-        }
-    }
+        impl ToInequalityQuery<$field, $v> for $field {
+            fn lt(&self, val: $v) -> RcQuery {
+                InequalityQuery {
+                    field: self.clone(),
+                    value: val,
+                    inequality: LessThan
+                }.upcast()
+            }
 
-    fn gt(&self, val: T) -> InequalityQuery<NamedField<T>, T> {
-        InequalityQuery {
-            field: self.clone(),
-            value: val,
-            inequality: GreaterThan
-        }
-    }
+            fn lte(&self, val: $v) -> RcQuery {
+                InequalityQuery {
+                    field: self.clone(),
+                    value: val,
+                    inequality: LessThanEqual
+                }.upcast()
+            }
 
-    fn gte(&self, val: T) -> InequalityQuery<NamedField<T>, T> {
-        InequalityQuery {
-            field: self.clone(),
-            value: val,
-            inequality: LessThanEqual
-        }
-    }
-}
+            fn gt(&self, val: $v) -> RcQuery {
+                InequalityQuery {
+                    field: self.clone(),
+                    value: val,
+                    inequality: GreaterThan
+                }.upcast()
+            }
 
-impl Query for InequalityQuery<BoolField, bool> { }
-impl Query for InequalityQuery<I8Field, i8> { }
-impl Query for InequalityQuery<I16Field, i16> { }
-impl Query for InequalityQuery<I32Field, i32> { }
-impl Query for InequalityQuery<I64Field, i64> { }
-impl Query for InequalityQuery<F32Field, f32> { }
-impl Query for InequalityQuery<F64Field, f64> { }
-impl Query for InequalityQuery<TimespecField, Timespec> { }
+            fn gte(&self, val: $v) -> RcQuery {
+                InequalityQuery {
+                    field: self.clone(),
+                    value: val,
+                    inequality: LessThanEqual
+                }.upcast()
+            }
+        }
+    )
+)
+
+impl_for!(BoolField, bool)
+impl_for!(I8Field, i8)
+impl_for!(I16Field, i16)
+impl_for!(I32Field, i32)
+impl_for!(I64Field, i64)
+impl_for!(F32Field, f32)
+impl_for!(F64Field, f64)
+impl_for!(TimespecField, Timespec)

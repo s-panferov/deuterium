@@ -8,7 +8,7 @@ pub struct OrQuery {
 }
 
 pub trait ToOrQuery {
-    fn or(&self, val: RcQuery) -> OrQuery;
+    fn or(&self, val: RcQuery) -> RcQuery;
 }
 
 impl Query for OrQuery { }

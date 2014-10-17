@@ -2,7 +2,7 @@
 use serialize::json::Json;
 use time::Timespec;
 
-use query::Query;
+use query::{Query, RcQuery};
 use field::{
     NamedField,
 
@@ -27,26 +27,32 @@ pub struct IsQuery<F, T> {
 }
 
 pub trait ToIsQuery<F, T> {
-    fn is(&self, val: T) -> IsQuery<F, T>;
+    fn is(&self, val: T) -> RcQuery;
 }
 
-impl<T: Clone> ToIsQuery<NamedField<T>, T> for NamedField<T> {
-    fn is(&self, val: T) -> IsQuery<NamedField<T>, T> {
-        IsQuery {
-            field: self.clone(),
-            value: val
+macro_rules! impl_for(
+    ($field:ty, $v:ty) => (
+        impl Query for IsQuery<$field, $v> { }
+
+        impl ToIsQuery<$field, $v> for $field {
+            fn is(&self, val: $v) -> RcQuery {
+                IsQuery {
+                    field: self.clone(),
+                    value: val
+                }.upcast()
+            }
         }
-    }
-}
+    )
+)
 
-impl Query for IsQuery<BoolField, bool> { }
-impl Query for IsQuery<I8Field, i8> { }
-impl Query for IsQuery<I16Field, i16> { }
-impl Query for IsQuery<I32Field, i32> { }
-impl Query for IsQuery<I64Field, i64> { }
-impl Query for IsQuery<F32Field, f32> { }
-impl Query for IsQuery<F64Field, f64> { }
-impl Query for IsQuery<StringField, String> { }
-impl Query for IsQuery<ByteListField, Vec<u8>> { }
-impl Query for IsQuery<JsonField, Json> { }
-impl Query for IsQuery<TimespecField, Timespec> { }
+impl_for!(BoolField, bool)
+impl_for!(I8Field, i8)
+impl_for!(I16Field, i16)
+impl_for!(I32Field, i32)
+impl_for!(I64Field, i64)
+impl_for!(F32Field, f32)
+impl_for!(F64Field, f64)
+impl_for!(StringField, String)
+impl_for!(ByteListField, Vec<u8>)
+impl_for!(JsonField, Json)
+impl_for!(TimespecField, Timespec)
