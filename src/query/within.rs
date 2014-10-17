@@ -48,16 +48,27 @@ impl Query for InQuery<F64Field, Vec<f64>> { }
 impl Query for InQuery<StringField, Vec<String>> { }
 impl Query for InQuery<TimespecField, Vec<Timespec>> { }
 
+#[deriving(Clone)]
+pub enum InRangeBounds {
+    ExcludeBoth,
+    IncludeBoth,
+    ExcludeRight,
+    ExcludeLeft
+}
 
 #[deriving(Send, Clone)]
 pub struct InRangeQuery<F, T> {
     pub field: F,
     pub from: T,
-    pub to: T
+    pub to: T,
+    pub bounds: InRangeBounds
 }
 
 pub trait ToInRangeQuery<F, T> {
     fn in_range(&self, from: T, to: T) -> InRangeQuery<F, T>;
+    fn in_range_exclude_left(&self, from: T, to: T) -> InRangeQuery<F, T>;
+    fn in_range_exclude_right(&self, from: T, to: T) -> InRangeQuery<F, T>;
+    fn in_range_exclude(&self, from: T, to: T) -> InRangeQuery<F, T>;
 }
 
 impl<T: Clone> ToInRangeQuery<NamedField<T>, T> for NamedField<T> {
@@ -65,7 +76,35 @@ impl<T: Clone> ToInRangeQuery<NamedField<T>, T> for NamedField<T> {
         InRangeQuery {
             field: self.clone(),
             from: from,
-            to: to
+            to: to,
+            bounds: IncludeBoth
+        }
+    }
+
+    fn in_range_exclude_left(&self, from: T, to: T) -> InRangeQuery<NamedField<T>, T> {
+        InRangeQuery {
+            field: self.clone(),
+            from: from,
+            to: to,
+            bounds: ExcludeLeft
+        }
+    }
+
+    fn in_range_exclude_right(&self, from: T, to: T) -> InRangeQuery<NamedField<T>, T> {
+        InRangeQuery {
+            field: self.clone(),
+            from: from,
+            to: to,
+            bounds: ExcludeRight
+        }
+    }
+
+    fn in_range_exclude(&self, from: T, to: T) -> InRangeQuery<NamedField<T>, T> {
+        InRangeQuery {
+            field: self.clone(),
+            from: from,
+            to: to,
+            bounds: ExcludeBoth
         }
     }
 }

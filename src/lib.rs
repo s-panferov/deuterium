@@ -31,7 +31,10 @@ pub use query::{
     OrQuery, ToOrQuery,
     AndQuery, ToAndQuery,
     InQuery, ToInQuery,
-    InRangeQuery, ToInRangeQuery
+    InRangeQuery, ToInRangeQuery, 
+    InRangeBounds, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft,
+    InequalityQuery, ToInequalityQuery, 
+    Inequality, LessThan, LessThanEqual, GreaterThan, GreaterTranEqual
 };
 pub use data_set::{SelectDataSet};
 pub use to_sql::{ToSql};
@@ -80,7 +83,9 @@ fn it_works() {
         is_admin.is(true).upcast().and(is_open.is(true).upcast()).upcast().and(
             name.within(vec!["Marcus".to_string(), "Jane".to_string()]).upcast()
         ).upcast()
-    ).upcast().or(counter.in_range(100, 200).upcast());
+    ).upcast().or(counter.in_range(100, 200).upcast()).upcast().and(
+        counter.lte(100).upcast()
+    );
 
     dset = dset.where_(&query.upcast());
 

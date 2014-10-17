@@ -9,7 +9,8 @@ use query::{
     OrQuery, 
     AndQuery,
     InQuery,
-    InRangeQuery
+    InRangeQuery, InRangeBounds, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft,
+    InequalityQuery, Inequality, LessThan, LessThanEqual, GreaterThan, GreaterTranEqual
 };
 use field::{
     Field, 
@@ -122,7 +123,28 @@ impl<T: ToQueryValue> ToSql for InQuery<NamedField<T>, Vec<T>> {
 
 impl<T: ToQueryValue> ToSql for InRangeQuery<NamedField<T>, T> {
     fn to_sql(&self) -> String {
-        format!("{} > {} AND {} < {}", self.field.name, self.from.to_query_value(), 
-                                       self.field.name, self.to.to_query_value())
+        let result = self.field.name.to_string();
+        let ref name = self.field.name;
+        let from = self.from.to_query_value(); 
+        let to = self.to.to_query_value();
+        match self.bounds {
+            IncludeBoth => format!("{} >= {} AND {} <= {}", name, from, name, to),
+            ExcludeBoth => format!("{} > {} AND {} < {}", name, from, name, to),
+            ExcludeLeft => format!("{} > {} AND {} <= {}", name, from, name, to),
+            ExcludeRight => format!("{} >= {} AND {} < {}", name, from, name, to)
+        }
+    }
+}
+
+impl<T: ToQueryValue> ToSql for InequalityQuery<NamedField<T>, T> {
+    fn to_sql(&self) -> String {
+        let ref name = self.field.name;
+        let value = self.value.to_query_value();
+        match self.inequality {
+            LessThan => format!("{} < {}", name, value),
+            LessThanEqual => format!("{} <= {}", name, value),
+            GreaterThan => format!("{} > {}", name, value),
+            GreaterTranEqual => format!("{} >= {}", name, value),
+        }
     }
 }
