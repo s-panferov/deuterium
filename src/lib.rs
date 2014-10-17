@@ -62,6 +62,9 @@ struct Null;
 struct Query;
 
 impl Query {
+
+    // FIXME: Unify select_N after [generics](https://github.com/rust-lang/rfcs/issues/376)
+
     pub fn select_1<T: Clone>(field: &Field<T>, from: From) -> SelectQuery<(T)> {
         SelectQuery::new(SelectOnly(vec![field.to_def().name()]), from)
     }
