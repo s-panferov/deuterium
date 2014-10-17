@@ -2,6 +2,7 @@
 use serialize::json::Json;
 use time::Timespec;
 
+use {Null};
 use query::{Query, RcQuery};
 use expression::{RawExpression, RawExpressionComparable};
 use field::{

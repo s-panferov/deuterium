@@ -1,12 +1,14 @@
 
 use std::sync::Arc;
 
-use to_sql::{ToSql};
+use to_sql::{ToSql, QueryToSql};
 
 pub use self::raw::{RawQuery};
 pub use self::is::{IsQuery, ToIsQuery};
+pub use self::is_null::{IsNullQuery, ToIsNullQuery};
 pub use self::or::{OrQuery, ToOrQuery};
 pub use self::and::{AndQuery, ToAndQuery};
+pub use self::exclude::{ExcludeQuery, ToExcludeQuery};
 pub use self::within::{
     InQuery, ToInQuery
 };
@@ -22,14 +24,16 @@ pub use self::inequality::{
 };
 
 mod is;
+mod is_null;
 mod or;
 mod within;
 mod range;
 mod and;
 mod inequality;
+mod exclude;
 mod raw;
 
-pub trait Query: Sync + Send + ToSql { 
+pub trait Query: Sync + Send + QueryToSql { 
     fn upcast(self) -> RcQuery {
         Arc::new(box self as BoxedQuery)
     }

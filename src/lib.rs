@@ -35,7 +35,9 @@ pub use query::{
     InRangeQuery, ToInRangeQuery, 
     InRangeBounds, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft,
     InequalityQuery, ToInequalityQuery, 
-    Inequality, LessThan, LessThanEqual, GreaterThan, GreaterTranEqual
+    Inequality, LessThan, LessThanEqual, GreaterThan, GreaterTranEqual,
+    ExcludeQuery, ToExcludeQuery,
+    IsNullQuery, ToIsNullQuery
 };
 
 pub use data_set::{SelectDataSet};
@@ -60,6 +62,8 @@ pub enum Select {
     SelectAll
 }
 
+struct Null;
+
 struct DT;
 
 impl DT {
@@ -83,13 +87,7 @@ fn it_works() {
 
     let mut dset = DT::select(&[&name], NamedFrom("table".to_string()));
 
-    let query = name.is("test".to_string()).or(
-        is_admin.is(true).and(is_open.is(true)).and(
-            name.within(vec!["Marcus".to_string(), "Jane".to_string()])
-        )
-    ).or(counter.in_range(100i32, 200i32)).and(
-        counter.lte(100i32)
-    ).or(RawExpression::new("max(name)".to_string()).lte(RawExpression::new("10".to_string())));
+    let query = name.is("Stas".to_string()).exclude().and(name.is_null());
 
     dset = dset.where_(&query);
 

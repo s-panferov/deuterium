@@ -9,7 +9,7 @@ trait Coercer: Send {
 
 }
 
-pub trait Field {
+pub trait Field: Send + Sync + Clone {
     fn to_def(&self) -> FieldDef;
 }
 
@@ -18,7 +18,7 @@ pub struct NamedField<T> {
     pub name: String
 }
 
-impl<T> Field for NamedField<T> {
+impl<T: Clone> Field for NamedField<T> {
     fn to_def(&self) -> FieldDef {
         FieldDef(self.name.to_string())
     }
