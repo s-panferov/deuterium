@@ -3,7 +3,7 @@
 use serialize::json::Json;
 use time::Timespec;
 
-use query::{Query, RcQuery};
+use predicate::{Predicate, RcPredicate};
 use expression::{RawExpression, RawExpressionComparable};
 use field::{
     NamedField,
@@ -20,7 +20,7 @@ use field::{
     JsonField, JsonComparable,
     TimespecField, TimespecComparable
 };
-use to_sql::{ToQueryValue};
+use to_sql::{ToPredicateValue};
 
 #[deriving(Clone)]
 pub enum Inequality {
@@ -31,47 +31,47 @@ pub enum Inequality {
 }
 
 #[deriving(Send, Clone)]
-pub struct InequalityQuery<F, T> {
+pub struct InequalityPredicate<F, T> {
     pub field: F,
     pub value: T,
     pub inequality: Inequality
 }
 
-pub trait ToInequalityQuery<F, T> {
-    fn lt(&self, val: T) -> RcQuery;
-    fn lte(&self, val: T) -> RcQuery;
-    fn gt(&self, val: T) -> RcQuery;
-    fn gte(&self, val: T) -> RcQuery;
+pub trait ToInequalityPredicate<F, T> {
+    fn lt(&self, val: T) -> RcPredicate;
+    fn lte(&self, val: T) -> RcPredicate;
+    fn gt(&self, val: T) -> RcPredicate;
+    fn gte(&self, val: T) -> RcPredicate;
 }
 
 macro_rules! inequality_methods(
     ($v:ty) => (
-        fn lt(&self, val: $v) -> RcQuery {
-            InequalityQuery {
+        fn lt(&self, val: $v) -> RcPredicate {
+            InequalityPredicate {
                 field: self.clone(),
                 value: val,
                 inequality: LessThan
             }.upcast()
         }
 
-        fn lte(&self, val: $v) -> RcQuery {
-            InequalityQuery {
+        fn lte(&self, val: $v) -> RcPredicate {
+            InequalityPredicate {
                 field: self.clone(),
                 value: val,
                 inequality: LessThanEqual
             }.upcast()
         }
 
-        fn gt(&self, val: $v) -> RcQuery {
-            InequalityQuery {
+        fn gt(&self, val: $v) -> RcPredicate {
+            InequalityPredicate {
                 field: self.clone(),
                 value: val,
                 inequality: GreaterThan
             }.upcast()
         }
 
-        fn gte(&self, val: $v) -> RcQuery {
-            InequalityQuery {
+        fn gte(&self, val: $v) -> RcPredicate {
+            InequalityPredicate {
                 field: self.clone(),
                 value: val,
                 inequality: LessThanEqual
@@ -82,9 +82,9 @@ macro_rules! inequality_methods(
 
 macro_rules! impl_for(
     ($field:ty, $v:ident) => (
-        impl<T: $v> Query for InequalityQuery<$field, T> { }
+        impl<T: $v> Predicate for InequalityPredicate<$field, T> { }
 
-        impl<T: $v> ToInequalityQuery<$field, T> for $field {
+        impl<T: $v> ToInequalityPredicate<$field, T> for $field {
             inequality_methods!(T)    
         }
     )

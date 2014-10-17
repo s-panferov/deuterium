@@ -2,7 +2,7 @@ use std::sync::Arc;
 use serialize::json::Json;
 use time::Timespec;
 
-use to_sql::{ToQueryValue};
+use to_sql::{ToPredicateValue};
 use expression::{RawExpression};
 
 trait Coercer: Send {
@@ -45,17 +45,17 @@ pub type ByteListField = NamedField<Vec<u8>>;
 pub type JsonField = NamedField<Json>;
 pub type TimespecField = NamedField<Timespec>;
 
-pub trait BoolComparable: Send + Clone + Sync + ToQueryValue { }
-pub trait I8Comparable: Send + Clone + Sync + ToQueryValue { }
-pub trait I16Comparable: Send + Clone + Sync + ToQueryValue { }
-pub trait I32Comparable: Send + Clone + Sync + ToQueryValue { }
-pub trait I64Comparable: Send + Clone + Sync + ToQueryValue { }
-pub trait F32Comparable: Send + Clone + Sync + ToQueryValue { }
-pub trait F64Comparable: Send + Clone + Sync + ToQueryValue { }
-pub trait StringComparable: Send + Clone + Sync + ToQueryValue { }
-pub trait ByteListComparable: Send + Clone + Sync + ToQueryValue { }
-pub trait JsonComparable: Send + Clone + Sync + ToQueryValue { }
-pub trait TimespecComparable: Send + Clone + Sync + ToQueryValue { }
+pub trait BoolComparable: Send + Clone + Sync + ToPredicateValue { }
+pub trait I8Comparable: Send + Clone + Sync + ToPredicateValue { }
+pub trait I16Comparable: Send + Clone + Sync + ToPredicateValue { }
+pub trait I32Comparable: Send + Clone + Sync + ToPredicateValue { }
+pub trait I64Comparable: Send + Clone + Sync + ToPredicateValue { }
+pub trait F32Comparable: Send + Clone + Sync + ToPredicateValue { }
+pub trait F64Comparable: Send + Clone + Sync + ToPredicateValue { }
+pub trait StringComparable: Send + Clone + Sync + ToPredicateValue { }
+pub trait ByteListComparable: Send + Clone + Sync + ToPredicateValue { }
+pub trait JsonComparable: Send + Clone + Sync + ToPredicateValue { }
+pub trait TimespecComparable: Send + Clone + Sync + ToPredicateValue { }
 
 impl BoolComparable for bool {}
 impl BoolComparable for BoolField {} 

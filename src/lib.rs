@@ -25,19 +25,19 @@ pub use field::{
     TimespecField,
 };
 
-pub use query::{
-    Query, 
-    RcQuery, 
-    IsQuery, ToIsQuery, 
-    OrQuery, ToOrQuery,
-    AndQuery, ToAndQuery,
-    InQuery, ToInQuery,
-    InRangeQuery, ToInRangeQuery, 
+pub use predicate::{
+    Predicate, 
+    RcPredicate, 
+    IsPredicate, ToIsPredicate, 
+    OrPredicate, ToOrPredicate,
+    AndPredicate, ToAndPredicate,
+    InPredicate, ToInPredicate,
+    InRangePredicate, ToInRangePredicate, 
     InRangeBounds, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft,
-    InequalityQuery, ToInequalityQuery, 
+    InequalityPredicate, ToInequalityPredicate, 
     Inequality, LessThan, LessThanEqual, GreaterThan, GreaterTranEqual,
-    ExcludeQuery, ToExcludeQuery,
-    IsNullQuery, ToIsNullQuery
+    ExcludePredicate, ToExcludePredicate,
+    IsNullPredicate, ToIsNullPredicate
 };
 
 pub use data_set::{SelectDataSet};
@@ -45,7 +45,7 @@ pub use expression::{RawExpression};
 pub use to_sql::{ToSql};
 
 mod field;
-mod query;
+mod predicate;
 mod data_set;
 mod to_sql;
 mod expression;
@@ -87,9 +87,9 @@ fn it_works() {
 
     let mut dset = DT::select(&[&name], NamedFrom("table".to_string()));
 
-    let query = name.is("Stas".to_string()).exclude().and(name.is_null());
+    let predicate = name.is("Stas".to_string()).exclude().and(name.is_null());
 
-    dset = dset.where_(&query);
+    dset = dset.where_(&predicate);
 
     println!("{}", dset.to_sql());
     fail!("")

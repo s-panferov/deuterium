@@ -2,7 +2,7 @@
 use serialize::json::Json;
 use time::Timespec;
 
-use to_sql::{ToQueryValue};
+use to_sql::{ToPredicateValue};
 use field::{
     BoolField,
     I8Field,
@@ -30,7 +30,7 @@ impl RawExpression {
     }
 }
 
-pub trait RawExpressionComparable: Send + Clone + Sync + ToQueryValue { }
+pub trait RawExpressionComparable: Send + Clone + Sync + ToPredicateValue { }
 
 impl RawExpressionComparable for bool {}
 impl RawExpressionComparable for i8 {}

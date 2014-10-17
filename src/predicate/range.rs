@@ -2,7 +2,7 @@
 use serialize::json::Json;
 use time::Timespec;
 
-use query::{Query, RcQuery};
+use predicate::{Predicate, RcPredicate};
 use expression::{RawExpression, RawExpressionComparable};
 
 use field::{
@@ -30,24 +30,24 @@ pub enum InRangeBounds {
 }
 
 #[deriving(Send, Clone)]
-pub struct InRangeQuery<F, T> {
+pub struct InRangePredicate<F, T> {
     pub field: F,
     pub from: T,
     pub to: T,
     pub bounds: InRangeBounds
 }
 
-pub trait ToInRangeQuery<F, T> {
-    fn in_range(&self, from: T, to: T) -> RcQuery;
-    fn in_range_exclude_left(&self, from: T, to: T) -> RcQuery;
-    fn in_range_exclude_right(&self, from: T, to: T) -> RcQuery;
-    fn in_range_exclude(&self, from: T, to: T) -> RcQuery;
+pub trait ToInRangePredicate<F, T> {
+    fn in_range(&self, from: T, to: T) -> RcPredicate;
+    fn in_range_exclude_left(&self, from: T, to: T) -> RcPredicate;
+    fn in_range_exclude_right(&self, from: T, to: T) -> RcPredicate;
+    fn in_range_exclude(&self, from: T, to: T) -> RcPredicate;
 }
 
 macro_rules! in_range_methods(
     ($v:ty) => (
-        fn in_range(&self, from: $v, to: $v) -> RcQuery {
-            InRangeQuery {
+        fn in_range(&self, from: $v, to: $v) -> RcPredicate {
+            InRangePredicate {
                 field: self.clone(),
                 from: from,
                 to: to,
@@ -55,8 +55,8 @@ macro_rules! in_range_methods(
             }.upcast()
         }
 
-        fn in_range_exclude_left(&self, from: $v, to: $v) -> RcQuery {
-            InRangeQuery {
+        fn in_range_exclude_left(&self, from: $v, to: $v) -> RcPredicate {
+            InRangePredicate {
                 field: self.clone(),
                 from: from,
                 to: to,
@@ -64,8 +64,8 @@ macro_rules! in_range_methods(
             }.upcast()
         }
 
-        fn in_range_exclude_right(&self, from: $v, to: $v) -> RcQuery {
-            InRangeQuery {
+        fn in_range_exclude_right(&self, from: $v, to: $v) -> RcPredicate {
+            InRangePredicate {
                 field: self.clone(),
                 from: from,
                 to: to,
@@ -73,8 +73,8 @@ macro_rules! in_range_methods(
             }.upcast()
         }
 
-        fn in_range_exclude(&self, from: $v, to: $v) -> RcQuery {
-            InRangeQuery {
+        fn in_range_exclude(&self, from: $v, to: $v) -> RcPredicate {
+            InRangePredicate {
                 field: self.clone(),
                 from: from,
                 to: to,
@@ -86,9 +86,9 @@ macro_rules! in_range_methods(
 
 macro_rules! impl_for(
     ($field:ty, $v:ident) => (
-        impl<T: $v> Query for InRangeQuery<$field, T> { }
+        impl<T: $v> Predicate for InRangePredicate<$field, T> { }
 
-        impl<T: $v> ToInRangeQuery<$field, T> for $field {
+        impl<T: $v> ToInRangePredicate<$field, T> for $field {
             in_range_methods!(T)    
         }
     )

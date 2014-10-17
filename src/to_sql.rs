@@ -3,17 +3,17 @@ use time::Timespec;
 
 use data_set::SelectDataSet;
 use {Select, SelectOnly, SelectAll, From, NamedFrom, DataSetFrom};
-use query::{
-    RcQuery, 
-    RawQuery,
-    IsQuery, 
-    OrQuery, 
-    AndQuery,
-    InQuery,
-    InRangeQuery, InRangeBounds, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft,
-    InequalityQuery, Inequality, LessThan, LessThanEqual, GreaterThan, GreaterTranEqual,
-    ExcludeQuery,
-    IsNullQuery
+use predicate::{
+    RcPredicate, 
+    RawPredicate,
+    IsPredicate, 
+    OrPredicate, 
+    AndPredicate,
+    InPredicate,
+    InRangePredicate, InRangeBounds, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft,
+    InequalityPredicate, Inequality, LessThan, LessThanEqual, GreaterThan, GreaterTranEqual,
+    ExcludePredicate,
+    IsNullPredicate
 };
 use field::{
     Field, 
@@ -39,7 +39,7 @@ pub trait ToSql {
     fn to_sql(&self) -> String;
 }
 
-pub trait QueryToSql {
+pub trait PredicateToSql {
     fn to_sql(&self, bool) -> String;
 }
 
@@ -81,66 +81,66 @@ impl ToSql for Select {
     }
 }
 
-pub trait ToQueryValue {
-    fn to_query_value(&self) -> String;
+pub trait ToPredicateValue {
+    fn to_predicate_value(&self) -> String;
 }
 
-macro_rules! to_query_for_field(
+macro_rules! to_predicate_for_field(
     ($f:ty) => (
-        impl ToQueryValue for $f  {
-            fn to_query_value(&self) -> String { self.name.to_string() }
+        impl ToPredicateValue for $f  {
+            fn to_predicate_value(&self) -> String { self.name.to_string() }
         }
     )
 )
 
-to_query_for_field!(BoolField)
-to_query_for_field!(I8Field)
-to_query_for_field!(I16Field)
-to_query_for_field!(I32Field)
-to_query_for_field!(I64Field)
-to_query_for_field!(F32Field)
-to_query_for_field!(F64Field)
-to_query_for_field!(StringField)
-to_query_for_field!(ByteListField)
-to_query_for_field!(JsonField)
-to_query_for_field!(TimespecField)
+to_predicate_for_field!(BoolField)
+to_predicate_for_field!(I8Field)
+to_predicate_for_field!(I16Field)
+to_predicate_for_field!(I32Field)
+to_predicate_for_field!(I64Field)
+to_predicate_for_field!(F32Field)
+to_predicate_for_field!(F64Field)
+to_predicate_for_field!(StringField)
+to_predicate_for_field!(ByteListField)
+to_predicate_for_field!(JsonField)
+to_predicate_for_field!(TimespecField)
 
-impl ToQueryValue for bool { fn to_query_value(&self) -> String { self.to_string() } }
-impl ToQueryValue for i8 { fn to_query_value(&self) -> String { self.to_string() } }
-impl ToQueryValue for i16 { fn to_query_value(&self) -> String { self.to_string() } }
-impl ToQueryValue for i32 { fn to_query_value(&self) -> String { self.to_string() } }
-impl ToQueryValue for i64 { fn to_query_value(&self) -> String { self.to_string() } }
-impl ToQueryValue for f32 { fn to_query_value(&self) -> String { self.to_string() } }
-impl ToQueryValue for f64 { fn to_query_value(&self) -> String { self.to_string() } }
-impl ToQueryValue for String { 
-    fn to_query_value(&self) -> String { format!("'{}'", self.to_string()) } 
+impl ToPredicateValue for bool { fn to_predicate_value(&self) -> String { self.to_string() } }
+impl ToPredicateValue for i8 { fn to_predicate_value(&self) -> String { self.to_string() } }
+impl ToPredicateValue for i16 { fn to_predicate_value(&self) -> String { self.to_string() } }
+impl ToPredicateValue for i32 { fn to_predicate_value(&self) -> String { self.to_string() } }
+impl ToPredicateValue for i64 { fn to_predicate_value(&self) -> String { self.to_string() } }
+impl ToPredicateValue for f32 { fn to_predicate_value(&self) -> String { self.to_string() } }
+impl ToPredicateValue for f64 { fn to_predicate_value(&self) -> String { self.to_string() } }
+impl ToPredicateValue for String { 
+    fn to_predicate_value(&self) -> String { format!("'{}'", self.to_string()) } 
 }
-impl ToQueryValue for Vec<u8> { fn to_query_value(&self) -> String { self.to_string() } }
-impl ToQueryValue for Json { fn to_query_value(&self) -> String { self.to_string() } }
-impl ToQueryValue for Timespec { fn to_query_value(&self) -> String { self.to_string() } }
-impl ToQueryValue for RawExpression { fn to_query_value(&self) -> String { self.content.to_string() } }
+impl ToPredicateValue for Vec<u8> { fn to_predicate_value(&self) -> String { self.to_string() } }
+impl ToPredicateValue for Json { fn to_predicate_value(&self) -> String { self.to_string() } }
+impl ToPredicateValue for Timespec { fn to_predicate_value(&self) -> String { self.to_string() } }
+impl ToPredicateValue for RawExpression { fn to_predicate_value(&self) -> String { self.content.to_string() } }
 
-impl<F: ToQueryValue, T: ToQueryValue> QueryToSql for IsQuery<F, T> {
+impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for IsPredicate<F, T> {
     fn to_sql(&self, negation: bool) -> String {
         let op = if negation { "!=" } else { "=" };
-        format!("{} {} {}", self.field.to_query_value(), op, self.value.to_query_value())
+        format!("{} {} {}", self.field.to_predicate_value(), op, self.value.to_predicate_value())
     }
 }
 
-impl<F: ToQueryValue> QueryToSql for IsNullQuery<F> {
+impl<F: ToPredicateValue> PredicateToSql for IsNullPredicate<F> {
     fn to_sql(&self, negation: bool) -> String {
         let op = if !negation && self.null { "IS NULL" } else { "IS NOT NULL" };
-        format!("{} {}", self.field.to_query_value(), op)
+        format!("{} {}", self.field.to_predicate_value(), op)
     }
 }
 
-impl QueryToSql for RcQuery {
+impl PredicateToSql for RcPredicate {
     fn to_sql(&self, negation: bool) -> String {
         (**self).to_sql(negation)
     }
 }
 
-impl QueryToSql for OrQuery {
+impl PredicateToSql for OrPredicate {
     fn to_sql(&self, negation: bool) -> String {
         let left = self.left.to_sql(negation);
         let right = self.right.to_sql(negation);
@@ -152,20 +152,20 @@ impl QueryToSql for OrQuery {
     }
 }
 
-impl QueryToSql for RawQuery {
+impl PredicateToSql for RawPredicate {
     fn to_sql(&self, negation: bool) -> String {
         let maybe_not = if negation { "NOT " } else { "" };
         format!("{}{}", maybe_not, self.content.to_string())
     }
 }
 
-impl QueryToSql for ExcludeQuery {
+impl PredicateToSql for ExcludePredicate {
     fn to_sql(&self, negation: bool) -> String {
-        self.query.to_sql(!negation)
+        self.predicate.to_sql(!negation)
     }
 }
 
-impl QueryToSql for AndQuery {
+impl PredicateToSql for AndPredicate {
     fn to_sql(&self, negation: bool) -> String {
         let left = self.left.to_sql(negation);
         let right = self.right.to_sql(negation);
@@ -177,19 +177,19 @@ impl QueryToSql for AndQuery {
     }
 }
 
-impl<F: ToQueryValue, T: ToQueryValue> QueryToSql for InQuery<F, Vec<T>> {
+impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InPredicate<F, Vec<T>> {
     fn to_sql(&self, negation: bool) -> String {
         let maybe_not = if negation { "NOT " } else { "" };
-        let query_values: Vec<String> = self.values.iter().map(|v| v.to_query_value()).collect();
-        format!("{} {}IN ({})", self.field.to_query_value(), maybe_not, query_values.connect(", "))
+        let predicate_values: Vec<String> = self.values.iter().map(|v| v.to_predicate_value()).collect();
+        format!("{} {}IN ({})", self.field.to_predicate_value(), maybe_not, predicate_values.connect(", "))
     }
 }
 
-impl<F: ToQueryValue, T: ToQueryValue> QueryToSql for InRangeQuery<F, T> {
+impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InRangePredicate<F, T> {
     fn to_sql(&self, negation: bool) -> String {
-        let ref name = self.field.to_query_value();
-        let from = self.from.to_query_value(); 
-        let to = self.to.to_query_value();
+        let ref name = self.field.to_predicate_value();
+        let from = self.from.to_predicate_value(); 
+        let to = self.to.to_predicate_value();
         match self.bounds {
             IncludeBoth => {
                 if !negation {
@@ -223,10 +223,10 @@ impl<F: ToQueryValue, T: ToQueryValue> QueryToSql for InRangeQuery<F, T> {
     }
 }
 
-impl<F: ToQueryValue, T: ToQueryValue> QueryToSql for InequalityQuery<F, T> {
+impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InequalityPredicate<F, T> {
     fn to_sql(&self, negation: bool) -> String {
-        let ref name = self.field.to_query_value();
-        let value = self.value.to_query_value();
+        let ref name = self.field.to_predicate_value();
+        let value = self.value.to_predicate_value();
         match self.inequality {
             LessThan => {
                 if !negation {

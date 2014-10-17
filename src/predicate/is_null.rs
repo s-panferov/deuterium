@@ -3,7 +3,7 @@ use serialize::json::Json;
 use time::Timespec;
 
 use {Null};
-use query::{Query, RcQuery};
+use predicate::{Predicate, RcPredicate};
 use expression::{RawExpression, RawExpressionComparable};
 use field::{
     Field, NamedField,
@@ -24,30 +24,30 @@ use field::{
 use to_sql::ToSql;
 
 #[deriving(Send, Clone)]
-pub struct IsNullQuery<F> {
+pub struct IsNullPredicate<F> {
     pub field: F,
     pub null: bool
 }
 
-pub trait ToIsNullQuery {
-    fn is_null(&self) -> RcQuery;
-    fn not_null(&self) -> RcQuery;
+pub trait ToIsNullPredicate {
+    fn is_null(&self) -> RcPredicate;
+    fn not_null(&self) -> RcPredicate;
 }
 
 macro_rules! impl_for(
     ($f:ty) => (
 
-        impl Query for IsNullQuery<$f> { }
-        impl ToIsNullQuery for $f {
-            fn is_null(&self) -> RcQuery {
-                IsNullQuery {
+        impl Predicate for IsNullPredicate<$f> { }
+        impl ToIsNullPredicate for $f {
+            fn is_null(&self) -> RcPredicate {
+                IsNullPredicate {
                     field: self.clone(),
                     null: true
                 }.upcast()
             }
 
-            fn not_null(&self) -> RcQuery {
-                IsNullQuery {
+            fn not_null(&self) -> RcPredicate {
+                IsNullPredicate {
                     field: self.clone(),
                     null: false
                 }.upcast()

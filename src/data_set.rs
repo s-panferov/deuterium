@@ -1,13 +1,13 @@
 
 use {Select, From, SelectAll, SelectOnly};
 use field::{Field};
-use query::{RcQuery};
+use predicate::{RcPredicate};
 
 #[deriving(Clone)]
 pub struct SelectDataSet {
     pub select: Select,
     pub from: From,
-    pub where_: Option<RcQuery>
+    pub where_: Option<RcPredicate>
 }
 
 impl SelectDataSet {
@@ -20,9 +20,9 @@ impl SelectDataSet {
         }
     }
 
-    pub fn where_(&self, query: &RcQuery) -> SelectDataSet {
+    pub fn where_(&self, predicate: &RcPredicate) -> SelectDataSet {
         let mut dset = self.clone();
-        dset.where_ = Some(query.clone());
+        dset.where_ = Some(predicate.clone());
         dset
     }
 
