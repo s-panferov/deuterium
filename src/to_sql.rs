@@ -1,8 +1,8 @@
 use serialize::json::Json;
 use time::Timespec;
 
-use data_set::SelectDataSet;
-use {Select, SelectOnly, SelectAll, From, NamedFrom, DataSetFrom};
+use select_query::{SelectQuery, ToSelectQuery, RcSelectQuery};
+use {Select, SelectOnly, SelectAll, From, NamedFrom, QueryFrom};
 use predicate::{
     RcPredicate, 
     RawPredicate,
@@ -43,7 +43,7 @@ pub trait PredicateToSql {
     fn to_sql(&self, bool) -> String;
 }
 
-impl ToSql for SelectDataSet {
+impl<T> ToSql for SelectQuery<T> {
     fn to_sql(&self) -> String {
         let mut sql = format!("SELECT {} FROM {}", 
             self.select.to_sql(), 
@@ -58,13 +58,20 @@ impl ToSql for SelectDataSet {
     }
 }
 
+impl ToSql for RcSelectQuery {
+    fn to_sql(&self) -> String {
+        (**self).to_sql()
+    }
+}
+
+
 impl ToSql for From {
     fn to_sql(&self) -> String {
         match self {
             &NamedFrom(ref from) => {
                 from.to_string()
             },
-            &DataSetFrom(ref dset) => format!("( {} )", dset.to_sql())
+            &QueryFrom(ref query) => format!("( {} )", query.to_sql())
         }
     }
 }
@@ -73,8 +80,7 @@ impl ToSql for Select {
     fn to_sql(&self) -> String {
         match self {
             &SelectOnly(ref fields) => {
-                let names: Vec<String> = fields.iter().map(|f| f.name().to_string()).collect();
-                names.connect(", ")
+                fields.connect(", ")
             },
             &SelectAll => "*".to_string()
         }

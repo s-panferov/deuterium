@@ -9,8 +9,12 @@ trait Coercer: Send {
 
 }
 
-pub trait Field: Send + Sync + Clone {
-    fn to_def(&self) -> FieldDef;
+pub trait Field<T>: Send + Sync + Clone {
+    fn to_def(&self) -> FieldDef<T>;
+}
+
+pub trait UntypedField: Send + Sync + Clone {
+    fn to_def(&self) -> FieldDef<()>;
 }
 
 #[deriving(Clone)]
@@ -18,18 +22,24 @@ pub struct NamedField<T> {
     pub name: String
 }
 
-impl<T: Clone> Field for NamedField<T> {
-    fn to_def(&self) -> FieldDef {
+impl<T: Clone> Field<T> for NamedField<T> {
+    fn to_def(&self) -> FieldDef<T> {
+        FieldDef(self.name.to_string())
+    }
+}
+
+impl<T: Clone> UntypedField for NamedField<T> {
+    fn to_def(&self) -> FieldDef<()> {
         FieldDef(self.name.to_string())
     }
 }
 
 #[deriving(Clone)]
-pub struct FieldDef(String);
+pub struct FieldDef<T>(String);
 
-impl FieldDef {
-    pub fn name(&self) -> &str {
-        self.0.as_slice()
+impl<T: Clone> FieldDef<T> {
+    pub fn name(&self) -> String {
+        self.0.to_string()
     }
 }
 

@@ -9,7 +9,8 @@ use std::rc::Rc;
 
 pub use field::{
     FieldDef, 
-    NamedField, 
+    NamedField,
+    UntypedField, 
     Field,
 
     BoolField,
@@ -40,40 +41,41 @@ pub use predicate::{
     IsNullPredicate, ToIsNullPredicate
 };
 
-pub use data_set::{SelectDataSet};
+pub use select_query::{SelectQuery, RcSelectQuery, ToSelectQuery, Select, SelectAll, SelectOnly};
 pub use expression::{RawExpression};
 pub use to_sql::{ToSql};
 
 mod field;
 mod predicate;
-mod data_set;
+mod select_query;
 mod to_sql;
 mod expression;
 
 #[deriving(Clone)]
 pub enum From {
-    DataSetFrom(Box<SelectDataSet>),
+    QueryFrom(RcSelectQuery),
     NamedFrom(String)
-}
-
-#[deriving(Clone)]
-pub enum Select {
-    SelectOnly(Vec<FieldDef>),
-    SelectAll
 }
 
 struct Null;
 
-struct DT;
+struct Query;
 
-impl DT {
-    pub fn select(fields: &[&Field], from: From) -> SelectDataSet {
-        let select = SelectOnly(fields.iter().map(|field| field.to_def()).collect());
-        SelectDataSet::new(select, from)
+impl Query {
+    pub fn select_1<T: Clone>(field: &Field<T>, from: From) -> SelectQuery<(T)> {
+        SelectQuery::new(SelectOnly(vec![field.to_def().name()]), from)
     }
 
-    pub fn select_all(from: From) -> SelectDataSet {
-        SelectDataSet::new(SelectAll, from)
+    pub fn select_2<T1: Clone, T2: Clone>(field1: &Field<T1>, field2: &Field<T2>, from: From) -> SelectQuery<(T1, T2)> {
+        SelectQuery::new(SelectOnly(vec![field1.to_def().name(), field2.to_def().name()]), from)
+    }
+
+    pub fn select(fields: &[&UntypedField], from: From) -> SelectQuery<()> {
+        SelectQuery::new(SelectOnly(fields.iter().map(|f| f.to_def().name()).collect()), from)
+    }
+
+    pub fn select_all<T: Clone>(from: From) -> SelectQuery<T> {
+        SelectQuery::new(SelectAll, from)
     }
 }
 
@@ -85,13 +87,11 @@ fn it_works() {
     let is_open = BoolField { name: "is_open".to_string() };
     let counter = I32Field { name: "counter".to_string() };
 
-    let mut dset = DT::select(&[&name], NamedFrom("table".to_string()));
-
+    let mut query = Query::select_1(&name, NamedFrom("table".to_string()));
     let predicate = name.is("Stas".to_string()).exclude().and(name.is_null());
+    query = query.where_(&predicate);
 
-    dset = dset.where_(&predicate);
-
-    println!("{}", dset.to_sql());
+    println!("{}", query.upcast().to_sql());
     fail!("")
 
 }
