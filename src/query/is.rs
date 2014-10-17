@@ -3,6 +3,7 @@ use serialize::json::Json;
 use time::Timespec;
 
 use query::{Query, RcQuery};
+use expression::{RawExpression};
 use field::{
     NamedField,
 
@@ -30,17 +31,23 @@ pub trait ToIsQuery<F, T> {
     fn is(&self, val: T) -> RcQuery;
 }
 
+macro_rules! is_methods(
+    ($v:ty) => (
+        fn is(&self, val: $v) -> RcQuery {
+            IsQuery {
+                field: self.clone(),
+                value: val
+            }.upcast()
+        }
+    )
+)
+
 macro_rules! impl_for(
     ($field:ty, $v:ty) => (
         impl Query for IsQuery<$field, $v> { }
 
         impl ToIsQuery<$field, $v> for $field {
-            fn is(&self, val: $v) -> RcQuery {
-                IsQuery {
-                    field: self.clone(),
-                    value: val
-                }.upcast()
-            }
+            is_methods!($v)   
         }
     )
 )
@@ -56,3 +63,8 @@ impl_for!(StringField, String)
 impl_for!(ByteListField, Vec<u8>)
 impl_for!(JsonField, Json)
 impl_for!(TimespecField, Timespec)
+
+impl Query for IsQuery<RawExpression, RawExpression> { }
+impl ToIsQuery<RawExpression, RawExpression> for RawExpression {
+    is_methods!(RawExpression)
+}

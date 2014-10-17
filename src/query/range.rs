@@ -3,6 +3,7 @@ use serialize::json::Json;
 use time::Timespec;
 
 use query::{Query, RcQuery};
+use expression::{RawExpression};
 
 use field::{
     NamedField,
@@ -43,49 +44,53 @@ pub trait ToInRangeQuery<F, T> {
     fn in_range_exclude(&self, from: T, to: T) -> RcQuery;
 }
 
+macro_rules! in_range_methods(
+    ($v:ty) => (
+        fn in_range(&self, from: $v, to: $v) -> RcQuery {
+            InRangeQuery {
+                field: self.clone(),
+                from: from,
+                to: to,
+                bounds: IncludeBoth
+            }.upcast()
+        }
+
+        fn in_range_exclude_left(&self, from: $v, to: $v) -> RcQuery {
+            InRangeQuery {
+                field: self.clone(),
+                from: from,
+                to: to,
+                bounds: ExcludeLeft
+            }.upcast()
+        }
+
+        fn in_range_exclude_right(&self, from: $v, to: $v) -> RcQuery {
+            InRangeQuery {
+                field: self.clone(),
+                from: from,
+                to: to,
+                bounds: ExcludeRight
+            }.upcast()
+        }
+
+        fn in_range_exclude(&self, from: $v, to: $v) -> RcQuery {
+            InRangeQuery {
+                field: self.clone(),
+                from: from,
+                to: to,
+                bounds: ExcludeBoth
+            }.upcast()
+        }
+    )
+)
+
 macro_rules! impl_for(
     ($field:ty, $v:ty) => (
-
         impl Query for InRangeQuery<$field, $v> { }
 
         impl ToInRangeQuery<$field, $v> for $field {
-            fn in_range(&self, from: $v, to: $v) -> RcQuery {
-                InRangeQuery {
-                    field: self.clone(),
-                    from: from,
-                    to: to,
-                    bounds: IncludeBoth
-                }.upcast()
-            }
-
-            fn in_range_exclude_left(&self, from: $v, to: $v) -> RcQuery {
-                InRangeQuery {
-                    field: self.clone(),
-                    from: from,
-                    to: to,
-                    bounds: ExcludeLeft
-                }.upcast()
-            }
-
-            fn in_range_exclude_right(&self, from: $v, to: $v) -> RcQuery {
-                InRangeQuery {
-                    field: self.clone(),
-                    from: from,
-                    to: to,
-                    bounds: ExcludeRight
-                }.upcast()
-            }
-
-            fn in_range_exclude(&self, from: $v, to: $v) -> RcQuery {
-                InRangeQuery {
-                    field: self.clone(),
-                    from: from,
-                    to: to,
-                    bounds: ExcludeBoth
-                }.upcast()
-            }
+            in_range_methods!($v)    
         }
-
     )
 )
 
@@ -96,3 +101,8 @@ impl_for!(I64Field, i64)
 impl_for!(F32Field, f32)
 impl_for!(F64Field, f64)
 impl_for!(TimespecField, Timespec)
+
+impl Query for InRangeQuery<RawExpression, RawExpression> { }
+impl ToInRangeQuery<RawExpression, RawExpression> for RawExpression {
+    in_range_methods!(RawExpression)   
+}

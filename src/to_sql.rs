@@ -30,6 +30,8 @@ use field::{
     TimespecField,
 };
 
+use expression::{RawExpression};
+
 pub trait ToSql {
     fn to_sql(&self) -> String;
 }
@@ -72,9 +74,29 @@ impl ToSql for Select {
     }
 }
 
-trait ToQueryValue {
+pub trait ToQueryValue {
     fn to_query_value(&self) -> String;
 }
+
+macro_rules! to_query_for_field(
+    ($f:ty) => (
+        impl ToQueryValue for $f  {
+            fn to_query_value(&self) -> String { self.name.to_string() }
+        }
+    )
+)
+
+to_query_for_field!(BoolField)
+to_query_for_field!(I8Field)
+to_query_for_field!(I16Field)
+to_query_for_field!(I32Field)
+to_query_for_field!(I64Field)
+to_query_for_field!(F32Field)
+to_query_for_field!(F64Field)
+to_query_for_field!(StringField)
+to_query_for_field!(ByteListField)
+to_query_for_field!(JsonField)
+to_query_for_field!(TimespecField)
 
 impl ToQueryValue for bool { fn to_query_value(&self) -> String { self.to_string() } }
 impl ToQueryValue for i8 { fn to_query_value(&self) -> String { self.to_string() } }
@@ -89,10 +111,11 @@ impl ToQueryValue for String {
 impl ToQueryValue for Vec<u8> { fn to_query_value(&self) -> String { self.to_string() } }
 impl ToQueryValue for Json { fn to_query_value(&self) -> String { self.to_string() } }
 impl ToQueryValue for Timespec { fn to_query_value(&self) -> String { self.to_string() } }
+impl ToQueryValue for RawExpression { fn to_query_value(&self) -> String { self.content.to_string() } }
 
-impl<T: ToQueryValue> ToSql for IsQuery<NamedField<T>, T> {
+impl<F: ToQueryValue, T: ToQueryValue> ToSql for IsQuery<F, T> {
     fn to_sql(&self) -> String {
-        format!("{} = {}", self.field.name, self.value.to_query_value())
+        format!("{} = {}", self.field.to_query_value(), self.value.to_query_value())
     }
 }
 
@@ -114,17 +137,16 @@ impl ToSql for AndQuery {
     }
 }
 
-impl<T: ToQueryValue> ToSql for InQuery<NamedField<T>, Vec<T>> {
+impl<F: ToQueryValue, T: ToQueryValue> ToSql for InQuery<F, Vec<T>> {
     fn to_sql(&self) -> String {
         let query_values: Vec<String> = self.values.iter().map(|v| v.to_query_value()).collect();
-        format!("{} IN ({})", self.field.name, query_values.connect(", "))
+        format!("{} IN ({})", self.field.to_query_value(), query_values.connect(", "))
     }
 }
 
-impl<T: ToQueryValue> ToSql for InRangeQuery<NamedField<T>, T> {
+impl<F: ToQueryValue, T: ToQueryValue> ToSql for InRangeQuery<F, T> {
     fn to_sql(&self) -> String {
-        let result = self.field.name.to_string();
-        let ref name = self.field.name;
+        let ref name = self.field.to_query_value();
         let from = self.from.to_query_value(); 
         let to = self.to.to_query_value();
         match self.bounds {
@@ -136,9 +158,9 @@ impl<T: ToQueryValue> ToSql for InRangeQuery<NamedField<T>, T> {
     }
 }
 
-impl<T: ToQueryValue> ToSql for InequalityQuery<NamedField<T>, T> {
+impl<F: ToQueryValue, T: ToQueryValue> ToSql for InequalityQuery<F, T> {
     fn to_sql(&self) -> String {
-        let ref name = self.field.name;
+        let ref name = self.field.to_query_value();
         let value = self.value.to_query_value();
         match self.inequality {
             LessThan => format!("{} < {}", name, value),

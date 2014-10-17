@@ -24,6 +24,7 @@ pub use field::{
     JsonField,
     TimespecField,
 };
+
 pub use query::{
     Query, 
     RcQuery, 
@@ -36,13 +37,16 @@ pub use query::{
     InequalityQuery, ToInequalityQuery, 
     Inequality, LessThan, LessThanEqual, GreaterThan, GreaterTranEqual
 };
+
 pub use data_set::{SelectDataSet};
+pub use expression::{RawExpression};
 pub use to_sql::{ToSql};
 
 mod field;
 mod query;
 mod data_set;
 mod to_sql;
+mod expression;
 
 #[deriving(Clone)]
 pub enum From {
@@ -85,7 +89,7 @@ fn it_works() {
         )
     ).or(counter.in_range(100, 200)).and(
         counter.lte(100)
-    );
+    ).or(RawExpression::new("max(name)".to_string()).lte(RawExpression::new("10".to_string())));
 
     dset = dset.where_(&query);
 

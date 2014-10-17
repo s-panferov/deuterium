@@ -3,6 +3,7 @@ use serialize::json::Json;
 use time::Timespec;
 
 use query::{Query, RcQuery};
+use expression::{RawExpression};
 
 use field::{
     NamedField,
@@ -30,17 +31,23 @@ pub trait ToInQuery<F, T> {
     fn within(&self, val: T) -> RcQuery;
 }
 
+macro_rules! within_methods(
+    ($v:ty) => (
+        fn within(&self, values: $v) -> RcQuery {
+            InQuery {
+                field: self.clone(),
+                values: values
+            }.upcast()
+        }
+    )
+)
+
 macro_rules! impl_for(
     ($field:ty, $v:ty) => (
         impl Query for InQuery<$field, $v> { }
 
         impl ToInQuery<$field, $v> for $field {
-            fn within(&self, values: $v) -> RcQuery {
-                InQuery {
-                    field: self.clone(),
-                    values: values
-                }.upcast()
-            }
+            within_methods!($v)   
         }
     )
 )
@@ -53,3 +60,8 @@ impl_for!(F32Field, Vec<f32>)
 impl_for!(F64Field, Vec<f64>)
 impl_for!(StringField, Vec<String>)
 impl_for!(TimespecField, Vec<Timespec>)
+
+impl Query for InQuery<RawExpression, Vec<RawExpression>> { }
+impl ToInQuery<RawExpression, Vec<RawExpression>> for RawExpression {
+    within_methods!(Vec<RawExpression>)   
+}
