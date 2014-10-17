@@ -3,7 +3,14 @@ use time::Timespec;
 
 use data_set::SelectDataSet;
 use {Select, SelectOnly, SelectAll, From, NamedFrom, DataSetFrom};
-use query::{RcQuery, IsQuery, OrQuery, AndQuery};
+use query::{
+    RcQuery, 
+    IsQuery, 
+    OrQuery, 
+    AndQuery,
+    InQuery,
+    InRangeQuery
+};
 use field::{
     Field, 
     FieldDef,
@@ -76,7 +83,7 @@ impl ToQueryValue for i64 { fn to_query_value(&self) -> String { self.to_string(
 impl ToQueryValue for f32 { fn to_query_value(&self) -> String { self.to_string() } }
 impl ToQueryValue for f64 { fn to_query_value(&self) -> String { self.to_string() } }
 impl ToQueryValue for String { 
-    fn to_query_value(&self) -> String { format!("\"{}\"", self.to_string()) } 
+    fn to_query_value(&self) -> String { format!("'{}'", self.to_string()) } 
 }
 impl ToQueryValue for Vec<u8> { fn to_query_value(&self) -> String { self.to_string() } }
 impl ToQueryValue for Json { fn to_query_value(&self) -> String { self.to_string() } }
@@ -103,5 +110,19 @@ impl ToSql for OrQuery {
 impl ToSql for AndQuery {
     fn to_sql(&self) -> String {
         format!("({}) AND ({})", self.left.to_sql(), self.right.to_sql())
+    }
+}
+
+impl<T: ToQueryValue> ToSql for InQuery<NamedField<T>, Vec<T>> {
+    fn to_sql(&self) -> String {
+        let query_values: Vec<String> = self.values.iter().map(|v| v.to_query_value()).collect();
+        format!("{} IN ({})", self.field.name, query_values.connect(", "))
+    }
+}
+
+impl<T: ToQueryValue> ToSql for InRangeQuery<NamedField<T>, T> {
+    fn to_sql(&self) -> String {
+        format!("{} > {} AND {} < {}", self.field.name, self.from.to_query_value(), 
+                                       self.field.name, self.to.to_query_value())
     }
 }

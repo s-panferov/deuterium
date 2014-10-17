@@ -6,9 +6,14 @@ use to_sql::{ToSql};
 pub use self::is::{IsQuery, ToIsQuery};
 pub use self::or::{OrQuery, ToOrQuery};
 pub use self::and::{AndQuery, ToAndQuery};
+pub use self::within::{
+    InQuery, ToInQuery,
+    InRangeQuery, ToInRangeQuery
+};
 
 mod is;
 mod or;
+mod within;
 mod and;
 
 pub trait Query: Sync + Send + ToSql { 
