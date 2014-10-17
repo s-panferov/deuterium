@@ -5,6 +5,7 @@ use data_set::SelectDataSet;
 use {Select, SelectOnly, SelectAll, From, NamedFrom, DataSetFrom};
 use query::{
     RcQuery, 
+    RawQuery,
     IsQuery, 
     OrQuery, 
     AndQuery,
@@ -128,6 +129,12 @@ impl ToSql for RcQuery {
 impl ToSql for OrQuery {
     fn to_sql(&self) -> String {
         format!("({}) OR ({})", self.left.to_sql(), self.right.to_sql())
+    }
+}
+
+impl ToSql for RawQuery {
+    fn to_sql(&self) -> String {
+        self.content.to_string()
     }
 }
 

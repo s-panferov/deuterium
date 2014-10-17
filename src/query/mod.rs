@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use to_sql::{ToSql};
 
+pub use self::raw::{RawQuery};
 pub use self::is::{IsQuery, ToIsQuery};
 pub use self::or::{OrQuery, ToOrQuery};
 pub use self::and::{AndQuery, ToAndQuery};
@@ -26,6 +27,7 @@ mod within;
 mod range;
 mod and;
 mod inequality;
+mod raw;
 
 pub trait Query: Sync + Send + ToSql { 
     fn upcast(self) -> RcQuery {
