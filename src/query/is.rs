@@ -3,21 +3,21 @@ use serialize::json::Json;
 use time::Timespec;
 
 use query::{Query, RcQuery};
-use expression::{RawExpression};
+use expression::{RawExpression, RawExpressionComparable};
 use field::{
     NamedField,
 
-    BoolField,
-    I8Field,
-    I16Field,
-    I32Field,
-    I64Field,
-    F32Field,
-    F64Field,
-    StringField,
-    ByteListField,
-    JsonField,
-    TimespecField,
+    BoolField, BoolComparable,
+    I8Field, I8Comparable,
+    I16Field, I16Comparable,
+    I32Field, I32Comparable,
+    I64Field, I64Comparable,
+    F32Field, F32Comparable,
+    F64Field, F64Comparable,
+    StringField, StringComparable,
+    ByteListField, ByteListComparable,
+    JsonField, JsonComparable,
+    TimespecField, TimespecComparable
 };
 use to_sql::ToSql;
 
@@ -33,7 +33,7 @@ pub trait ToIsQuery<F, T> {
 
 macro_rules! is_methods(
     ($v:ty) => (
-        fn is(&self, val: $v) -> RcQuery {
+        fn is(&self, val: T) -> RcQuery {
             IsQuery {
                 field: self.clone(),
                 value: val
@@ -43,28 +43,23 @@ macro_rules! is_methods(
 )
 
 macro_rules! impl_for(
-    ($field:ty, $v:ty) => (
-        impl Query for IsQuery<$field, $v> { }
-
-        impl ToIsQuery<$field, $v> for $field {
-            is_methods!($v)   
+    ($field:ty, $v:ident) => (
+        impl<T: $v> Query for IsQuery<$field, T> { }
+        impl<T: $v> ToIsQuery<$field, T> for $field {
+            is_methods!(T) 
         }
     )
 )
 
-impl_for!(BoolField, bool)
-impl_for!(I8Field, i8)
-impl_for!(I16Field, i16)
-impl_for!(I32Field, i32)
-impl_for!(I64Field, i64)
-impl_for!(F32Field, f32)
-impl_for!(F64Field, f64)
-impl_for!(StringField, String)
-impl_for!(ByteListField, Vec<u8>)
-impl_for!(JsonField, Json)
-impl_for!(TimespecField, Timespec)
-
-impl Query for IsQuery<RawExpression, RawExpression> { }
-impl ToIsQuery<RawExpression, RawExpression> for RawExpression {
-    is_methods!(RawExpression)
-}
+impl_for!(BoolField, BoolComparable)
+impl_for!(I8Field, I8Comparable)
+impl_for!(I16Field, I16Comparable)
+impl_for!(I32Field, I32Comparable)
+impl_for!(I64Field, I64Comparable)
+impl_for!(F32Field, F32Comparable)
+impl_for!(F64Field, F64Comparable)
+impl_for!(StringField, StringComparable)
+impl_for!(ByteListField, ByteListComparable)
+impl_for!(JsonField, JsonComparable)
+impl_for!(TimespecField, TimespecComparable)
+impl_for!(RawExpression, RawExpressionComparable)

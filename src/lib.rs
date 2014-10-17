@@ -87,8 +87,8 @@ fn it_works() {
         is_admin.is(true).and(is_open.is(true)).and(
             name.within(vec!["Marcus".to_string(), "Jane".to_string()])
         )
-    ).or(counter.in_range(100, 200)).and(
-        counter.lte(100)
+    ).or(counter.in_range(100i32, 200i32)).and(
+        counter.lte(100i32)
     ).or(RawExpression::new("max(name)".to_string()).lte(RawExpression::new("10".to_string())));
 
     dset = dset.where_(&query);

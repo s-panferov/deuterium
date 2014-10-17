@@ -18,7 +18,7 @@ use field::{
     FieldDef,
     NamedField, 
 
-    BoolField,
+    BoolField, BoolComparable,
     I8Field,
     I16Field,
     I32Field,
