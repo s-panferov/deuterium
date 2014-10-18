@@ -1,7 +1,7 @@
 
 use std::sync::Arc;
 
-use to_sql::{ToSql, PredicateToSql};
+use to_sql::{PredicateToSql};
 
 pub use self::raw::{RawPredicate};
 pub use self::is::{IsPredicate, ToIsPredicate};

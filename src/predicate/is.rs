@@ -1,13 +1,7 @@
 
-use serialize::json::Json;
-use time::Timespec;
-
-use {Null};
 use predicate::{Predicate, RcPredicate};
 use expression::{RawExpression, RawExpressionComparable};
 use field::{
-    NamedField,
-
     BoolField, BoolComparable,
     I8Field, I8Comparable,
     I16Field, I16Comparable,
@@ -20,7 +14,6 @@ use field::{
     JsonField, JsonComparable,
     TimespecField, TimespecComparable
 };
-use to_sql::ToSql;
 
 #[deriving(Send, Clone)]
 pub struct IsPredicate<F, T> {

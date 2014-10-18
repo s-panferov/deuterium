@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use serialize::json::Json;
 use time::Timespec;
 

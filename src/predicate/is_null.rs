@@ -1,27 +1,19 @@
 
-use serialize::json::Json;
-use time::Timespec;
-
-use {Null};
 use predicate::{Predicate, RcPredicate};
-use expression::{RawExpression, RawExpressionComparable};
+use expression::{RawExpression};
 use field::{
-    Field, NamedField,
-
-    BoolField, BoolComparable,
-    I8Field, I8Comparable,
-    I16Field, I16Comparable,
-    I32Field, I32Comparable,
-    I64Field, I64Comparable,
-    F32Field, F32Comparable,
-    F64Field, F64Comparable,
-    StringField, StringComparable,
-    ByteListField, ByteListComparable,
-    JsonField, JsonComparable,
-    TimespecField, TimespecComparable
+    BoolField,
+    I8Field,
+    I16Field,
+    I32Field,
+    I64Field,
+    F32Field,
+    F64Field,
+    StringField,
+    ByteListField,
+    JsonField,
+    TimespecField
 };
-
-use to_sql::ToSql;
 
 #[deriving(Send, Clone)]
 pub struct IsNullPredicate<F> {

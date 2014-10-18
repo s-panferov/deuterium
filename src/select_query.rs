@@ -2,7 +2,6 @@
 use std::sync::Arc;
 
 use {From};
-use field::{Field, FieldDef};
 use predicate::{RcPredicate};
 use to_sql::{ToSql};
 

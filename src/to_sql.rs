@@ -1,7 +1,7 @@
 use serialize::json::Json;
 use time::Timespec;
 
-use select_query::{SelectQuery, ToSelectQuery, RcSelectQuery};
+use select_query::{SelectQuery, RcSelectQuery};
 use {Select, SelectOnly, SelectAll, From, NamedFrom, QueryFrom};
 use predicate::{
     RcPredicate, 
@@ -10,17 +10,13 @@ use predicate::{
     OrPredicate, 
     AndPredicate,
     InPredicate,
-    InRangePredicate, InRangeBounds, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft,
-    InequalityPredicate, Inequality, LessThan, LessThanEqual, GreaterThan, GreaterTranEqual,
+    InRangePredicate, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft,
+    InequalityPredicate, LessThan, LessThanEqual, GreaterThan, GreaterTranEqual,
     ExcludePredicate,
     IsNullPredicate
 };
 use field::{
-    Field, 
-    FieldDef,
-    NamedField, 
-
-    BoolField, BoolComparable,
+    BoolField,
     I8Field,
     I16Field,
     I32Field,

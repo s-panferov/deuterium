@@ -1,5 +1,5 @@
 
-use predicate::{Predicate, RcPredicate};
+use predicate::{Predicate};
 
 #[deriving(Send, Clone)]
 pub struct RawPredicate {
