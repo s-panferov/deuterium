@@ -2,7 +2,7 @@ use serialize::json::Json;
 use time::Timespec;
 
 use select_query::{SelectQuery, RcSelectQuery};
-use {Select, SelectOnly, SelectAll, From, NamedFrom, QueryFrom};
+use {Select, SelectOnly, SelectAll};
 use predicate::{
     RcPredicate, 
     RawPredicate,
@@ -32,6 +32,8 @@ use field::{
 use order_by::{OrderBy, Asc, Desc};
 use expression::{RawExpression};
 
+use from::{TableDef, FromSelect};
+
 pub trait QueryToSql {
     fn to_final_sql(&self) -> String;
 }
@@ -44,6 +46,10 @@ pub trait PredicateToSql {
     fn to_sql(&self, bool) -> String;
 }
 
+pub trait FromToSql {
+    fn to_from_sql(&self) -> String;
+}
+
 impl ToSql for OrderBy {
     fn to_sql(&self) -> String {
         format!("{} {}", self.get_by(), match self.get_order() {
@@ -53,11 +59,23 @@ impl ToSql for OrderBy {
     }
 }
 
+impl FromToSql for TableDef {
+    fn to_from_sql(&self) -> String {
+        self.name()
+    }
+}
+
+impl<T, L> FromToSql for FromSelect<T, L> {
+    fn to_from_sql(&self) -> String {
+        format!("({}) as {}", self.select.to_sql(), self.alias.to_string())
+    }
+}
+
 impl<T, L> ToSql for SelectQuery<T, L> {
     fn to_sql(&self) -> String {
         let mut sql = format!("SELECT {} FROM {}", 
             self.select.to_sql(), 
-            self.from.to_sql()
+            self.from.to_from_sql()
         );
 
         if self.where_.is_some() {
@@ -94,16 +112,16 @@ impl ToSql for RcSelectQuery {
 }
 
 
-impl ToSql for From {
-    fn to_sql(&self) -> String {
-        match self {
-            &NamedFrom(ref from) => {
-                from.to_string()
-            },
-            &QueryFrom(ref query) => format!("( {} )", query.to_sql())
-        }
-    }
-}
+// impl ToSql for From {
+//     fn to_sql(&self) -> String {
+//         match self {
+//             &NamedFrom(ref from) => {
+//                 from.to_string()
+//             },
+//             &QueryFrom(ref query) => format!("( {} )", query.to_sql())
+//         }
+//     }
+// }
 
 impl ToSql for Select {
     fn to_sql(&self) -> String {

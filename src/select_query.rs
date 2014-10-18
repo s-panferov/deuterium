@@ -5,7 +5,7 @@ use time::Timespec;
 use std::sync::Arc;
 use std::mem;
 
-use {From};
+use from::{RcFrom, FromSelect};
 use field::{Field};
 use predicate::{RcPredicate};
 use to_sql::{ToSql};
@@ -57,7 +57,7 @@ pub struct LimitMany;
 #[deriving(Clone)]
 pub struct SelectQuery<T, L> {
     pub select: Select,
-    pub from: From,
+    pub from: RcFrom,
     pub where_: Option<RcPredicate>,
     pub limit: Option<uint>,
     pub offset: Option<uint>,
@@ -66,7 +66,7 @@ pub struct SelectQuery<T, L> {
 
 impl<T: Clone, L: Clone> SelectQuery<T, L> {
  
-    pub fn new(select: Select, from: From) -> SelectQuery<T, L> {
+    pub fn new(select: Select, from: RcFrom) -> SelectQuery<T, L> {
         SelectQuery {
             select: select,
             from: from,
@@ -77,9 +77,9 @@ impl<T: Clone, L: Clone> SelectQuery<T, L> {
         }
     }
 
-    pub fn where_(&self, predicate: &RcPredicate) -> SelectQuery<T, L> {
+    pub fn where_(&self, predicate: RcPredicate) -> SelectQuery<T, L> {
         let mut query = self.clone();
-        query.where_ = Some(predicate.clone());
+        query.where_ = Some(predicate);
         query
     }
 
@@ -152,11 +152,13 @@ impl<T: Clone, L: Clone> SelectQuery<T, L> {
         query.order_by.insert(0, OrderBy::reverse_by(field));
         query
     }
+
+    pub fn as_alias(&self, alias: String) -> FromSelect<T, L> {
+        FromSelect { select: self.clone(), alias: alias }
+    }
 }
 
-impl<T: Clone, L: Clone> ToSelectQuery for SelectQuery<T, L> {
-    
-}
+impl<T: Clone, L: Clone> ToSelectQuery for SelectQuery<T, L> { }
 
 pub type BoxedSelectQuery = Box<ToSelectQuery + Send + Sync>;
 pub type RcSelectQuery = Arc<BoxedSelectQuery>;
@@ -180,3 +182,4 @@ impl F64ComparableList for SelectQuery<(f64), LimitMany> { }
 impl StringComparableList for SelectQuery<(String), LimitMany> { }
 impl JsonComparableList for SelectQuery<(Json), LimitMany> { }
 impl TimespecComparableList for SelectQuery<(Timespec), LimitMany> { }
+

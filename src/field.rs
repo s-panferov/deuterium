@@ -4,10 +4,6 @@ use time::Timespec;
 use to_sql::{ToPredicateValue};
 use expression::{RawExpression};
 
-trait Coercer: Send {
-
-}
-
 pub trait Field<T>: Send + Sync + Clone {
     fn to_def(&self) -> FieldDef<T>;
 }

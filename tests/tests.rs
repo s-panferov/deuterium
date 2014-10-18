@@ -14,12 +14,12 @@ macro_rules! assert_sql(
 #[test]
 fn it_works() {
 
-    // Typed field
+    let jedi_table = TableDef::new("jedi".to_string());
     let name = StringField { name: "name".to_string() };
     
     // Type is here only for sure it is right, it can be ommited in real code
-    let query: SelectQuery<(String), LimitMany> = Query::select_1(&name, NamedFrom("jedi".to_string())).where_(
-        &name.is("Luke".to_string()).exclude()
+    let query: SelectQuery<(String), LimitMany> = Query::select_1(&name, &jedi_table).where_(
+        name.is("Luke".to_string()).exclude()
     );
 
     assert_sql!(query, "SELECT name FROM jedi WHERE name != 'Luke';");
@@ -29,10 +29,11 @@ fn it_works() {
 #[test]
 fn select_1_first() {
 
+    let jedi_table = TableDef::new("jedi".to_string());
     let name = StringField { name: "name".to_string() };
     
-    let query: SelectQuery<(String), LimitOne> = Query::select_1(&name, NamedFrom("jedi".to_string())).where_(
-        &name.is("Luke".to_string()).exclude()
+    let query: SelectQuery<(String), LimitOne> = Query::select_1(&name, &jedi_table).where_(
+        name.is("Luke".to_string()).exclude()
     ).first().offset(10);
 
     assert_sql!(query, "SELECT name FROM jedi WHERE name != 'Luke' LIMIT 1 OFFSET 10;");
@@ -42,9 +43,10 @@ fn select_1_first() {
 #[test]
 fn select_order() {
 
+    let jedi_table = TableDef::new("jedi".to_string());
     let name = StringField { name: "name".to_string() };
     
-    let query: SelectQuery<(String), LimitOne> = Query::select_1(&name, NamedFrom("jedi".to_string()))
+    let query: SelectQuery<(String), LimitOne> = Query::select_1(&name, &jedi_table)
         .first().order_by(&name);
 
     assert_sql!(query, "SELECT name FROM jedi ORDER BY name ASC LIMIT 1;");
@@ -54,14 +56,35 @@ fn select_order() {
 #[test]
 fn select_within() {
 
+    let jedi_table = TableDef::new("jedi".to_string());
     let name = StringField { name: "name".to_string() };
     
-    let query = Query::select_all(NamedFrom("jedi".to_string())).where_(&name.within(vec!["Luke".to_string()]));
+    let query = Query::select_all(&jedi_table).where_(name.within(vec!["Luke".to_string()]));
     assert_sql!(query, "SELECT * FROM jedi WHERE name IN ('Luke');");
 
-    let query = Query::select_all(NamedFrom("jedi".to_string())).where_(&name.within(
-        Query::select_1(&name, NamedFrom("jedi".to_string()))
+}
+
+#[test]
+fn select_within_select() {
+
+    let jedi_table = TableDef::new("jedi".to_string());
+    let name = StringField { name: "name".to_string() };
+
+    let query = Query::select_all(&jedi_table).where_(name.within(
+        Query::select_1(&name, &jedi_table)
     ));
+
     assert_sql!(query, "SELECT * FROM jedi WHERE name IN (SELECT name FROM jedi);");
+
+}
+
+#[test]
+fn select_from_select() {
+
+    let jedi_table = TableDef::new("jedi".to_string());
+    let name = StringField { name: "name".to_string() };
+    
+    let query = Query::select_all(&Query::select_all(&jedi_table).as_alias("jedi_list".to_string()));
+    assert_sql!(query, "SELECT * FROM (SELECT * FROM jedi) as jedi_list;");
 
 }
