@@ -61,7 +61,10 @@ impl ToSql for OrderBy {
 
 impl FromToSql for TableDef {
     fn to_from_sql(&self) -> String {
-        self.name()
+        match self.get_alias() {
+            &Some(ref alias) => format!("{} AS {}", self.get_name(), alias),
+            &None => format!("{}", self.get_name()),
+        }
     }
 }
 
@@ -110,18 +113,6 @@ impl ToSql for RcSelectQuery {
         (**self).to_sql()
     }
 }
-
-
-// impl ToSql for From {
-//     fn to_sql(&self) -> String {
-//         match self {
-//             &NamedFrom(ref from) => {
-//                 from.to_string()
-//             },
-//             &QueryFrom(ref query) => format!("( {} )", query.to_sql())
-//         }
-//     }
-// }
 
 impl ToSql for Select {
     fn to_sql(&self) -> String {

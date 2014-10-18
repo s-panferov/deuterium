@@ -12,16 +12,27 @@ pub type RcFrom = Arc<BoxedFrom>;
 
 #[deriving(Clone)]
 pub struct TableDef {
-    name: String
+    name: String,
+    alias: Option<String>
 }
 
 impl TableDef {
     pub fn new(name: String) -> TableDef {
-        TableDef { name: name }
+        TableDef { name: name, alias: None }
     }
 
-    pub fn name(&self) -> String {
-        self.name.to_string()
+    pub fn alias(&self, alias: String) -> TableDef {
+        let mut table_def = self.clone();
+        table_def.alias = Some(alias);
+        table_def
+    }
+
+    pub fn get_name(&self) -> &String {
+        &self.name
+    }
+
+    pub fn get_alias(&self) -> &Option<String> {
+        &self.alias
     }
 }
 

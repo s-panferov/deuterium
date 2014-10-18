@@ -70,11 +70,11 @@ fn select_within_select() {
     let jedi_table = TableDef::new("jedi".to_string());
     let name = StringField { name: "name".to_string() };
 
-    let query = Query::select_all(&jedi_table).where_(name.within(
+    let query = Query::select_all(&jedi_table.alias("j".to_string())).where_(name.within(
         Query::select_1(&name, &jedi_table)
     ));
 
-    assert_sql!(query, "SELECT * FROM jedi WHERE name IN (SELECT name FROM jedi);");
+    assert_sql!(query, "SELECT * FROM jedi AS j WHERE name IN (SELECT name FROM jedi);");
 
 }
 
@@ -82,7 +82,6 @@ fn select_within_select() {
 fn select_from_select() {
 
     let jedi_table = TableDef::new("jedi".to_string());
-    let name = StringField { name: "name".to_string() };
     
     let query = Query::select_all(&Query::select_all(&jedi_table).as_alias("jedi_list".to_string()));
     assert_sql!(query, "SELECT * FROM (SELECT * FROM jedi) as jedi_list;");
