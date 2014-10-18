@@ -1,6 +1,8 @@
 
 #![feature(tuple_indexing)]
 #![feature(macro_rules)]
+#![feature(struct_variant)]
+#![feature(globs)]
 
 #![deny(warnings)]
 #![deny(bad_style)]
@@ -54,6 +56,7 @@ mod to_sql;
 mod expression;
 mod order_by;
 mod from;
+mod join;
 
 pub struct Query;
 

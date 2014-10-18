@@ -31,8 +31,26 @@ use field::{
 
 use order_by::{OrderBy, Asc, Desc};
 use expression::{RawExpression};
-
 use from::{TableDef, FromSelect};
+use join::{
+    Join, 
+    ConditionedJoin, 
+    UnconditionedJoin,
+    ConditionedJoinType,
+    UnconditionedJoinType,
+    InnerJoin,
+    FullOuterJoin,
+    RightOuterJoin, 
+    LeftOuterJoin,
+    FullJoin,
+    RightJoin,
+    LeftJoin,
+    NaturalJoin,
+    NaturalLeftJoin,
+    NaturalRightJoin,
+    NaturalFullJoin,
+    CrossJoin
+};
 
 pub trait QueryToSql {
     fn to_final_sql(&self) -> String;
@@ -59,6 +77,45 @@ impl ToSql for OrderBy {
     }
 }
 
+impl ToSql for ConditionedJoinType {
+    fn to_sql(&self) -> String {
+        match self {
+            &InnerJoin => "INNER JOIN",
+            &FullOuterJoin => "FULL OUTER JOIN",
+            &RightOuterJoin => "RIGHT OUTER JOIN",
+            &LeftOuterJoin => "LEFT OUTER JOIN",
+            &FullJoin => "FULL JOIN",
+            &RightJoin => "RIGHT JOIN",
+            &LeftJoin => "LEFT JOIN",
+        }.to_string()
+    }
+}
+
+impl ToSql for UnconditionedJoinType {
+    fn to_sql(&self) -> String {
+        match self {
+            &NaturalJoin => "NATURAL JOIN",
+            &NaturalLeftJoin => "NATURAL LEFT JOIN",
+            &NaturalRightJoin => "NATURAL RIGHT JOIN",
+            &NaturalFullJoin => "NATURAL FULL JOIN",
+            &CrossJoin => "CROSS JOIN",
+        }.to_string()
+    }
+}
+
+impl ToSql for Join {
+    fn to_sql(&self) -> String {
+        match self {
+            &ConditionedJoin(ref join_type, ref from, ref on) => {
+                format!("{} {} ON {}", join_type.to_sql(), from.to_from_sql(), on.to_sql(false))
+            },
+            &UnconditionedJoin(ref join_type, ref from) => {
+                format!("{} {}", join_type.to_sql(), from.to_from_sql())
+            }
+        }
+    }
+}
+
 impl FromToSql for TableDef {
     fn to_from_sql(&self) -> String {
         match self.get_alias() {
@@ -80,6 +137,11 @@ impl<T, L> ToSql for SelectQuery<T, L> {
             self.select.to_sql(), 
             self.from.to_from_sql()
         );
+
+        if !self.joins.is_empty() {
+            let joins: Vec<String> = self.joins.iter().map(|join| join.to_sql()).collect();
+            sql = format!("{} {}", sql, joins.connect(" "))
+        }
 
         if self.where_.is_some() {
             sql = format!("{} WHERE {}", sql, self.where_.as_ref().unwrap().to_sql(false))

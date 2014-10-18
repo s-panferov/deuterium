@@ -5,11 +5,12 @@ use time::Timespec;
 use std::sync::Arc;
 use std::mem;
 
-use from::{RcFrom, FromSelect};
+use from::{From, RcFrom, FromSelect};
 use field::{Field};
 use predicate::{RcPredicate};
 use to_sql::{ToSql};
 use order_by::{OrderBy};
+use join::{Join};
 
 use field::{
     I8Comparable,
@@ -61,7 +62,8 @@ pub struct SelectQuery<T, L> {
     pub where_: Option<RcPredicate>,
     pub limit: Option<uint>,
     pub offset: Option<uint>,
-    pub order_by: Vec<OrderBy>
+    pub order_by: Vec<OrderBy>,
+    pub joins: Vec<Join>
 }
 
 impl<T: Clone, L: Clone> SelectQuery<T, L> {
@@ -73,7 +75,8 @@ impl<T: Clone, L: Clone> SelectQuery<T, L> {
             where_: None,
             limit: None,
             offset: None,
-            order_by: vec![]
+            order_by: vec![],
+            joins: vec![]
         }
     }
 
@@ -155,6 +158,78 @@ impl<T: Clone, L: Clone> SelectQuery<T, L> {
 
     pub fn as_alias(&self, alias: String) -> FromSelect<T, L> {
         FromSelect { select: self.clone(), alias: alias }
+    }
+
+    pub fn inner_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L> {
+        let mut query = self.clone();
+        query.joins.push(Join::inner_join(from.upcast(), on));
+        query
+    }
+
+    pub fn full_outer_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L> {
+        let mut query = self.clone();
+        query.joins.push(Join::full_outer_join(from.upcast(), on));
+        query
+    }
+
+    pub fn right_outer_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L> {
+        let mut query = self.clone();
+        query.joins.push(Join::right_outer_join(from.upcast(), on));
+        query
+    }
+
+    pub fn left_outer_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L> {
+        let mut query = self.clone();
+        query.joins.push(Join::left_outer_join(from.upcast(), on));
+        query
+    }
+
+    pub fn full_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L> {
+        let mut query = self.clone();
+        query.joins.push(Join::full_join(from.upcast(), on));
+        query
+    }
+
+    pub fn left_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L> {
+        let mut query = self.clone();
+        query.joins.push(Join::left_join(from.upcast(), on));
+        query
+    }
+
+    pub fn right_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L> {
+        let mut query = self.clone();
+        query.joins.push(Join::right_join(from.upcast(), on));
+        query
+    }
+
+    pub fn natural_join(&self, from: &From) -> SelectQuery<T, L> {
+        let mut query = self.clone();
+        query.joins.push(Join::natural_join(from.upcast()));
+        query
+    }
+    
+    pub fn natural_left_join(&self, from: &From) -> SelectQuery<T, L> {
+        let mut query = self.clone();
+        query.joins.push(Join::natural_left_join(from.upcast()));
+        query
+    }
+    
+    pub fn natural_right_join(&self, from: &From) -> SelectQuery<T, L> {
+        let mut query = self.clone();
+        query.joins.push(Join::natural_right_join(from.upcast()));
+        query
+    }
+    
+    pub fn natural_full_join(&self, from: &From) -> SelectQuery<T, L> {
+        let mut query = self.clone();
+        query.joins.push(Join::natural_full_join(from.upcast()));
+        query
+    }
+
+    pub fn cross_join(&self, from: &From) -> SelectQuery<T, L> {
+        let mut query = self.clone();
+        query.joins.push(Join::cross_join(from.upcast()));
+        query
     }
 }
 

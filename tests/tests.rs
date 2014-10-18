@@ -87,3 +87,14 @@ fn select_from_select() {
     assert_sql!(query, "SELECT * FROM (SELECT * FROM jedi) as jedi_list;");
 
 }
+
+#[test]
+fn select_left_join() {
+
+    let jedi_table = TableDef::new("jedi".to_string());
+    let name = StringField { name: "name".to_string() };
+    
+    let query = Query::select_all(&jedi_table).left_join(&jedi_table.alias("j".to_string()), name.is(name.clone()));
+    assert_sql!(query, "SELECT * FROM (SELECT * FROM jedi) as jedi_list;");
+
+}
