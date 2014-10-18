@@ -42,7 +42,7 @@ pub use predicate::{
     IsNullPredicate, ToIsNullPredicate
 };
 
-pub use select_query::{SelectQuery, RcSelectQuery, ToSelectQuery, Select, SelectAll, SelectOnly};
+pub use select_query::{SelectQuery, RcSelectQuery, ToSelectQuery, Select, SelectAll, SelectOnly, LimitOne, LimitTwo, LimitMany};
 pub use expression::{RawExpression};
 pub use to_sql::{ToSql};
 
@@ -58,27 +58,25 @@ pub enum From {
     NamedFrom(String)
 }
 
-pub struct Null;
-
 pub struct Query;
 
 impl Query {
 
     // FIXME: Unify select_N after [generics](https://github.com/rust-lang/rfcs/issues/376)
 
-    pub fn select_1<T: Clone>(field: &Field<T>, from: From) -> SelectQuery<(T)> {
+    pub fn select_1<T: Clone>(field: &Field<T>, from: From) -> SelectQuery<(T), LimitMany> {
         SelectQuery::new(SelectOnly(vec![field.to_def().name()]), from)
     }
 
-    pub fn select_2<T1: Clone, T2: Clone>(field1: &Field<T1>, field2: &Field<T2>, from: From) -> SelectQuery<(T1, T2)> {
+    pub fn select_2<T1: Clone, T2: Clone>(field1: &Field<T1>, field2: &Field<T2>, from: From) -> SelectQuery<(T1, T2), LimitMany> {
         SelectQuery::new(SelectOnly(vec![field1.to_def().name(), field2.to_def().name()]), from)
     }
 
-    pub fn select(fields: &[&UntypedField], from: From) -> SelectQuery<()> {
+    pub fn select(fields: &[&UntypedField], from: From) -> SelectQuery<(), LimitMany> {
         SelectQuery::new(SelectOnly(fields.iter().map(|f| f.to_def().name()).collect()), from)
     }
 
-    pub fn select_all<T: Clone>(from: From) -> SelectQuery<T> {
+    pub fn select_all(from: From) -> SelectQuery<(), LimitMany> {
         SelectQuery::new(SelectAll, from)
     }
 }

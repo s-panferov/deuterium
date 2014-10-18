@@ -1,22 +1,40 @@
 #![feature(globs)]
+#![feature(macro_rules)]
 
 extern crate deuterium;
 
 use deuterium::*;
 
+macro_rules! assert_sql(
+    ($query:expr, $s:expr) => (
+        assert_eq!($query.to_sql().as_slice(), $s)
+    )
+)
+
 #[test]
 fn it_works() {
 
+    // Typed field
     let name = StringField { name: "name".to_string() };
-    let is_admin = BoolField { name: "is_admin".to_string() };
-    let is_open = BoolField { name: "is_open".to_string() };
-    let counter = I32Field { name: "counter".to_string() };
+    
+    // Type is here only for sure it is right, it can be ommited in real code
+    let query: SelectQuery<(String), LimitMany> = Query::select_1(&name, NamedFrom("jedi".to_string())).where_(
+        &name.is("Luke".to_string()).exclude()
+    );
 
-    let mut query = Query::select_1(&name, NamedFrom("table".to_string()));
-    let predicate = name.is("Stas".to_string()).exclude().and(name.is_null());
-    query = query.where_(&predicate);
+    assert_sql!(query, "SELECT name FROM jedi WHERE name != 'Luke';");
 
-    println!("{}", query.upcast().to_sql());
-    fail!("")
+}
+
+#[test]
+fn select_1_first() {
+
+    let name = StringField { name: "name".to_string() };
+    
+    let query: SelectQuery<(String), LimitOne> = Query::select_1(&name, NamedFrom("jedi".to_string())).where_(
+        &name.is("Luke".to_string()).exclude()
+    ).first().offset(10);
+
+    assert_sql!(query, "SELECT name FROM jedi WHERE name != 'Luke' LIMIT 1 OFFSET 10;");
 
 }

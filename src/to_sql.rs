@@ -39,7 +39,7 @@ pub trait PredicateToSql {
     fn to_sql(&self, bool) -> String;
 }
 
-impl<T> ToSql for SelectQuery<T> {
+impl<T, L> ToSql for SelectQuery<T, L> {
     fn to_sql(&self) -> String {
         let mut sql = format!("SELECT {} FROM {}", 
             self.select.to_sql(), 
@@ -48,6 +48,14 @@ impl<T> ToSql for SelectQuery<T> {
 
         if self.where_.is_some() {
             sql = format!("{} WHERE {}", sql, self.where_.as_ref().unwrap().to_sql(false))
+        }
+
+        if self.limit.is_some() {
+            sql = format!("{} LIMIT {}", sql, self.limit.unwrap())
+        }
+
+        if self.offset.is_some() {
+            sql = format!("{} OFFSET {}", sql, self.offset.unwrap())
         }
 
         format!("{};", sql)
