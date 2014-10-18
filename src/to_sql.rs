@@ -29,6 +29,7 @@ use field::{
     TimespecField,
 };
 
+use order_by::{OrderBy, Asc, Desc};
 use expression::{RawExpression};
 
 pub trait ToSql {
@@ -37,6 +38,15 @@ pub trait ToSql {
 
 pub trait PredicateToSql {
     fn to_sql(&self, bool) -> String;
+}
+
+impl ToSql for OrderBy {
+    fn to_sql(&self) -> String {
+        format!("{} {}", self.get_by(), match self.get_order() {
+            &Asc => "ASC",
+            &Desc => "DESC"
+        })
+    }
 }
 
 impl<T, L> ToSql for SelectQuery<T, L> {
@@ -48,6 +58,11 @@ impl<T, L> ToSql for SelectQuery<T, L> {
 
         if self.where_.is_some() {
             sql = format!("{} WHERE {}", sql, self.where_.as_ref().unwrap().to_sql(false))
+        }
+
+        if !self.order_by.is_empty() {
+            let orders: Vec<String> = self.order_by.iter().map(|ord| ord.to_sql()).collect();
+            sql = format!("{} ORDER BY {}", sql, orders.connect(", "))
         }
 
         if self.limit.is_some() {

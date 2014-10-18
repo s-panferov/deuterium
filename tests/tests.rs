@@ -38,3 +38,15 @@ fn select_1_first() {
     assert_sql!(query, "SELECT name FROM jedi WHERE name != 'Luke' LIMIT 1 OFFSET 10;");
 
 }
+
+#[test]
+fn select_order() {
+
+    let name = StringField { name: "name".to_string() };
+    
+    let query: SelectQuery<(String), LimitOne> = Query::select_1(&name, NamedFrom("jedi".to_string()))
+        .first().order_by(&name);
+
+    assert_sql!(query, "SELECT name FROM jedi ORDER BY name ASC LIMIT 1;");
+
+}

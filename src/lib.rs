@@ -51,6 +51,7 @@ mod predicate;
 mod select_query;
 mod to_sql;
 mod expression;
+mod order_by;
 
 #[deriving(Clone)]
 pub enum From {
