@@ -7,7 +7,7 @@ use deuterium::*;
 
 macro_rules! assert_sql(
     ($query:expr, $s:expr) => (
-        assert_eq!($query.to_sql().as_slice(), $s)
+        assert_eq!($query.to_final_sql().as_slice(), $s)
     )
 )
 
@@ -48,5 +48,20 @@ fn select_order() {
         .first().order_by(&name);
 
     assert_sql!(query, "SELECT name FROM jedi ORDER BY name ASC LIMIT 1;");
+
+}
+
+#[test]
+fn select_within() {
+
+    let name = StringField { name: "name".to_string() };
+    
+    let query = Query::select_all(NamedFrom("jedi".to_string())).where_(&name.within(vec!["Luke".to_string()]));
+    assert_sql!(query, "SELECT * FROM jedi WHERE name IN ('Luke');");
+
+    let query = Query::select_all(NamedFrom("jedi".to_string())).where_(&name.within(
+        Query::select_1(&name, NamedFrom("jedi".to_string()))
+    ));
+    assert_sql!(query, "SELECT * FROM jedi WHERE name IN (SELECT name FROM jedi);");
 
 }

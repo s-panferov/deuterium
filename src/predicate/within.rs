@@ -2,14 +2,14 @@
 use predicate::{Predicate, RcPredicate};
 
 use field::{
-    I8Field, I8Comparable,
-    I16Field, I16Comparable,
-    I32Field, I32Comparable,
-    I64Field, I64Comparable,
-    F32Field, F32Comparable,
-    F64Field, F64Comparable,
-    StringField, StringComparable,
-    TimespecField, TimespecComparable
+    I8Field, I8ComparableList,
+    I16Field, I16ComparableList,
+    I32Field, I32ComparableList,
+    I64Field, I64ComparableList,
+    F32Field, F32ComparableList,
+    F64Field, F64ComparableList,
+    StringField, StringComparableList,
+    TimespecField, TimespecComparableList
 };
 
 #[deriving(Send, Clone)]
@@ -35,19 +35,19 @@ macro_rules! within_methods(
 
 macro_rules! impl_for(
     ($field:ty, $v:ident) => (
-        impl<T: $v> Predicate for InPredicate<$field, Vec<T>> { }
+        impl<T: $v> Predicate for InPredicate<$field, T> { }
 
-        impl<T: $v> ToInPredicate<$field, Vec<T>> for $field {
-            within_methods!(Vec<T>)   
+        impl<T: $v> ToInPredicate<$field, T> for $field {
+            within_methods!(T)   
         }
     )
 )
 
-impl_for!(I8Field, I8Comparable)
-impl_for!(I16Field, I16Comparable)
-impl_for!(I32Field, I32Comparable)
-impl_for!(I64Field, I64Comparable)
-impl_for!(F32Field, F32Comparable)
-impl_for!(F64Field, F64Comparable)
-impl_for!(StringField, StringComparable)
-impl_for!(TimespecField, TimespecComparable)
+impl_for!(I8Field, I8ComparableList)
+impl_for!(I16Field, I16ComparableList)
+impl_for!(I32Field, I32ComparableList)
+impl_for!(I64Field, I64ComparableList)
+impl_for!(F32Field, F32ComparableList)
+impl_for!(F64Field, F64ComparableList)
+impl_for!(StringField, StringComparableList)
+impl_for!(TimespecField, TimespecComparableList)

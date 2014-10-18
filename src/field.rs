@@ -66,6 +66,30 @@ pub trait ByteListComparable: Send + Clone + Sync + ToPredicateValue { }
 pub trait JsonComparable: Send + Clone + Sync + ToPredicateValue { }
 pub trait TimespecComparable: Send + Clone + Sync + ToPredicateValue { }
 
+pub trait BoolComparableList: Send + Clone + Sync + ToPredicateValue { }
+pub trait I8ComparableList: Send + Clone + Sync + ToPredicateValue{ }
+pub trait I16ComparableList: Send + Clone + Sync + ToPredicateValue { }
+pub trait I32ComparableList: Send + Clone + Sync + ToPredicateValue { }
+pub trait I64ComparableList: Send + Clone + Sync + ToPredicateValue { }
+pub trait F32ComparableList: Send + Clone + Sync + ToPredicateValue { }
+pub trait F64ComparableList: Send + Clone + Sync + ToPredicateValue { }
+pub trait StringComparableList: Send + Clone + Sync + ToPredicateValue { }
+pub trait ByteListComparableList: Send + Clone + Sync + ToPredicateValue { }
+pub trait JsonComparableList: Send + Clone + Sync + ToPredicateValue { }
+pub trait TimespecComparableList: Send + Clone + Sync + ToPredicateValue { }
+
+impl BoolComparableList for Vec<bool> {}
+impl I8ComparableList for Vec<i8> {}
+impl I16ComparableList for Vec<i16> {}
+impl I32ComparableList for Vec<i32> {}
+impl I64ComparableList for Vec<i64> {}
+impl F32ComparableList for Vec<f32> {}
+impl F64ComparableList for Vec<f64> {}
+impl StringComparableList for Vec<String> {}
+impl ByteListComparableList for Vec<Vec<u8>> {}
+impl JsonComparableList for Vec<Json> {}
+impl TimespecComparableList for Vec<Timespec> {}
+
 impl BoolComparable for bool {}
 impl BoolComparable for BoolField {} 
 impl BoolComparable for RawExpression {} 

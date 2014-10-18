@@ -32,6 +32,10 @@ use field::{
 use order_by::{OrderBy, Asc, Desc};
 use expression::{RawExpression};
 
+pub trait QueryToSql {
+    fn to_final_sql(&self) -> String;
+}
+
 pub trait ToSql {
     fn to_sql(&self) -> String;
 }
@@ -73,7 +77,13 @@ impl<T, L> ToSql for SelectQuery<T, L> {
             sql = format!("{} OFFSET {}", sql, self.offset.unwrap())
         }
 
-        format!("{};", sql)
+        sql
+    }
+}
+
+impl<T, L> QueryToSql for SelectQuery<T, L> {
+    fn to_final_sql(&self) -> String {
+        format!("{};", self.to_sql())
     }
 }
 
@@ -145,6 +155,17 @@ impl ToPredicateValue for Json { fn to_predicate_value(&self) -> String { self.t
 impl ToPredicateValue for Timespec { fn to_predicate_value(&self) -> String { self.to_string() } }
 impl ToPredicateValue for RawExpression { fn to_predicate_value(&self) -> String { self.content.to_string() } }
 
+impl<T: ToPredicateValue> ToPredicateValue for Vec<T> {
+    fn to_predicate_value(&self) -> String { 
+        let values: Vec<String> = self.iter().map(|v| v.to_predicate_value()).collect();
+        values.connect(", ")
+    }  
+}
+
+impl<T, L> ToPredicateValue for SelectQuery<T, L> {
+    fn to_predicate_value(&self) -> String { self.to_sql() }   
+}
+
 impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for IsPredicate<F, T> {
     fn to_sql(&self, negation: bool) -> String {
         let op = if negation { "!=" } else { "=" };
@@ -202,11 +223,11 @@ impl PredicateToSql for AndPredicate {
     }
 }
 
-impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InPredicate<F, Vec<T>> {
+impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InPredicate<F, T> {
     fn to_sql(&self, negation: bool) -> String {
         let maybe_not = if negation { "NOT " } else { "" };
-        let predicate_values: Vec<String> = self.values.iter().map(|v| v.to_predicate_value()).collect();
-        format!("{} {}IN ({})", self.field.to_predicate_value(), maybe_not, predicate_values.connect(", "))
+        let values = self.values.to_predicate_value();
+        format!("{} {}IN ({})", self.field.to_predicate_value(), maybe_not, values)
     }
 }
 

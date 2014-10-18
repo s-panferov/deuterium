@@ -44,7 +44,8 @@ pub use predicate::{
 
 pub use select_query::{SelectQuery, RcSelectQuery, ToSelectQuery, Select, SelectAll, SelectOnly, LimitOne, LimitTwo, LimitMany};
 pub use expression::{RawExpression};
-pub use to_sql::{ToSql};
+pub use to_sql::{ToSql, QueryToSql};
+pub use table::{TableDef, TableSource};
 
 mod field;
 mod predicate;
@@ -52,6 +53,7 @@ mod select_query;
 mod to_sql;
 mod expression;
 mod order_by;
+mod table;
 
 #[deriving(Clone)]
 pub enum From {
