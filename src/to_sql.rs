@@ -31,7 +31,7 @@ use field::{
 
 use order_by::{OrderBy, Asc, Desc};
 use expression::{RawExpression};
-use from::{TableDef, FromSelect};
+use from::{RcTable, Table, TableDef, FromSelect};
 use join::{
     Join, 
     ConditionedJoin, 
@@ -116,11 +116,22 @@ impl ToSql for Join {
     }
 }
 
+impl FromToSql for RcTable {
+    fn to_from_sql(&self) -> String {
+        let name = self.get_table_name();
+        match self.get_table_alias() {
+            &Some(ref alias) => format!("{} AS {}", name, alias),
+            &None => format!("{}", name),
+        }
+    }
+}
+
 impl FromToSql for TableDef {
     fn to_from_sql(&self) -> String {
-        match self.get_alias() {
-            &Some(ref alias) => format!("{} AS {}", self.get_name(), alias),
-            &None => format!("{}", self.get_name()),
+        let name = self.get_table_name();
+        match self.get_table_alias() {
+            &Some(ref alias) => format!("{} AS {}", name, alias),
+            &None => format!("{}", name),
         }
     }
 }

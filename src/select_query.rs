@@ -156,7 +156,7 @@ impl<T: Clone, L: Clone> SelectQuery<T, L> {
         query
     }
 
-    pub fn as_alias(&self, alias: String) -> FromSelect<T, L> {
+    pub fn alias(&self, alias: String) -> FromSelect<T, L> {
         FromSelect { select: self.clone(), alias: alias }
     }
 
