@@ -3,6 +3,7 @@ use time::Timespec;
 
 use to_sql::{ToPredicateValue};
 use expression::{RawExpression};
+use from::{Table};
 
 pub trait Field<T>: Send + Sync + Clone {
     fn to_def(&self) -> FieldDef<T>;
@@ -28,6 +29,12 @@ impl<T: Clone> NamedField<T> {
     pub fn qual(&self, qual: &str) -> NamedField<T> {
         let mut def = self.def.clone();
         def.qual = Some(qual.to_string());
+        NamedField { def: def }
+    }
+
+    pub fn qual_for(&self, table: &Table) -> NamedField<T> {
+        let mut def = self.def.clone();
+        def.qual = Some(table.get_table_alias().as_ref().map(|v| v.to_string()).unwrap_or_else(|| "".to_string()));
         NamedField { def: def }
     }
 }

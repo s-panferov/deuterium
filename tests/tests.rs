@@ -112,3 +112,18 @@ fn aliases() {
     assert_sql!(query, "SELECT * FROM jedi AS a INNER JOIN jedi AS b ON a.name = b.name;");
 
 }
+
+#[test]
+fn table_as_type() {
+
+    let jedi_table = TableDef::new("jedi".to_string());
+    let name = NamedField::<String>::new("name");
+    let jedi_a = jedi_table.alias("a".to_string());
+    let jedi_b = jedi_table.alias("b".to_string());
+    let name_a = name.qual_for(&jedi_a);
+    let name_b = name.qual_for(&jedi_b);
+    
+    let query = jedi_a.select_all().inner_join(&jedi_b, name_a.is(name_b));
+    assert_sql!(query, "SELECT * FROM jedi AS a INNER JOIN jedi AS b ON a.name = b.name;");
+
+}
