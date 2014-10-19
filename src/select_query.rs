@@ -13,6 +13,7 @@ use order_by::{OrderBy};
 use join::{Join};
 
 use field::{
+    FieldDef,
     I8Comparable,
     I16Comparable,
     I32Comparable,
@@ -36,7 +37,7 @@ use field::{
 
 #[deriving(Clone)]
 pub enum Select {
-    SelectOnly(Vec<String>),
+    SelectOnly(Vec<FieldDef<()>>),
     SelectAll
 }
 

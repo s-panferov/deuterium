@@ -10,15 +10,15 @@ pub trait From: FromToSql {
     // FIXME: Unify select_N after [generics](https://github.com/rust-lang/rfcs/issues/376)
 
     fn select_1<T: Clone>(&self, field: &Field<T>) -> SelectQuery<(T), LimitMany> {
-        SelectQuery::new(SelectOnly(vec![field.to_def().name()]), self.upcast())
+        SelectQuery::new(SelectOnly(vec![field.to_def().clone_with_erase()]), self.upcast())
     }
 
     fn select_2<T1: Clone, T2: Clone>(&self, field1: &Field<T1>, field2: &Field<T2>) -> SelectQuery<(T1, T2), LimitMany> {
-        SelectQuery::new(SelectOnly(vec![field1.to_def().name(), field2.to_def().name()]), self.upcast())
+        SelectQuery::new(SelectOnly(vec![field1.to_def().clone_with_erase(), field2.to_def().clone_with_erase()]), self.upcast())
     }
 
     fn select(&self, fields: &[&UntypedField]) -> SelectQuery<(), LimitMany> {
-        SelectQuery::new(SelectOnly(fields.iter().map(|f| f.to_def().name()).collect()), self.upcast())
+        SelectQuery::new(SelectOnly(fields.iter().map(|f| f.to_def().clone_with_erase()).collect()), self.upcast())
     }
 
     fn select_all(&self) -> SelectQuery<(), LimitMany> {

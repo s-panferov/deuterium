@@ -16,6 +16,7 @@ use predicate::{
     IsNullPredicate
 };
 use field::{
+    FieldDef,
     BoolField,
     I8Field,
     I16Field,
@@ -70,7 +71,7 @@ pub trait FromToSql {
 
 impl ToSql for OrderBy {
     fn to_sql(&self) -> String {
-        format!("{} {}", self.get_by(), match self.get_order() {
+        format!("{} {}", self.get_by().to_sql(), match self.get_order() {
             &Asc => "ASC",
             &Desc => "DESC"
         })
@@ -191,9 +192,20 @@ impl ToSql for Select {
     fn to_sql(&self) -> String {
         match self {
             &SelectOnly(ref fields) => {
-                fields.connect(", ")
+                let defs: Vec<String> = fields.iter().map(|f| f.to_sql()).collect();
+                defs.connect(", ")
             },
             &SelectAll => "*".to_string()
+        }
+    }
+}
+
+impl<T: Clone> ToSql for FieldDef<T> {
+    fn to_sql(&self) -> String {
+        let name = self.name();
+        match self.qual() {
+            Some(qual) => format!("{}.{}", qual, name),
+            None => name.to_string()
         }
     }
 }
@@ -205,7 +217,7 @@ pub trait ToPredicateValue {
 macro_rules! to_predicate_for_field(
     ($f:ty) => (
         impl ToPredicateValue for $f  {
-            fn to_predicate_value(&self) -> String { self.name.to_string() }
+            fn to_predicate_value(&self) -> String { self.def.to_sql() }
         }
     )
 )

@@ -14,27 +14,59 @@ pub trait UntypedField: Send + Sync + Clone {
 
 #[deriving(Clone)]
 pub struct NamedField<T> {
-    pub name: String
+    pub def: FieldDef<T>
+}
+
+impl<T: Clone> NamedField<T> {
+    pub fn new(name: &str) -> NamedField<T>  {
+        let def = FieldDef { name: name.to_string(), qual: None };
+        NamedField {
+            def: def
+        }
+    }
+
+    pub fn qual(&self, qual: &str) -> NamedField<T> {
+        let mut def = self.def.clone();
+        def.qual = Some(qual.to_string());
+        NamedField { def: def }
+    }
 }
 
 impl<T: Clone> Field<T> for NamedField<T> {
     fn to_def(&self) -> FieldDef<T> {
-        FieldDef(self.name.to_string())
+        self.def.clone()
     }
 }
 
 impl<T: Clone> UntypedField for NamedField<T> {
     fn to_def(&self) -> FieldDef<()> {
-        FieldDef(self.name.to_string())
+        FieldDef { 
+            name: self.def.name().to_string(),
+            qual: self.def.qual().map(|v| v.to_string())
+        }
     }
 }
 
 #[deriving(Clone)]
-pub struct FieldDef<T>(String);
+pub struct FieldDef<T>{
+    pub name: String,
+    pub qual: Option<String>
+}
 
 impl<T: Clone> FieldDef<T> {
-    pub fn name(&self) -> String {
-        self.0.to_string()
+    pub fn name(&self) -> &str {
+        self.name.as_slice()
+    }
+
+    pub fn qual(&self) -> Option<&String> {
+        self.qual.as_ref()
+    }
+
+    pub fn clone_with_erase(&self) -> FieldDef<()> {
+        FieldDef { 
+            name: self.name.to_string(),
+            qual: self.qual.clone()
+        }
     }
 }
 
