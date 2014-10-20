@@ -2,7 +2,9 @@
 #![feature(macro_rules)]
 
 extern crate deuterium;
+extern crate time;
 
+use time::Timespec;
 use deuterium::*;
 
 macro_rules! assert_sql(
@@ -115,6 +117,15 @@ fn aliases() {
 
 #[test]
 fn table_as_type() {
+
+    struct Jedi {
+        id: String,
+        name: String,
+        force_level: u8,
+        side: bool,
+        created_at: Timespec,
+        updated_at: Timespec
+    }
 
     let jedi_table = TableDef::new("jedi".to_string());
     let name = NamedField::<String>::new("name");

@@ -26,6 +26,13 @@ impl<T: Clone> NamedField<T> {
         }
     }
 
+    pub fn new_qual(name: &str, qual: &str) -> NamedField<T>  {
+        let def = FieldDef { name: name.to_string(), qual: Some(qual.to_string()) };
+        NamedField {
+            def: def
+        }
+    }
+
     pub fn qual(&self, qual: &str) -> NamedField<T> {
         let mut def = self.def.clone();
         def.qual = Some(qual.to_string());
