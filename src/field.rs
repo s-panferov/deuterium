@@ -162,6 +162,7 @@ number_comparable!(F32Comparable)
 number_comparable!(F64Comparable)
 
 impl StringComparable for String {}
+impl StringComparable for &'static str {}
 impl StringComparable for StringField {}
 impl StringComparable for RawExpression {}
 

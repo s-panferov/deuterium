@@ -241,8 +241,11 @@ impl ToPredicateValue for i32 { fn to_predicate_value(&self) -> String { self.to
 impl ToPredicateValue for i64 { fn to_predicate_value(&self) -> String { self.to_string() } }
 impl ToPredicateValue for f32 { fn to_predicate_value(&self) -> String { self.to_string() } }
 impl ToPredicateValue for f64 { fn to_predicate_value(&self) -> String { self.to_string() } }
+impl ToPredicateValue for &'static str {  
+    fn to_predicate_value(&self) -> String { format!("'{}'", self) } 
+}
 impl ToPredicateValue for String { 
-    fn to_predicate_value(&self) -> String { format!("'{}'", self.to_string()) } 
+    fn to_predicate_value(&self) -> String { format!("'{}'", self) } 
 }
 impl ToPredicateValue for Vec<u8> { fn to_predicate_value(&self) -> String { self.to_string() } }
 impl ToPredicateValue for Json { fn to_predicate_value(&self) -> String { self.to_string() } }

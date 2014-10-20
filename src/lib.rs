@@ -58,7 +58,7 @@ pub use select_query::{
 
 pub use expression::{RawExpression};
 pub use to_sql::{ToSql, QueryToSql};
-pub use from::{TableDef, From, RcFrom};
+pub use from::{TableDef, RcTable, Table, BoxedTable, From, RcFrom};
 
 mod field;
 mod predicate;
