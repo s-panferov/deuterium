@@ -45,6 +45,8 @@ pub use predicate::{
 };
 
 pub use select_query::{
+    Queryable,
+    Orderable,
     SelectQuery, 
     RcSelectQuery, 
     ToSelectQuery, 

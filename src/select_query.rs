@@ -7,7 +7,11 @@ use std::mem;
 
 use from::{From, RcFrom, FromSelect};
 use field::{Field};
-use predicate::{RcPredicate};
+use predicate::{
+    RcPredicate,
+    ToOrPredicate,
+    ToAndPredicate
+};
 use to_sql::{ToSql};
 use order_by::{OrderBy};
 use join::{Join};
@@ -67,6 +71,105 @@ pub struct SelectQuery<T, L> {
     pub joins: Vec<Join>
 }
 
+pub trait Queryable: Clone {
+    fn get_where(&self) -> &Option<RcPredicate>;
+    fn set_where(&mut self, RcPredicate);
+    fn unset_where(&mut self);
+
+    fn or(&self, predicate: RcPredicate) -> Self {
+        let mut query = self.clone();
+        match self.get_where() {
+            &Some(ref where_) => {
+                query.set_where(where_.or(predicate));
+            },
+            &None => {
+                query.set_where(predicate);
+            }
+        }
+        query
+    }
+
+    fn where_(&self, predicate: RcPredicate) -> Self {
+        let mut query = self.clone();
+        match self.get_where() {
+            &Some(ref where_) => {
+                query.set_where(where_.and(predicate));
+            },
+            &None => {
+                query.set_where(predicate);
+            }
+        }
+        query
+    }
+
+    fn and(&self, predicate: RcPredicate) -> Self {
+        self.where_(predicate)
+    }
+    
+}
+
+pub trait Orderable: Clone {
+    fn get_order_by_mut(&mut self) -> &mut Vec<OrderBy>;
+    fn set_order_by(&mut self, Vec<OrderBy>);
+
+    fn order_by<F: Clone>(&self, field: &Field<F>) -> Self {
+        let mut query = self.clone();
+        query.set_order_by(
+            vec![OrderBy::by(field)]
+        );
+        query
+    }
+
+    fn order_by_fields<F: Clone>(&self, fields: &[&Field<F>]) -> Self {
+        let mut query = self.clone();
+        query.set_order_by(
+            fields.iter().map(|f| OrderBy::by(*f)).collect()
+        );
+        query
+    }
+
+    fn reverse_by<F: Clone>(&self, field: &Field<F>) -> Self {
+        let mut query = self.clone();
+        query.set_order_by(
+            vec![OrderBy::reverse_by(field)]
+        );
+        query
+    }
+
+    fn reverse_by_fields<F: Clone>(&self, fields: &[&Field<F>]) -> Self {
+        let mut query = self.clone();
+        query.set_order_by(
+            fields.iter().map(|f| OrderBy::reverse_by(*f)).collect()
+        );
+        query
+    }
+
+    fn order_append<F: Clone>(&self, field: &Field<F>) -> Self {
+        let mut query = self.clone();
+        query.get_order_by_mut().push(OrderBy::by(field));
+        query
+    }
+
+    fn order_prepend<F: Clone>(&self, field: &Field<F>) -> Self {
+        let mut query = self.clone();
+        query.get_order_by_mut().insert(0, OrderBy::by(field));
+        query
+    }
+
+    fn order_reverse_append<F: Clone>(&self, field: &Field<F>) -> Self {
+        let mut query = self.clone();
+        query.get_order_by_mut().push(OrderBy::reverse_by(field));
+        query
+    }
+
+    fn order_reverse_prepend<F: Clone>(&self, field: &Field<F>) -> Self {
+        let mut query = self.clone();
+        query.get_order_by_mut().insert(0, OrderBy::reverse_by(field));
+        query
+    }
+
+}
+
 impl<T: Clone, L: Clone> SelectQuery<T, L> {
  
     pub fn new(select: Select, from: RcFrom) -> SelectQuery<T, L> {
@@ -79,12 +182,6 @@ impl<T: Clone, L: Clone> SelectQuery<T, L> {
             order_by: vec![],
             joins: vec![]
         }
-    }
-
-    pub fn where_(&self, predicate: RcPredicate) -> SelectQuery<T, L> {
-        let mut query = self.clone();
-        query.where_ = Some(predicate);
-        query
     }
 
     pub fn limit(&self, limit: uint) -> SelectQuery<T, LimitOne> {
@@ -106,54 +203,6 @@ impl<T: Clone, L: Clone> SelectQuery<T, L> {
     pub fn offset(&self, offset: uint) -> SelectQuery<T, L> {
         let mut query = self.clone();
         query.offset = Some(offset);
-        query
-    }
-
-    pub fn order_by<F: Clone>(&self, field: &Field<F>) -> SelectQuery<T, L> {
-        let mut query = self.clone();
-        query.order_by = vec![OrderBy::by(field)];
-        query
-    }
-
-    pub fn order_by_fields<F: Clone>(&self, fields: &[&Field<F>]) -> SelectQuery<T, L> {
-        let mut query = self.clone();
-        query.order_by = fields.iter().map(|f| OrderBy::by(*f)).collect();
-        query
-    }
-
-    pub fn reverse_by<F: Clone>(&self, field: &Field<F>) -> SelectQuery<T, L> {
-        let mut query = self.clone();
-        query.order_by = vec![OrderBy::reverse_by(field)];
-        query
-    }
-
-    pub fn reverse_by_fields<F: Clone>(&self, fields: &[&Field<F>]) -> SelectQuery<T, L> {
-        let mut query = self.clone();
-        query.order_by = fields.iter().map(|f| OrderBy::reverse_by(*f)).collect();
-        query
-    }
-
-    pub fn order_append<F: Clone>(&self, field: &Field<F>) -> SelectQuery<T, L> {
-        let mut query = self.clone();
-        query.order_by.push(OrderBy::by(field));
-        query
-    }
-
-    pub fn order_prepend<F: Clone>(&self, field: &Field<F>) -> SelectQuery<T, L> {
-        let mut query = self.clone();
-        query.order_by.insert(0, OrderBy::by(field));
-        query
-    }
-
-    pub fn order_reverse_append<F: Clone>(&self, field: &Field<F>) -> SelectQuery<T, L> {
-        let mut query = self.clone();
-        query.order_by.push(OrderBy::reverse_by(field));
-        query
-    }
-
-    pub fn order_reverse_prepend<F: Clone>(&self, field: &Field<F>) -> SelectQuery<T, L> {
-        let mut query = self.clone();
-        query.order_by.insert(0, OrderBy::reverse_by(field));
         query
     }
 
@@ -232,6 +281,17 @@ impl<T: Clone, L: Clone> SelectQuery<T, L> {
         query.joins.push(Join::cross_join(from.upcast()));
         query
     }
+}
+
+impl<T: Clone, L: Clone> Queryable for SelectQuery<T, L> { 
+    fn get_where(&self) -> &Option<RcPredicate> { &self.where_ }
+    fn set_where(&mut self, predicate: RcPredicate) { self.where_ = Some(predicate); }
+    fn unset_where(&mut self) { self.where_ = None; }
+}
+
+impl<T: Clone, L: Clone> Orderable for SelectQuery<T, L> { 
+    fn get_order_by_mut(&mut self) -> &mut Vec<OrderBy> { &mut self.order_by }
+    fn set_order_by(&mut self, order_by: Vec<OrderBy>) { self.order_by = order_by }
 }
 
 impl<T: Clone, L: Clone> ToSelectQuery for SelectQuery<T, L> { }
