@@ -19,15 +19,37 @@ pub struct NamedField<T> {
 }
 
 impl<T: Clone> NamedField<T> {
-    pub fn new(name: &str) -> NamedField<T>  {
-        let def = FieldDef { name: name.to_string(), qual: None };
+    pub fn new(name: &str, table_name: &str) -> NamedField<T>  {
+        let def = FieldDef { 
+            name: name.to_string(), 
+            table_name: table_name.to_string(), 
+            qual: None 
+        };
+
         NamedField {
             def: def
         }
     }
 
-    pub fn new_qual(name: &str, qual: &str) -> NamedField<T>  {
-        let def = FieldDef { name: name.to_string(), qual: Some(qual.to_string()) };
+    pub fn new_qual(name: &str, table_name: &str, qual: &str) -> NamedField<T>  {
+        let def = FieldDef { 
+            name: name.to_string(), 
+            table_name: table_name.to_string(),
+            qual: Some(qual.to_string()) 
+        };
+
+        NamedField {
+            def: def
+        }
+    }
+
+    pub fn field_of(name: &str, table: &Table) -> NamedField<T> {
+        let def = FieldDef { 
+            name: name.to_string(), 
+            table_name: table.get_table_name().to_string(),
+            qual: table.get_table_alias().as_ref().map(|v| v.to_string())
+        };
+
         NamedField {
             def: def
         }
@@ -41,7 +63,7 @@ impl<T: Clone> NamedField<T> {
 
     pub fn qual_for(&self, table: &Table) -> NamedField<T> {
         let mut def = self.def.clone();
-        def.qual = Some(table.get_table_alias().as_ref().map(|v| v.to_string()).unwrap_or_else(|| "".to_string()));
+        def.qual = table.get_table_alias().as_ref().map(|v| v.to_string());
         NamedField { def: def }
     }
 }
@@ -56,6 +78,7 @@ impl<T: Clone> UntypedField for NamedField<T> {
     fn to_def(&self) -> FieldDef<()> {
         FieldDef { 
             name: self.def.name().to_string(),
+            table_name: self.def.table_name.to_string(),
             qual: self.def.qual().map(|v| v.to_string())
         }
     }
@@ -64,6 +87,7 @@ impl<T: Clone> UntypedField for NamedField<T> {
 #[deriving(Clone)]
 pub struct FieldDef<T>{
     pub name: String,
+    pub table_name: String,
     pub qual: Option<String>
 }
 
@@ -79,6 +103,7 @@ impl<T: Clone> FieldDef<T> {
     pub fn clone_with_erase(&self) -> FieldDef<()> {
         FieldDef { 
             name: self.name.to_string(),
+            table_name: self.table_name.to_string(),
             qual: self.qual.clone()
         }
     }

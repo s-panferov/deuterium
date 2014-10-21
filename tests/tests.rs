@@ -17,7 +17,7 @@ macro_rules! assert_sql(
 fn it_works() {
 
     let jedi_table = TableDef::new("jedi".to_string());
-    let name = NamedField::<String>::new("name");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
     
     // Type is here only for sure it is right, it can be ommited in real code
     let query: SelectQuery<(String), LimitMany> = jedi_table.select_1(&name).where_(
@@ -32,7 +32,7 @@ fn it_works() {
 fn select_1_first() {
 
     let jedi_table = TableDef::new("jedi".to_string());
-    let name = NamedField::<String>::new("name");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
     
     let query: SelectQuery<(String), LimitOne> = jedi_table.select_1(&name).where_(
         name.is("Luke".to_string()).exclude()
@@ -46,7 +46,7 @@ fn select_1_first() {
 fn select_order() {
 
     let jedi_table = TableDef::new("jedi".to_string());
-    let name = NamedField::<String>::new("name");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
     
     let query: SelectQuery<(String), LimitOne> = jedi_table.select_1(&name)
         .first().order_by(&name);
@@ -59,7 +59,7 @@ fn select_order() {
 fn select_within() {
 
     let jedi_table = TableDef::new("jedi".to_string());
-    let name = NamedField::<String>::new("name");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
     
     let query = jedi_table.select_all().where_(name.within(vec!["Luke".to_string()]));
     assert_sql!(query, "SELECT * FROM jedi WHERE name IN ('Luke');");
@@ -70,7 +70,7 @@ fn select_within() {
 fn select_within_select() {
 
     let jedi_table = TableDef::new("jedi".to_string());
-    let name = NamedField::<String>::new("name");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
 
     let query = jedi_table.alias("j".to_string()).select_all().where_(name.within(
         jedi_table.select_1(&name)
@@ -94,7 +94,7 @@ fn select_from_select() {
 fn select_left_join() {
 
     let jedi_table = TableDef::new("jedi".to_string());
-    let name = NamedField::<String>::new("name");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
     
     let query = jedi_table.select_all().left_join(&jedi_table.alias("j".to_string()), name.is(name.clone()));
     assert_sql!(query, "SELECT * FROM jedi LEFT JOIN jedi AS j ON name = name;");
@@ -107,32 +107,8 @@ fn aliases() {
     let jedi_table = TableDef::new("jedi".to_string());
     let jedi_a = jedi_table.alias("a".to_string());
     let jedi_b = jedi_table.alias("b".to_string());
-    let name_a = NamedField::<String>::new("name").qual("a");
-    let name_b = NamedField::<String>::new("name").qual("b");
-    
-    let query = jedi_a.select_all().inner_join(&jedi_b, name_a.is(name_b));
-    assert_sql!(query, "SELECT * FROM jedi AS a INNER JOIN jedi AS b ON a.name = b.name;");
-
-}
-
-#[test]
-fn table_as_type() {
-
-    struct Jedi {
-        id: String,
-        name: String,
-        force_level: u8,
-        side: bool,
-        created_at: Timespec,
-        updated_at: Timespec
-    }
-
-    let jedi_table = TableDef::new("jedi".to_string());
-    let name = NamedField::<String>::new("name");
-    let jedi_a = jedi_table.alias("a".to_string());
-    let jedi_b = jedi_table.alias("b".to_string());
-    let name_a = name.qual_for(&jedi_a);
-    let name_b = name.qual_for(&jedi_b);
+    let name_a = NamedField::<String>::field_of("name", &jedi_a);
+    let name_b = NamedField::<String>::field_of("name", &jedi_b);
     
     let query = jedi_a.select_all().inner_join(&jedi_b, name_a.is(name_b));
     assert_sql!(query, "SELECT * FROM jedi AS a INNER JOIN jedi AS b ON a.name = b.name;");
