@@ -45,6 +45,7 @@ pub use predicate::{
 };
 
 pub use select_query::{
+    Selectable,
     Queryable,
     Orderable,
     SelectQuery, 
@@ -59,8 +60,8 @@ pub use select_query::{
 };
 
 pub use expression::{RawExpression};
-pub use to_sql::{ToSql, QueryToSql};
-pub use from::{TableDef, Selectable, Table, From, RcFrom};
+pub use to_sql::{ToSql, QueryToSql, FromToSql};
+pub use from::{TableDef, Table, From, BoxedFrom, RcFrom};
 
 mod field;
 mod predicate;
@@ -78,18 +79,18 @@ impl Query {
     // FIXME: Unify select_N after [generics](https://github.com/rust-lang/rfcs/issues/376)
 
     pub fn select_1<T: Clone>(field: &Field<T>, from: &From) -> SelectQuery<(T), LimitMany, ()> {
-        SelectQuery::new(SelectOnly(vec![field.to_def().clone_with_erase()]), from.upcast())
+        SelectQuery::new(SelectOnly(vec![field.to_def().clone_with_erase()]), from.upcast_from())
     }
 
     pub fn select_2<T1: Clone, T2: Clone>(field1: &Field<T1>, field2: &Field<T2>, from: &From) -> SelectQuery<(T1, T2), LimitMany, ()> {
-        SelectQuery::new(SelectOnly(vec![field1.to_def().clone_with_erase(), field2.to_def().clone_with_erase()]), from.upcast())
+        SelectQuery::new(SelectOnly(vec![field1.to_def().clone_with_erase(), field2.to_def().clone_with_erase()]), from.upcast_from())
     }
 
     pub fn select(fields: &[&UntypedField], from: &From) -> SelectQuery<(), LimitMany, ()> {
-        SelectQuery::new(SelectOnly(fields.iter().map(|f| f.to_def().clone_with_erase()).collect()), from.upcast())
+        SelectQuery::new(SelectOnly(fields.iter().map(|f| f.to_def().clone_with_erase()).collect()), from.upcast_from())
     }
 
     pub fn select_all(from: &From) -> SelectQuery<(), LimitMany, ()> {
-        SelectQuery::new(SelectAll, from.upcast())
+        SelectQuery::new(SelectAll, from.upcast_from())
     }
 }

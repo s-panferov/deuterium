@@ -32,7 +32,7 @@ use field::{
 
 use order_by::{OrderBy, Asc, Desc};
 use expression::{RawExpression};
-use from::{RcTable, Table, TableDef, FromSelect};
+use from::{Table, TableDef, FromSelect};
 use join::{
     Join, 
     ConditionedJoin, 
@@ -108,21 +108,11 @@ impl ToSql for Join {
     fn to_sql(&self) -> String {
         match self {
             &ConditionedJoin(ref join_type, ref from, ref on) => {
-                format!("{} {} ON {}", join_type.to_sql(), from.to_from_sql(), on.to_sql(false))
+                format!("{} {} ON {}", join_type.to_sql(), from.as_sql().to_from_sql(), on.to_sql(false))
             },
             &UnconditionedJoin(ref join_type, ref from) => {
-                format!("{} {}", join_type.to_sql(), from.to_from_sql())
+                format!("{} {}", join_type.to_sql(), from.as_sql().to_from_sql())
             }
-        }
-    }
-}
-
-impl FromToSql for RcTable {
-    fn to_from_sql(&self) -> String {
-        let name = self.get_table_name();
-        match self.get_table_alias() {
-            &Some(ref alias) => format!("{} AS {}", name, alias),
-            &None => format!("{}", name),
         }
     }
 }
@@ -147,7 +137,7 @@ impl<T, L, M> ToSql for SelectQuery<T, L, M> {
     fn to_sql(&self) -> String {
         let mut sql = format!("SELECT {} FROM {}", 
             self.select.to_sql(), 
-            self.from.to_from_sql()
+            self.from.as_sql().to_from_sql()
         );
 
         if !self.joins.is_empty() {

@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::mem;
 
 use from::{From, RcFrom, FromSelect};
-use field::{Field};
+use field::{Field, UntypedField};
 use predicate::{
     RcPredicate,
     ToOrPredicate,
@@ -206,80 +206,100 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
         query
     }
 
-    pub fn alias(&self, alias: String) -> FromSelect<T, L, M> {
-        FromSelect { select: self.clone(), alias: alias }
+    pub fn alias(&self, alias: &str) -> FromSelect<T, L, M> {
+        FromSelect { select: self.clone(), alias: alias.to_string() }
     }
 
     pub fn inner_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
         let mut query = self.clone();
-        query.joins.push(Join::inner_join(from.upcast(), on));
+        query.joins.push(Join::inner_join(from.upcast_from(), on));
         query
     }
 
     pub fn full_outer_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
         let mut query = self.clone();
-        query.joins.push(Join::full_outer_join(from.upcast(), on));
+        query.joins.push(Join::full_outer_join(from.upcast_from(), on));
         query
     }
 
     pub fn right_outer_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
         let mut query = self.clone();
-        query.joins.push(Join::right_outer_join(from.upcast(), on));
+        query.joins.push(Join::right_outer_join(from.upcast_from(), on));
         query
     }
 
     pub fn left_outer_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
         let mut query = self.clone();
-        query.joins.push(Join::left_outer_join(from.upcast(), on));
+        query.joins.push(Join::left_outer_join(from.upcast_from(), on));
         query
     }
 
     pub fn full_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
         let mut query = self.clone();
-        query.joins.push(Join::full_join(from.upcast(), on));
+        query.joins.push(Join::full_join(from.upcast_from(), on));
         query
     }
 
     pub fn left_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
         let mut query = self.clone();
-        query.joins.push(Join::left_join(from.upcast(), on));
+        query.joins.push(Join::left_join(from.upcast_from(), on));
         query
     }
 
     pub fn right_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
         let mut query = self.clone();
-        query.joins.push(Join::right_join(from.upcast(), on));
+        query.joins.push(Join::right_join(from.upcast_from(), on));
         query
     }
 
     pub fn natural_join(&self, from: &From) -> SelectQuery<T, L, M> {
         let mut query = self.clone();
-        query.joins.push(Join::natural_join(from.upcast()));
+        query.joins.push(Join::natural_join(from.upcast_from()));
         query
     }
     
     pub fn natural_left_join(&self, from: &From) -> SelectQuery<T, L, M> {
         let mut query = self.clone();
-        query.joins.push(Join::natural_left_join(from.upcast()));
+        query.joins.push(Join::natural_left_join(from.upcast_from()));
         query
     }
     
     pub fn natural_right_join(&self, from: &From) -> SelectQuery<T, L, M> {
         let mut query = self.clone();
-        query.joins.push(Join::natural_right_join(from.upcast()));
+        query.joins.push(Join::natural_right_join(from.upcast_from()));
         query
     }
     
     pub fn natural_full_join(&self, from: &From) -> SelectQuery<T, L, M> {
         let mut query = self.clone();
-        query.joins.push(Join::natural_full_join(from.upcast()));
+        query.joins.push(Join::natural_full_join(from.upcast_from()));
         query
     }
 
     pub fn cross_join(&self, from: &From) -> SelectQuery<T, L, M> {
         let mut query = self.clone();
-        query.joins.push(Join::cross_join(from.upcast()));
+        query.joins.push(Join::cross_join(from.upcast_from()));
         query
+    }
+}
+
+pub trait Selectable<M: Clone>: From {
+    // FIXME: Unify select_N after [generics](https://github.com/rust-lang/rfcs/issues/376)
+
+    fn select_1<T: Clone>(&self, field: &Field<T>) -> SelectQuery<(T), LimitMany, M> {
+        SelectQuery::new(SelectOnly(vec![field.to_def().clone_with_erase()]), self.upcast_from())
+    }
+
+    fn select_2<T1: Clone, T2: Clone>(&self, field1: &Field<T1>, field2: &Field<T2>) -> SelectQuery<(T1, T2), LimitMany, M> {
+        SelectQuery::new(SelectOnly(vec![field1.to_def().clone_with_erase(), field2.to_def().clone_with_erase()]), self.upcast_from())
+    }
+
+    fn select(&self, fields: &[&UntypedField]) -> SelectQuery<(), LimitMany, M> {
+        SelectQuery::new(SelectOnly(fields.iter().map(|f| f.to_def().clone_with_erase()).collect()), self.upcast_from())
+    }
+
+    fn select_all(&self) -> SelectQuery<(), LimitMany, M> {
+        SelectQuery::new(SelectAll, self.upcast_from())
     }
 }
 

@@ -1,44 +1,23 @@
 
 use std::sync::Arc;
 use to_sql::{FromToSql};
-use field::{Field, UntypedField};
-use select_query::{SelectQuery, SelectOnly, SelectAll, LimitMany};
+use select_query::{SelectQuery, Selectable};
 
-pub trait From: FromToSql + Clone { 
-    fn upcast(&self) -> RcFrom;
-}
-
-pub trait Selectable<M: Clone>: From {
-    // FIXME: Unify select_N after [generics](https://github.com/rust-lang/rfcs/issues/376)
-
-    fn select_1<T: Clone>(&self, field: &Field<T>) -> SelectQuery<(T), LimitMany, M> {
-        SelectQuery::new(SelectOnly(vec![field.to_def().clone_with_erase()]), self.upcast())
-    }
-
-    fn select_2<T1: Clone, T2: Clone>(&self, field1: &Field<T1>, field2: &Field<T2>) -> SelectQuery<(T1, T2), LimitMany, M> {
-        SelectQuery::new(SelectOnly(vec![field1.to_def().clone_with_erase(), field2.to_def().clone_with_erase()]), self.upcast())
-    }
-
-    fn select(&self, fields: &[&UntypedField]) -> SelectQuery<(), LimitMany, M> {
-        SelectQuery::new(SelectOnly(fields.iter().map(|f| f.to_def().clone_with_erase()).collect()), self.upcast())
-    }
-
-    fn select_all(&self) -> SelectQuery<(), LimitMany, M> {
-        SelectQuery::new(SelectAll, self.upcast())
-    }
+pub trait From { 
+    fn as_sql(&self) -> &FromToSql;
+    fn upcast_from(&self) -> RcFrom;
 }
 
 pub type BoxedFrom = Box<From + Send + Sync>;
 pub type RcFrom = Arc<BoxedFrom>;
 
-pub trait Table {
-    fn upcast(&self) -> RcTable;
+pub trait Table: Clone {
     fn get_table_name(&self) -> &String;
     fn get_table_alias(&self) -> &Option<String>;
 }
 
-pub type BoxedTable = Box<Table + Send + Sync>;
-pub type RcTable = Arc<BoxedTable>;
+// pub type BoxedTable = Box<Table + Send + Sync>;
+// pub type RcTable = Arc<BoxedTable>;
 
 #[deriving(Clone)]
 pub struct TableDef {
@@ -47,24 +26,22 @@ pub struct TableDef {
 }
 
 impl TableDef {
-    pub fn new(name: String) -> TableDef {
-        TableDef { name: name, alias: None }
+    pub fn new(name: &str) -> TableDef {
+        TableDef { name: name.to_string(), alias: None }
     }
 
-    pub fn alias(&self, alias: String) -> TableDef {
+    pub fn new_with_alias(name: &str, alias: &str) -> TableDef {
+        TableDef { name: name.to_string(), alias: Some(alias.to_string()) }
+    }
+
+    pub fn alias(&self, alias: &str) -> TableDef {
         let mut table_def = self.clone();
-        table_def.alias = Some(alias);
+        table_def.alias = Some(alias.to_string());
         table_def
     }
 }
 
-impl Selectable<TableDef> for TableDef { }
-
 impl Table for TableDef {
-    fn upcast(&self) -> RcTable {
-        Arc::new(box self.clone() as BoxedTable)
-    }
-
     fn get_table_name(&self) -> &String {
         &self.name
     }
@@ -74,17 +51,17 @@ impl Table for TableDef {
     }
 }
 
-impl From for TableDef { 
-    fn upcast(&self) -> RcFrom {
+impl From for TableDef {
+    fn as_sql(&self) -> &FromToSql {
+        self
+    }
+
+    fn upcast_from(&self) -> RcFrom {
         Arc::new(box self.clone() as BoxedFrom)
     }
 }
 
-impl From for RcTable { 
-    fn upcast(&self) -> RcFrom {
-        Arc::new(box self.clone() as BoxedFrom)
-    }
-}
+impl Selectable<()> for TableDef {}
 
 #[deriving(Clone)]
 pub struct FromSelect<T, L, M> {
@@ -93,9 +70,14 @@ pub struct FromSelect<T, L, M> {
 }
 
 impl<T: Clone, L: Clone, M: Clone> From for FromSelect<T, L, M> {
-    fn upcast(&self) -> RcFrom {
+    fn as_sql(&self) -> &FromToSql {
+        self
+    }
+
+    fn upcast_from(&self) -> RcFrom {
         Arc::new(box self.clone() as BoxedFrom)
     }
 }
 
 impl<T: Clone, L: Clone, M: Clone> Selectable<M> for FromSelect<T, L, M> {}
+

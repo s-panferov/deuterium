@@ -16,11 +16,11 @@ macro_rules! assert_sql(
 #[test]
 fn it_works() {
 
-    let jedi_table = TableDef::new("jedi".to_string());
+    let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
     
     // Type is here only for sure it is right, it can be ommited in real code
-    let query: SelectQuery<(String), LimitMany, TableDef> = jedi_table.select_1(&name).where_(
+    let query: SelectQuery<(String), LimitMany, ()> = jedi_table.select_1(&name).where_(
         name.is("Luke".to_string()).exclude()
     );
 
@@ -31,10 +31,10 @@ fn it_works() {
 #[test]
 fn select_1_first() {
 
-    let jedi_table = TableDef::new("jedi".to_string());
+    let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
     
-    let query: SelectQuery<(String), LimitOne, TableDef> = jedi_table.select_1(&name).where_(
+    let query: SelectQuery<(String), LimitOne, ()> = jedi_table.select_1(&name).where_(
         name.is("Luke".to_string()).exclude()
     ).first().offset(10);
 
@@ -45,10 +45,10 @@ fn select_1_first() {
 #[test]
 fn select_order() {
 
-    let jedi_table = TableDef::new("jedi".to_string());
+    let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
     
-    let query: SelectQuery<(String), LimitOne, TableDef> = jedi_table.select_1(&name)
+    let query: SelectQuery<(String), LimitOne, ()> = jedi_table.select_1(&name)
         .first().order_by(&name);
 
     assert_sql!(query, "SELECT name FROM jedi ORDER BY name ASC LIMIT 1;");
@@ -58,7 +58,7 @@ fn select_order() {
 #[test]
 fn select_within() {
 
-    let jedi_table = TableDef::new("jedi".to_string());
+    let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
     
     let query = jedi_table.select_all().where_(name.within(vec!["Luke".to_string()]));
@@ -69,10 +69,10 @@ fn select_within() {
 #[test]
 fn select_within_select() {
 
-    let jedi_table = TableDef::new("jedi".to_string());
+    let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
 
-    let query = jedi_table.alias("j".to_string()).select_all().where_(name.within(
+    let query = jedi_table.alias("j").select_all().where_(name.within(
         jedi_table.select_1(&name)
     ));
 
@@ -83,9 +83,9 @@ fn select_within_select() {
 #[test]
 fn select_from_select() {
 
-    let jedi_table = TableDef::new("jedi".to_string());
+    let jedi_table = TableDef::new("jedi");
     
-    let query = jedi_table.select_all().alias("jedi_list".to_string()).select_all();
+    let query = jedi_table.select_all().alias("jedi_list").select_all();
     assert_sql!(query, "SELECT * FROM (SELECT * FROM jedi) as jedi_list;");
 
 }
@@ -93,10 +93,10 @@ fn select_from_select() {
 #[test]
 fn select_left_join() {
 
-    let jedi_table = TableDef::new("jedi".to_string());
+    let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
     
-    let query = jedi_table.select_all().left_join(&jedi_table.alias("j".to_string()), name.is(name.clone()));
+    let query = jedi_table.select_all().left_join(&jedi_table.alias("j"), name.is(name.clone()));
     assert_sql!(query, "SELECT * FROM jedi LEFT JOIN jedi AS j ON name = name;");
 
 }
@@ -104,9 +104,9 @@ fn select_left_join() {
 #[test]
 fn aliases() {
 
-    let jedi_table = TableDef::new("jedi".to_string());
-    let jedi_a = jedi_table.alias("a".to_string());
-    let jedi_b = jedi_table.alias("b".to_string());
+    let jedi_table = TableDef::new("jedi");
+    let jedi_a = jedi_table.alias("a");
+    let jedi_b = jedi_table.alias("b");
     let name_a = NamedField::<String>::field_of("name", &jedi_a);
     let name_b = NamedField::<String>::field_of("name", &jedi_b);
     
