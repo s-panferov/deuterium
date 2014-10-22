@@ -77,19 +77,19 @@ impl Query {
 
     // FIXME: Unify select_N after [generics](https://github.com/rust-lang/rfcs/issues/376)
 
-    pub fn select_1<T: Clone>(field: &Field<T>, from: &From) -> SelectQuery<(T), LimitMany> {
+    pub fn select_1<T: Clone>(field: &Field<T>, from: &From) -> SelectQuery<(T), LimitMany, ()> {
         SelectQuery::new(SelectOnly(vec![field.to_def().clone_with_erase()]), from.upcast())
     }
 
-    pub fn select_2<T1: Clone, T2: Clone>(field1: &Field<T1>, field2: &Field<T2>, from: &From) -> SelectQuery<(T1, T2), LimitMany> {
+    pub fn select_2<T1: Clone, T2: Clone>(field1: &Field<T1>, field2: &Field<T2>, from: &From) -> SelectQuery<(T1, T2), LimitMany, ()> {
         SelectQuery::new(SelectOnly(vec![field1.to_def().clone_with_erase(), field2.to_def().clone_with_erase()]), from.upcast())
     }
 
-    pub fn select(fields: &[&UntypedField], from: &From) -> SelectQuery<(), LimitMany> {
+    pub fn select(fields: &[&UntypedField], from: &From) -> SelectQuery<(), LimitMany, ()> {
         SelectQuery::new(SelectOnly(fields.iter().map(|f| f.to_def().clone_with_erase()).collect()), from.upcast())
     }
 
-    pub fn select_all(from: &From) -> SelectQuery<(), LimitMany> {
+    pub fn select_all(from: &From) -> SelectQuery<(), LimitMany, ()> {
         SelectQuery::new(SelectAll, from.upcast())
     }
 }

@@ -4,24 +4,24 @@ use to_sql::{FromToSql};
 use field::{Field, UntypedField};
 use select_query::{SelectQuery, SelectOnly, SelectAll, LimitMany};
 
-pub trait From: FromToSql { 
+pub trait From: FromToSql + Clone { 
     fn upcast(&self) -> RcFrom;
 
     // FIXME: Unify select_N after [generics](https://github.com/rust-lang/rfcs/issues/376)
 
-    fn select_1<T: Clone>(&self, field: &Field<T>) -> SelectQuery<(T), LimitMany> {
+    fn select_1<T: Clone>(&self, field: &Field<T>) -> SelectQuery<(T), LimitMany, Self> {
         SelectQuery::new(SelectOnly(vec![field.to_def().clone_with_erase()]), self.upcast())
     }
 
-    fn select_2<T1: Clone, T2: Clone>(&self, field1: &Field<T1>, field2: &Field<T2>) -> SelectQuery<(T1, T2), LimitMany> {
+    fn select_2<T1: Clone, T2: Clone>(&self, field1: &Field<T1>, field2: &Field<T2>) -> SelectQuery<(T1, T2), LimitMany, Self> {
         SelectQuery::new(SelectOnly(vec![field1.to_def().clone_with_erase(), field2.to_def().clone_with_erase()]), self.upcast())
     }
 
-    fn select(&self, fields: &[&UntypedField]) -> SelectQuery<(), LimitMany> {
+    fn select(&self, fields: &[&UntypedField]) -> SelectQuery<(), LimitMany, Self> {
         SelectQuery::new(SelectOnly(fields.iter().map(|f| f.to_def().clone_with_erase()).collect()), self.upcast())
     }
 
-    fn select_all(&self) -> SelectQuery<(), LimitMany> {
+    fn select_all(&self) -> SelectQuery<(), LimitMany, Self> {
         SelectQuery::new(SelectAll, self.upcast())
     }
 }
@@ -83,12 +83,12 @@ impl From for RcTable {
 }
 
 #[deriving(Clone)]
-pub struct FromSelect<T,L> {
-    pub select: SelectQuery<T,L>,
+pub struct FromSelect<T, L, M> {
+    pub select: SelectQuery<T, L, M>,
     pub alias: String 
 }
 
-impl<T: Clone, L: Clone> From for FromSelect<T,L> {
+impl<T: Clone, L: Clone, M: Clone> From for FromSelect<T, L, M> {
     fn upcast(&self) -> RcFrom {
         Arc::new(box self.clone() as BoxedFrom)
     }

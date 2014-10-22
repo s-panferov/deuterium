@@ -20,7 +20,7 @@ fn it_works() {
     let name = NamedField::<String>::field_of("name", &jedi_table);
     
     // Type is here only for sure it is right, it can be ommited in real code
-    let query: SelectQuery<(String), LimitMany> = jedi_table.select_1(&name).where_(
+    let query: SelectQuery<(String), LimitMany, TableDef> = jedi_table.select_1(&name).where_(
         name.is("Luke".to_string()).exclude()
     );
 
@@ -34,7 +34,7 @@ fn select_1_first() {
     let jedi_table = TableDef::new("jedi".to_string());
     let name = NamedField::<String>::field_of("name", &jedi_table);
     
-    let query: SelectQuery<(String), LimitOne> = jedi_table.select_1(&name).where_(
+    let query: SelectQuery<(String), LimitOne, TableDef> = jedi_table.select_1(&name).where_(
         name.is("Luke".to_string()).exclude()
     ).first().offset(10);
 
@@ -48,7 +48,7 @@ fn select_order() {
     let jedi_table = TableDef::new("jedi".to_string());
     let name = NamedField::<String>::field_of("name", &jedi_table);
     
-    let query: SelectQuery<(String), LimitOne> = jedi_table.select_1(&name)
+    let query: SelectQuery<(String), LimitOne, TableDef> = jedi_table.select_1(&name)
         .first().order_by(&name);
 
     assert_sql!(query, "SELECT name FROM jedi ORDER BY name ASC LIMIT 1;");

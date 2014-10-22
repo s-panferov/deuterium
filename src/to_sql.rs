@@ -137,13 +137,13 @@ impl FromToSql for TableDef {
     }
 }
 
-impl<T, L> FromToSql for FromSelect<T, L> {
+impl<T, L, M> FromToSql for FromSelect<T, L, M> {
     fn to_from_sql(&self) -> String {
         format!("({}) as {}", self.select.to_sql(), self.alias.to_string())
     }
 }
 
-impl<T, L> ToSql for SelectQuery<T, L> {
+impl<T, L, M> ToSql for SelectQuery<T, L, M> {
     fn to_sql(&self) -> String {
         let mut sql = format!("SELECT {} FROM {}", 
             self.select.to_sql(), 
@@ -176,7 +176,7 @@ impl<T, L> ToSql for SelectQuery<T, L> {
     }
 }
 
-impl<T, L> QueryToSql for SelectQuery<T, L> {
+impl<T, L, M> QueryToSql for SelectQuery<T, L, M> {
     fn to_final_sql(&self) -> String {
         format!("{};", self.to_sql())
     }
@@ -259,7 +259,7 @@ impl<T: ToPredicateValue> ToPredicateValue for Vec<T> {
     }  
 }
 
-impl<T, L> ToPredicateValue for SelectQuery<T, L> {
+impl<T, L, M> ToPredicateValue for SelectQuery<T, L, M> {
     fn to_predicate_value(&self) -> String { self.to_sql() }   
 }
 
