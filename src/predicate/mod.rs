@@ -9,7 +9,7 @@ pub use self::is_null::{IsNullPredicate, ToIsNullPredicate};
 pub use self::or::{OrPredicate, ToOrPredicate};
 pub use self::and::{AndPredicate, ToAndPredicate};
 pub use self::exclude::{ExcludePredicate, ToExcludePredicate};
-pub use self::within::{
+pub use self::in_::{
     InPredicate, ToInPredicate
 };
 
@@ -26,7 +26,7 @@ pub use self::inequality::{
 pub mod is;
 pub mod is_null;
 pub mod or;
-pub mod within;
+pub mod in_;
 pub mod range;
 pub mod and;
 pub mod inequality;

@@ -16,9 +16,6 @@ pub trait Table: Clone {
     fn get_table_alias(&self) -> &Option<String>;
 }
 
-// pub type BoxedTable = Box<Table + Send + Sync>;
-// pub type RcTable = Arc<BoxedTable>;
-
 #[deriving(Clone)]
 pub struct TableDef {
     name: String,
