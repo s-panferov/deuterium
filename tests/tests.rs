@@ -4,7 +4,6 @@
 extern crate deuterium;
 extern crate time;
 
-use time::Timespec;
 use deuterium::*;
 
 #[macro_export]
