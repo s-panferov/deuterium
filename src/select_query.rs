@@ -118,64 +118,56 @@ pub trait Queryable: Clone {
     
 }
 
+macro_rules! with_clone(
+    ($slf: ident, $v:ident, $ex:expr) => ({
+        let mut $v = $slf.clone();
+        $ex;
+        $v
+    })
+)
+
 pub trait Orderable: Clone {
     fn get_order_by_mut(&mut self) -> &mut Vec<OrderBy>;
     fn set_order_by(&mut self, Vec<OrderBy>);
 
     fn order_by<F: Clone>(&self, field: &Field<F>) -> Self {
-        let mut query = self.clone();
-        query.set_order_by(
+        with_clone!(self, query, query.set_order_by(
             vec![OrderBy::by(field)]
-        );
-        query
+        ))
     }
 
     fn order_by_fields<F: Clone>(&self, fields: &[&Field<F>]) -> Self {
-        let mut query = self.clone();
-        query.set_order_by(
+        with_clone!(self, query, query.set_order_by(
             fields.iter().map(|f| OrderBy::by(*f)).collect()
-        );
-        query
+        ))
     }
 
     fn reverse_by<F: Clone>(&self, field: &Field<F>) -> Self {
-        let mut query = self.clone();
-        query.set_order_by(
+        with_clone!(self, query, query.set_order_by(
             vec![OrderBy::reverse_by(field)]
-        );
-        query
+        ))
     }
 
     fn reverse_by_fields<F: Clone>(&self, fields: &[&Field<F>]) -> Self {
-        let mut query = self.clone();
-        query.set_order_by(
+        with_clone!(self, query, query.set_order_by(
             fields.iter().map(|f| OrderBy::reverse_by(*f)).collect()
-        );
-        query
+        ))
     }
 
     fn order_append<F: Clone>(&self, field: &Field<F>) -> Self {
-        let mut query = self.clone();
-        query.get_order_by_mut().push(OrderBy::by(field));
-        query
+        with_clone!(self, query, query.get_order_by_mut().push(OrderBy::by(field)))
     }
 
     fn order_prepend<F: Clone>(&self, field: &Field<F>) -> Self {
-        let mut query = self.clone();
-        query.get_order_by_mut().insert(0, OrderBy::by(field));
-        query
+        with_clone!(self, query, query.get_order_by_mut().insert(0, OrderBy::by(field)))
     }
 
     fn order_reverse_append<F: Clone>(&self, field: &Field<F>) -> Self {
-        let mut query = self.clone();
-        query.get_order_by_mut().push(OrderBy::reverse_by(field));
-        query
+        with_clone!(self, query, query.get_order_by_mut().push(OrderBy::reverse_by(field)))
     }
 
     fn order_reverse_prepend<F: Clone>(&self, field: &Field<F>) -> Self {
-        let mut query = self.clone();
-        query.get_order_by_mut().insert(0, OrderBy::reverse_by(field));
-        query
+        with_clone!(self, query, query.get_order_by_mut().insert(0, OrderBy::reverse_by(field)))
     }
 
 }
@@ -206,14 +198,8 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
         unsafe{ mem::transmute(query) }
     }
 
-    pub fn last(&self) -> SelectQuery<T, LimitOne, M> {
-        unimplemented!()
-    }
-
     pub fn offset(&self, offset: uint) -> SelectQuery<T, L, M> {
-        let mut query = self.clone();
-        query.offset = Some(offset);
-        query
+        with_clone!(self, query, query.offset = Some(offset))
     }
 
     pub fn alias(&self, alias: &str) -> FromSelect<T, L, M> {
@@ -221,75 +207,51 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
     }
 
     pub fn inner_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
-        let mut query = self.clone();
-        query.joins.push(Join::inner_join(from.upcast_from(), on));
-        query
+        with_clone!(self, query, query.joins.push(Join::inner_join(from.upcast_from(), on)))
     }
 
     pub fn full_outer_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
-        let mut query = self.clone();
-        query.joins.push(Join::full_outer_join(from.upcast_from(), on));
-        query
+        with_clone!(self, query, query.joins.push(Join::full_outer_join(from.upcast_from(), on)))
     }
 
     pub fn right_outer_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
-        let mut query = self.clone();
-        query.joins.push(Join::right_outer_join(from.upcast_from(), on));
-        query
+        with_clone!(self, query, query.joins.push(Join::right_outer_join(from.upcast_from(), on)))
     }
 
     pub fn left_outer_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
-        let mut query = self.clone();
-        query.joins.push(Join::left_outer_join(from.upcast_from(), on));
-        query
+        with_clone!(self, query, query.joins.push(Join::left_outer_join(from.upcast_from(), on)))
     }
 
     pub fn full_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
-        let mut query = self.clone();
-        query.joins.push(Join::full_join(from.upcast_from(), on));
-        query
+        with_clone!(self, query, query.joins.push(Join::full_join(from.upcast_from(), on)))
     }
 
     pub fn left_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
-        let mut query = self.clone();
-        query.joins.push(Join::left_join(from.upcast_from(), on));
-        query
+        with_clone!(self, query, query.joins.push(Join::left_join(from.upcast_from(), on)))
     }
 
     pub fn right_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
-        let mut query = self.clone();
-        query.joins.push(Join::right_join(from.upcast_from(), on));
-        query
+        with_clone!(self, query, query.joins.push(Join::right_join(from.upcast_from(), on)))
     }
 
     pub fn natural_join(&self, from: &From) -> SelectQuery<T, L, M> {
-        let mut query = self.clone();
-        query.joins.push(Join::natural_join(from.upcast_from()));
-        query
+        with_clone!(self, query, query.joins.push(Join::natural_join(from.upcast_from())))
     }
     
     pub fn natural_left_join(&self, from: &From) -> SelectQuery<T, L, M> {
-        let mut query = self.clone();
-        query.joins.push(Join::natural_left_join(from.upcast_from()));
-        query
+        with_clone!(self, query, query.joins.push(Join::natural_left_join(from.upcast_from())))
     }
     
     pub fn natural_right_join(&self, from: &From) -> SelectQuery<T, L, M> {
-        let mut query = self.clone();
-        query.joins.push(Join::natural_right_join(from.upcast_from()));
-        query
+        with_clone!(self, query, query.joins.push(Join::natural_right_join(from.upcast_from())))
     }
     
     pub fn natural_full_join(&self, from: &From) -> SelectQuery<T, L, M> {
-        let mut query = self.clone();
-        query.joins.push(Join::natural_full_join(from.upcast_from()));
-        query
+        with_clone!(self, query, query.joins.push(Join::natural_full_join(from.upcast_from())))
     }
 
     pub fn cross_join(&self, from: &From) -> SelectQuery<T, L, M> {
-        let mut query = self.clone();
-        query.joins.push(Join::cross_join(from.upcast_from()));
-        query
+        with_clone!(self, query, query.joins.push(Join::cross_join(from.upcast_from())))
     }
 }
 
