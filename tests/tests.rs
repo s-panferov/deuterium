@@ -7,26 +7,15 @@ extern crate time;
 use time::Timespec;
 use deuterium::*;
 
+#[macro_export]
 macro_rules! assert_sql(
     ($query:expr, $s:expr) => (
         assert_eq!($query.to_final_sql().as_slice(), $s)
     )
 )
 
-#[test]
-fn it_works() {
-
-    let jedi_table = TableDef::new("jedi");
-    let name = NamedField::<String>::field_of("name", &jedi_table);
-    
-    // Type is here only for sure it is right, it can be ommited in real code
-    let query: SelectQuery<(String), LimitMany, ()> = jedi_table.select_1(&name).where_(
-        name.is("Luke".to_string()).exclude()
-    );
-
-    assert_sql!(query, "SELECT name FROM jedi WHERE name != 'Luke';");
-
-}
+mod simple_select;
+mod where_;
 
 #[test]
 fn select_1_first() {
@@ -34,7 +23,7 @@ fn select_1_first() {
     let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
     
-    let query: SelectQuery<(String), LimitOne, ()> = jedi_table.select_1(&name).where_(
+    let query = jedi_table.select_1(&name).where_(
         name.is("Luke".to_string()).exclude()
     ).first().offset(10);
 

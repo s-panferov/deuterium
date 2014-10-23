@@ -11,7 +11,7 @@ use predicate::{
     AndPredicate,
     InPredicate,
     InRangePredicate, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft,
-    InequalityPredicate, LessThan, LessThanEqual, GreaterThan, GreaterTranEqual,
+    InequalityPredicate, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual,
     ExcludePredicate,
     IsNullPredicate
 };
@@ -382,7 +382,7 @@ impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InequalityPred
                     format!("{} <= {}", name, value)
                 }
             },
-            GreaterTranEqual => {
+            GreaterThanEqual => {
                 if !negation {
                     format!("{} >= {}", name, value)
                 } else {

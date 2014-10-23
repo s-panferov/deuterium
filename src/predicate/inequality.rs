@@ -16,7 +16,7 @@ pub enum Inequality {
     LessThan,
     LessThanEqual,
     GreaterThan,
-    GreaterTranEqual
+    GreaterThanEqual
 }
 
 #[deriving(Send, Clone)]
@@ -63,7 +63,7 @@ macro_rules! inequality_methods(
             InequalityPredicate {
                 field: self.clone(),
                 value: val,
-                inequality: LessThanEqual
+                inequality: GreaterThanEqual
             }.upcast()
         }
     )

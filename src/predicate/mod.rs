@@ -20,7 +20,7 @@ pub use self::range::{
 
 pub use self::inequality::{
     InequalityPredicate, ToInequalityPredicate,
-    Inequality, LessThan, LessThanEqual, GreaterThan, GreaterTranEqual
+    Inequality, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual
 };
 
 pub mod is;

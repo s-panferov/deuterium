@@ -39,7 +39,7 @@ pub use predicate::{
     InRangePredicate, ToInRangePredicate, 
     InRangeBounds, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft,
     InequalityPredicate, ToInequalityPredicate, 
-    Inequality, LessThan, LessThanEqual, GreaterThan, GreaterTranEqual,
+    Inequality, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual,
     ExcludePredicate, ToExcludePredicate,
     IsNullPredicate, ToIsNullPredicate
 };

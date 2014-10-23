@@ -10,7 +10,8 @@ use field::{Field, UntypedField};
 use predicate::{
     RcPredicate,
     ToOrPredicate,
-    ToAndPredicate
+    ToAndPredicate,
+    ToExcludePredicate
 };
 use to_sql::{ToSql};
 use order_by::{OrderBy};
@@ -71,39 +72,48 @@ pub struct SelectQuery<T, L, M> {
     pub joins: Vec<Join>
 }
 
+macro_rules! set_where(
+    ($s:ident, $pr:expr, $w:ident, $new_pr:expr) => ({
+        let mut query = $s.clone();
+        match $s.get_where() {
+            &Some(ref $w) => {
+                query.set_where($new_pr);
+            },
+            &None => {
+                query.set_where($pr);
+            }
+        }
+        query
+    })
+)
+
 pub trait Queryable: Clone {
     fn get_where(&self) -> &Option<RcPredicate>;
     fn set_where(&mut self, RcPredicate);
     fn unset_where(&mut self);
 
     fn or(&self, predicate: RcPredicate) -> Self {
-        let mut query = self.clone();
-        match self.get_where() {
-            &Some(ref where_) => {
-                query.set_where(where_.or(predicate));
-            },
-            &None => {
-                query.set_where(predicate);
-            }
-        }
-        query
+        set_where!(self, predicate, w, w.or(predicate))
     }
 
     fn where_(&self, predicate: RcPredicate) -> Self {
-        let mut query = self.clone();
-        match self.get_where() {
-            &Some(ref where_) => {
-                query.set_where(where_.and(predicate));
-            },
-            &None => {
-                query.set_where(predicate);
-            }
-        }
-        query
+        set_where!(self, predicate, w, w.and(predicate))
     }
 
     fn and(&self, predicate: RcPredicate) -> Self {
         self.where_(predicate)
+    }
+
+    fn exclude(&self, predicate: RcPredicate) -> Self {
+       set_where!(self, predicate.exclude(), w, w.and(predicate.exclude()))
+    }
+
+    fn and_exclude(&self, predicate: RcPredicate) -> Self {
+       self.exclude(predicate)
+    }
+
+    fn or_exclude(&self, predicate: RcPredicate) -> Self {
+       set_where!(self, predicate.exclude(), w, w.or(predicate.exclude()))
     }
     
 }
