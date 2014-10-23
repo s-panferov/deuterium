@@ -64,7 +64,7 @@ pub use to_sql::{ToSql, QueryToSql, FromToSql};
 pub use from::{TableDef, Table, From, BoxedFrom, RcFrom};
 
 mod field;
-mod predicate;
+pub mod predicate;
 mod select_query;
 mod to_sql;
 mod expression;

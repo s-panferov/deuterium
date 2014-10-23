@@ -23,15 +23,15 @@ pub use self::inequality::{
     Inequality, LessThan, LessThanEqual, GreaterThan, GreaterTranEqual
 };
 
-mod is;
-mod is_null;
-mod or;
-mod within;
-mod range;
-mod and;
-mod inequality;
-mod exclude;
-mod raw;
+pub mod is;
+pub mod is_null;
+pub mod or;
+pub mod within;
+pub mod range;
+pub mod and;
+pub mod inequality;
+pub mod exclude;
+pub mod raw;
 
 pub trait Predicate: Sync + Send + PredicateToSql { 
     fn upcast(self) -> RcPredicate {
