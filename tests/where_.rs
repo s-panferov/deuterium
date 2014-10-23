@@ -58,6 +58,28 @@ fn predicate_and_or() {
 }
 
 #[test]
+fn exclude_and() {
+
+    let jedi_table = TableDef::new("jedi");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
+    let side = NamedField::<bool>::field_of("side", &jedi_table);
+    
+    let query = jedi_table.select_all().exclude(name.is("Luke").and(side.is(true)));
+    assert_sql!(query, "SELECT * FROM jedi WHERE (name != 'Luke') AND (side != true);"); 
+}
+
+#[test]
+fn exclude_or() {
+
+    let jedi_table = TableDef::new("jedi");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
+    let side = NamedField::<bool>::field_of("side", &jedi_table);
+    
+    let query = jedi_table.select_all().exclude(name.is("Luke").or(side.is(true)));
+    assert_sql!(query, "SELECT * FROM jedi WHERE (name != 'Luke') AND (side != true);"); 
+}
+
+#[test]
 fn predicate_inequality() {
 
     let jedi_table = TableDef::new("jedi");
@@ -93,4 +115,29 @@ fn predicate_inequality_exclude() {
 
     let query = jedi_table.select_all().exclude(force_level.gte(100i8));
     assert_sql!(query, "SELECT * FROM jedi WHERE force_level < 100;"); 
+}
+
+#[test]
+fn predicate_is_null() {
+
+    let jedi_table = TableDef::new("jedi");
+    let force_level = NamedField::<i8>::field_of("force_level", &jedi_table);
+    
+    let query = jedi_table.select_all().where_(force_level.is_null());
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level IS NULL;"); 
+
+    let query = jedi_table.select_all().exclude(force_level.is_null());
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level IS NOT NULL;");     
+
+}
+
+#[test]
+fn predicate_within() {
+
+    let jedi_table = TableDef::new("jedi");
+    let force_level = NamedField::<i8>::field_of("force_level", &jedi_table);
+    
+    let query = jedi_table.select_all().where_(force_level.in_(vec![100i8, 120i8]));
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level IN (100, 120);");     
+
 }

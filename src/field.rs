@@ -153,6 +153,7 @@ impl I64ComparableList for Vec<i64> {}
 impl F32ComparableList for Vec<f32> {}
 impl F64ComparableList for Vec<f64> {}
 impl StringComparableList for Vec<String> {}
+impl StringComparableList for Vec<&'static str> {}
 impl ByteListComparableList for Vec<Vec<u8>> {}
 impl JsonComparableList for Vec<Json> {}
 impl TimespecComparableList for Vec<Timespec> {}

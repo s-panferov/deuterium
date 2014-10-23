@@ -302,11 +302,7 @@ impl PredicateToSql for AndPredicate {
     fn to_sql(&self, negation: bool) -> String {
         let left = self.left.to_sql(negation);
         let right = self.right.to_sql(negation);
-        if !negation {
-            format!("({}) AND ({})", left, right)
-        } else {
-            format!("({}) OR ({})", left, right)
-        }
+        format!("({}) AND ({})", left, right)
     }
 }
 

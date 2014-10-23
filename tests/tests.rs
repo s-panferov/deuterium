@@ -49,7 +49,7 @@ fn select_within() {
     let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
     
-    let query = jedi_table.select_all().where_(name.within(vec!["Luke".to_string()]));
+    let query = jedi_table.select_all().where_(name.in_(vec!["Luke".to_string()]));
     assert_sql!(query, "SELECT * FROM jedi WHERE name IN ('Luke');");
 
 }
@@ -60,7 +60,7 @@ fn select_within_select() {
     let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
 
-    let query = jedi_table.alias("j").select_all().where_(name.within(
+    let query = jedi_table.alias("j").select_all().where_(name.in_(
         jedi_table.select_1(&name)
     ));
 

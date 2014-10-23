@@ -19,12 +19,12 @@ pub struct InPredicate<F, T> {
 }
 
 pub trait ToInPredicate<F, T> {
-    fn within(&self, val: T) -> RcPredicate;
+    fn in_(&self, val: T) -> RcPredicate;
 }
 
-macro_rules! within_methods(
+macro_rules! in_methods(
     ($v:ty) => (
-        fn within(&self, values: $v) -> RcPredicate {
+        fn in_(&self, values: $v) -> RcPredicate {
             InPredicate {
                 field: self.clone(),
                 values: values
@@ -38,7 +38,7 @@ macro_rules! impl_for(
         impl<T: $v> Predicate for InPredicate<$field, T> { }
 
         impl<T: $v> ToInPredicate<$field, T> for $field {
-            within_methods!(T)   
+            in_methods!(T)   
         }
     )
 )
