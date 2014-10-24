@@ -199,3 +199,14 @@ fn predicate_like() {
     assert_sql!(query, "SELECT * FROM jedi WHERE name NOT ILIKE 'Luke%';");        
 
 }
+
+#[test]
+fn predicate_like_another_string_field() {
+
+    let jedi_table = TableDef::new("jedi");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
+    
+    let query = jedi_table.select_all().where_(name.like(name.clone()));
+    assert_sql!(query, "SELECT * FROM jedi WHERE name LIKE name;");                 
+
+}

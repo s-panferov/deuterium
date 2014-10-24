@@ -1,42 +1,49 @@
 
 use predicate::{Predicate, RcPredicate};
 use expression::{RawExpression};
-use field::{StringField};
+use field::{StringField, StringComparable};
 
 #[deriving(Send, Clone)]
-pub struct LikePredicate<F> {
+pub struct LikePredicate<F, T> {
     pub field: F,
-    pub value: String,
+    pub value: T,
     pub case_sensitive: bool
 }
 
-pub trait ToLikePredicate<F> {
-    fn like(&self, val: &str) -> RcPredicate;
-    fn ilike(&self, val: &str) -> RcPredicate;
+pub trait ToLikePredicate<F, T> {
+    fn like(&self, val: T) -> RcPredicate;
+    fn ilike(&self, val: T) -> RcPredicate;
 }
 
-macro_rules! impl_for(
-    ($field:ident) => (
-        impl Predicate for LikePredicate<$field> { }
-        impl ToLikePredicate<$field> for $field { 
-            fn like(&self, val: &str) -> RcPredicate {
-                LikePredicate {
-                    field: self.clone(),
-                    value: val.to_string(),
-                    case_sensitive: true
-                }.upcast()
-            }
+macro_rules! is_methods(
+    ($v:ty) => (
+        fn like(&self, val: $v) -> RcPredicate {
+            LikePredicate {
+                field: self.clone(),
+                value: val,
+                case_sensitive: true
+            }.upcast()
+        }
 
-            fn ilike(&self, val: &str) -> RcPredicate {
-                LikePredicate {
-                    field: self.clone(),
-                    value: val.to_string(),
-                    case_sensitive: false
-                }.upcast()
-            }
+        fn ilike(&self, val: $v) -> RcPredicate {
+            LikePredicate {
+                field: self.clone(),
+                value: val,
+                case_sensitive: false
+            }.upcast()
         }
     )
 )
 
-impl_for!(StringField)
-impl_for!(RawExpression)
+macro_rules! impl_for(
+    ($field:ty, $v:ident) => (
+        impl<T: $v> Predicate for LikePredicate<$field, T> { }
+        impl<T: $v> ToLikePredicate<$field, T> for $field {
+            is_methods!(T) 
+        }
+    )
+)
+
+
+impl_for!(StringField, StringComparable)
+impl_for!(RawExpression, StringComparable)

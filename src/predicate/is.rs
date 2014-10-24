@@ -27,7 +27,7 @@ pub trait ToIsPredicate<F, T> {
 
 macro_rules! is_methods(
     ($v:ty) => (
-        fn is(&self, val: T) -> RcPredicate {
+        fn is(&self, val: $v) -> RcPredicate {
             IsPredicate {
                 field: self.clone(),
                 value: val

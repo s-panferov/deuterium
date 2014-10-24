@@ -315,7 +315,7 @@ impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InPredicate<F,
     }
 }
 
-impl<F: ToPredicateValue> PredicateToSql for LikePredicate<F> {
+impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for LikePredicate<F, T> {
     fn to_sql(&self, negation: bool) -> String {
         let maybe_not = if negation { "NOT " } else { "" };
         let like = if self.case_sensitive { "LIKE" } else { "ILIKE" };
