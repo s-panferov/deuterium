@@ -35,6 +35,7 @@ use order_by::{OrderBy, Asc, Desc};
 use expression::{RawExpression};
 use from::{Table, TableDef, FromSelect};
 use distinct::{Distinct};
+use group_by::{GroupBy};
 use join::{
     Join, 
     ConditionedJoin, 
@@ -123,10 +124,22 @@ impl ToSql for Distinct {
     fn to_sql(&self) -> String {
         match &self.on {
             &None => "DISTINCT".to_string(),
+            &Some(ref on) if on.is_empty() => "DISTINCT".to_string(),
             &Some(ref on) => {
                 let defs: Vec<String> = on.iter().map(|f| f.to_sql()).collect();
                 format!("DISTINCT ON ({})", defs.connect(", "))
             }
+        }
+    }
+}
+
+impl ToSql for GroupBy {
+    fn to_sql(&self) -> String {
+        if !self.by.is_empty() {
+            let defs: Vec<String> = self.by.iter().map(|f| f.to_sql()).collect();
+            format!(" GROUP BY {}", defs.connect(", "))
+        } else {
+            String::new()
         }
     }
 }
@@ -167,7 +180,11 @@ impl<T, L, M> ToSql for SelectQuery<T, L, M> {
         }
 
         if self.where_.is_some() {
-            sql = format!("{} WHERE {}", sql, self.where_.as_ref().unwrap().to_sql(false))
+            sql = format!("{} WHERE {}", sql, self.where_.as_ref().unwrap().to_sql(false));
+        }
+
+        if self.group_by.is_some() {
+            sql = format!("{}{}", sql, self.group_by.as_ref().unwrap().to_sql());
         }
 
         if !self.order_by.is_empty() {

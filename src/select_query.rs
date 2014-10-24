@@ -18,6 +18,7 @@ use to_sql::{ToSql};
 use order_by::{OrderBy};
 use join::{Join};
 use distinct::{Distinct};
+use group_by::{GroupBy};
 
 use field::{
     FieldDef,
@@ -68,11 +69,12 @@ pub struct SelectQuery<T, L, M> {
     pub distinct: Option<Distinct>,
     pub select: Select,
     pub from: RcFrom,
+    pub joins: Vec<Join>,
     pub where_: Option<RcPredicate>,
+    pub group_by: Option<GroupBy>,
     pub limit: Option<uint>,
     pub offset: Option<uint>,
     pub order_by: Vec<OrderBy>,
-    pub joins: Vec<Join>
 }
 
 macro_rules! set_where(
@@ -186,11 +188,12 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
             distinct: None,
             select: select,
             from: from,
+            joins: vec![],
             where_: None,
+            group_by: None,
             limit: None,
             offset: None,
             order_by: vec![],
-            joins: vec![]
         }
     }
 
@@ -198,8 +201,12 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
         with_clone!(self, query, query.distinct = Some(Distinct::new()))
     }
 
-    pub fn distinct_on<F: Clone>(&self, fields: &[&Field<F>]) -> SelectQuery<T, L, M> {
+    pub fn distinct_on(&self, fields: &[&UntypedField]) -> SelectQuery<T, L, M> {
         with_clone!(self, query, query.distinct = Some(Distinct::on(fields)))
+    }
+
+    pub fn group_by(&self, fields: &[&UntypedField]) -> SelectQuery<T, L, M> {
+        with_clone!(self, query, query.group_by = Some(GroupBy::new(fields)))
     }
 
     pub fn limit(&self, limit: uint) -> SelectQuery<T, LimitOne, M> {

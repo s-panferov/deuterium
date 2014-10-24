@@ -1,5 +1,5 @@
 
-use field::{Field, FieldDef};
+use field::{UntypedField, FieldDef};
 
 #[deriving(Clone)]
 pub struct Distinct {
@@ -11,7 +11,7 @@ impl Distinct {
         Distinct { on: None }
     }
 
-    pub fn on<T: Clone>(fields: &[&Field<T>]) -> Distinct {
+    pub fn on(fields: &[&UntypedField]) -> Distinct {
         Distinct { on: Some( 
             fields.iter().map(|f| f.to_def().clone_with_erase()).collect() 
         )}
