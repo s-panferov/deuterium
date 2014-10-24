@@ -18,62 +18,52 @@ pub type RcExpression = Arc<BoxedExpression>;
 
 #[deriving(Clone)]
 pub struct NamedField<T> {
-    pub def: FieldDef<T>
+    pub name: String,
+    pub table_name: String,
+    pub qual: Option<String>
 }
 
 impl<T: Clone> NamedField<T> {
     pub fn new(name: &str, table_name: &str) -> NamedField<T>  {
-        let def = FieldDef { 
+        NamedField { 
             name: name.to_string(), 
             table_name: table_name.to_string(), 
             qual: None 
-        };
-
-        NamedField {
-            def: def
         }
     }
 
     pub fn new_qual(name: &str, table_name: &str, qual: &str) -> NamedField<T>  {
-        let def = FieldDef { 
+        NamedField { 
             name: name.to_string(), 
             table_name: table_name.to_string(),
             qual: Some(qual.to_string()) 
-        };
-
-        NamedField {
-            def: def
         }
     }
 
     pub fn field_of(name: &str, table: &Table) -> NamedField<T> {
-        let def = FieldDef { 
+        NamedField { 
             name: name.to_string(), 
             table_name: table.get_table_name().to_string(),
             qual: table.get_table_alias().as_ref().map(|v| v.to_string())
-        };
-
-        NamedField {
-            def: def
         }
     }
 
     pub fn qual(&self, qual: &str) -> NamedField<T> {
-        let mut def = self.def.clone();
-        def.qual = Some(qual.to_string());
-        NamedField { def: def }
+        let mut field = self.clone();
+        field.qual = Some(qual.to_string());
+        field
     }
 
     pub fn qual_for(&self, table: &Table) -> NamedField<T> {
-        let mut def = self.def.clone();
-        def.qual = table.get_table_alias().as_ref().map(|v| v.to_string());
-        NamedField { def: def }
+        let mut field = self.clone();
+        field.qual = table.get_table_alias().as_ref().map(|v| v.to_string());
+        field
     }
 }
 
 impl<T: Clone> UntypedExpression for NamedField<T> {
     fn expression_as_sql(&self) -> &ToSql {
-        &self.def
+        self
     }
 
     fn upcast(&self) -> RcExpression {
@@ -82,31 +72,6 @@ impl<T: Clone> UntypedExpression for NamedField<T> {
 }
 
 impl<T: Clone> Expression<T> for NamedField<T> {}
-
-#[deriving(Clone)]
-pub struct FieldDef<T>{
-    pub name: String,
-    pub table_name: String,
-    pub qual: Option<String>
-}
-
-impl<T: Clone> FieldDef<T> {
-    pub fn name(&self) -> &str {
-        self.name.as_slice()
-    }
-
-    pub fn qual(&self) -> Option<&String> {
-        self.qual.as_ref()
-    }
-
-    pub fn clone_with_erase(&self) -> FieldDef<()> {
-        FieldDef { 
-            name: self.name.to_string(),
-            table_name: self.table_name.to_string(),
-            qual: self.qual.clone()
-        }
-    }
-}
 
 pub type BoolField = NamedField<bool>;
 pub type I8Field = NamedField<i8>;

@@ -11,7 +11,6 @@ extern crate serialize;
 extern crate time;
 
 pub use field::{
-    FieldDef, 
     NamedField,
     UntypedExpression, 
     Expression,

@@ -17,7 +17,7 @@ use predicate::{
     IsNullPredicate
 };
 use field::{
-    FieldDef,
+    NamedField,
     BoolField,
     I8Field,
     I16Field,
@@ -232,12 +232,12 @@ impl ToSql for Select {
     }
 }
 
-impl<T: Clone> ToSql for FieldDef<T> {
+impl<T: Clone> ToSql for NamedField<T> {
     fn to_sql(&self) -> String {
-        let name = self.name();
-        match self.qual() {
-            Some(qual) => format!("{}.{}", qual, name),
-            None => name.to_string()
+        let ref name = self.name;
+        match &self.qual {
+            &Some(ref qual) => format!("{}.{}", qual, name),
+            &None => name.to_string()
         }
     }
 }
@@ -249,7 +249,7 @@ pub trait ToPredicateValue {
 macro_rules! to_predicate_for_field(
     ($f:ty) => (
         impl ToPredicateValue for $f  {
-            fn to_predicate_value(&self) -> String { self.def.to_sql() }
+            fn to_predicate_value(&self) -> String { self.to_sql() }
         }
     )
 )
