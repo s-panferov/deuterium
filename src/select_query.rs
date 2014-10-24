@@ -64,19 +64,6 @@ pub struct LimitTwo;
 #[deriving(Clone)]
 pub struct LimitMany;
 
-#[deriving(Clone)]
-pub struct SelectQuery<T, L, M> {
-    pub distinct: Option<Distinct>,
-    pub select: Select,
-    pub from: RcFrom,
-    pub joins: Vec<Join>,
-    pub where_: Option<RcPredicate>,
-    pub group_by: Option<GroupBy>,
-    pub limit: Option<uint>,
-    pub offset: Option<uint>,
-    pub order_by: Vec<OrderBy>,
-}
-
 macro_rules! set_where(
     ($s:ident, $pr:expr, $w:ident, $new_pr:expr) => ({
         let mut query = $s.clone();
@@ -122,6 +109,7 @@ pub trait Queryable: Clone {
     }
     
 }
+
 
 macro_rules! with_clone(
     ($slf: ident, $v:ident, $ex:expr) => ({
@@ -179,6 +167,20 @@ pub trait Orderable: Clone {
         with_clone!(self, query, query.set_order_by(vec![]))
     }
 
+}
+
+#[deriving(Clone)]
+pub struct SelectQuery<T, L, M> {
+    pub distinct: Option<Distinct>,
+    pub select: Select,
+    pub from: RcFrom,
+    pub joins: Vec<Join>,
+    pub where_: Option<RcPredicate>,
+    pub group_by: Option<GroupBy>,
+    pub having: Option<RcPredicate>,
+    pub limit: Option<uint>,
+    pub offset: Option<uint>,
+    pub order_by: Vec<OrderBy>,
 }
 
 impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
