@@ -162,11 +162,11 @@ pub trait Orderable: Clone {
         with_clone!(self, query, query.get_order_by_mut().insert(0, OrderBy::by(field)))
     }
 
-    fn order_reverse_append<F: Clone>(&self, field: &Field<F>) -> Self {
+    fn reverse_append<F: Clone>(&self, field: &Field<F>) -> Self {
         with_clone!(self, query, query.get_order_by_mut().push(OrderBy::reverse_by(field)))
     }
 
-    fn order_reverse_prepend<F: Clone>(&self, field: &Field<F>) -> Self {
+    fn reverse_prepend<F: Clone>(&self, field: &Field<F>) -> Self {
         with_clone!(self, query, query.get_order_by_mut().insert(0, OrderBy::reverse_by(field)))
     }
 
