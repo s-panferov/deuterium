@@ -12,8 +12,6 @@ extern crate time;
 
 pub use field::{
     NamedField,
-    UntypedExpression, 
-    Expression,
 
     BoolField,
     I8Field,
@@ -59,7 +57,13 @@ pub use select_query::{
     LimitMany
 };
 
-pub use expression::{RawExpression};
+pub use expression::{
+    UntypedExpression, 
+    Expression,
+    RcExpression
+};
+
+pub use raw_expression::{RawExpression};
 pub use to_sql::{ToSql, QueryToSql, FromToSql};
 pub use from::{TableDef, Table, From, BoxedFrom, RcFrom};
 
@@ -68,6 +72,7 @@ pub mod predicate;
 mod select_query;
 mod to_sql;
 mod expression;
+mod raw_expression;
 mod order_by;
 mod from;
 mod join;

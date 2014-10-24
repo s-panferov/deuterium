@@ -1,5 +1,5 @@
 
-use field::{RcExpression, UntypedExpression};
+use expression::{RcExpression, UntypedExpression};
 
 #[deriving(Clone)]
 pub enum Order {

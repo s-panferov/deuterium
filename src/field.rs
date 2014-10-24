@@ -3,18 +3,10 @@ use time::Timespec;
 use std::sync::Arc;
 
 use to_sql::{ToPredicateValue};
-use expression::{RawExpression};
+use raw_expression::{RawExpression};
 use from::{Table};
 use to_sql::{ToSql};
-
-pub trait Expression<T>: UntypedExpression {}
-pub trait UntypedExpression {
-    fn expression_as_sql(&self) -> &ToSql;
-    fn upcast(&self) -> RcExpression;
-}
-
-pub type BoxedExpression = Box<UntypedExpression + Send + Sync>;
-pub type RcExpression = Arc<BoxedExpression>;
+use expression::{Expression, UntypedExpression, RcExpression, BoxedExpression};
 
 #[deriving(Clone)]
 pub struct NamedField<T> {

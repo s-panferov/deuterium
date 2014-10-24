@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::mem;
 
 use from::{From, RcFrom, FromSelect};
-use field::{Expression, UntypedExpression, RcExpression};
+use expression::{Expression, UntypedExpression, RcExpression};
 use predicate::{
     RcPredicate,
     ToOrPredicate,

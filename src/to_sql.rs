@@ -32,7 +32,7 @@ use field::{
 };
 
 use order_by::{OrderBy, Asc, Desc};
-use expression::{RawExpression};
+use raw_expression::{RawExpression};
 use from::{Table, TableDef, FromSelect};
 use distinct::{Distinct};
 use group_by::{GroupBy};

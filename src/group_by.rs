@@ -1,5 +1,5 @@
 
-use field::{UntypedExpression, RcExpression};
+use expression::{UntypedExpression, RcExpression};
 
 #[deriving(Clone)]
 pub struct GroupBy {

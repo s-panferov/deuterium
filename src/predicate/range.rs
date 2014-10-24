@@ -1,6 +1,6 @@
 
 use predicate::{Predicate, RcPredicate};
-use expression::{RawExpression, RawExpressionComparable};
+use raw_expression::{RawExpression, RawExpressionComparable};
 
 use field::{
     I8Field, I8Comparable,

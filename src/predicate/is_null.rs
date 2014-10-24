@@ -1,6 +1,6 @@
 
 use predicate::{Predicate, RcPredicate};
-use expression::{RawExpression};
+use raw_expression::{RawExpression};
 use field::{
     BoolField,
     I8Field,
