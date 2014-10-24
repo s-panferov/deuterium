@@ -13,9 +13,11 @@ use predicate::{
     ToAndPredicate,
     ToExcludePredicate
 };
+
 use to_sql::{ToSql};
 use order_by::{OrderBy};
 use join::{Join};
+use distinct::{Distinct};
 
 use field::{
     FieldDef,
@@ -63,6 +65,7 @@ pub struct LimitMany;
 
 #[deriving(Clone)]
 pub struct SelectQuery<T, L, M> {
+    pub distinct: Option<Distinct>,
     pub select: Select,
     pub from: RcFrom,
     pub where_: Option<RcPredicate>,
@@ -180,6 +183,7 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
  
     pub fn new(select: Select, from: RcFrom) -> SelectQuery<T, L, M> {
         SelectQuery {
+            distinct: None,
             select: select,
             from: from,
             where_: None,
@@ -188,6 +192,14 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
             order_by: vec![],
             joins: vec![]
         }
+    }
+
+    pub fn distinct(&self, ) -> SelectQuery<T, L, M> {
+        with_clone!(self, query, query.distinct = Some(Distinct::new()))
+    }
+
+    pub fn distinct_on<F: Clone>(&self, fields: &[&Field<F>]) -> SelectQuery<T, L, M> {
+        with_clone!(self, query, query.distinct = Some(Distinct::on(fields)))
     }
 
     pub fn limit(&self, limit: uint) -> SelectQuery<T, LimitOne, M> {

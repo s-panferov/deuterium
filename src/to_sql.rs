@@ -34,6 +34,7 @@ use field::{
 use order_by::{OrderBy, Asc, Desc};
 use expression::{RawExpression};
 use from::{Table, TableDef, FromSelect};
+use distinct::{Distinct};
 use join::{
     Join, 
     ConditionedJoin, 
@@ -118,6 +119,18 @@ impl ToSql for Join {
     }
 }
 
+impl ToSql for Distinct {
+    fn to_sql(&self) -> String {
+        match &self.on {
+            &None => "DISTINCT".to_string(),
+            &Some(ref on) => {
+                let defs: Vec<String> = on.iter().map(|f| f.to_sql()).collect();
+                format!("DISTINCT ON ({})", defs.connect(", "))
+            }
+        }
+    }
+}
+
 impl FromToSql for TableDef {
     fn to_from_sql(&self) -> String {
         let name = self.get_table_name();
@@ -136,7 +149,14 @@ impl<T, L, M> FromToSql for FromSelect<T, L, M> {
 
 impl<T, L, M> ToSql for SelectQuery<T, L, M> {
     fn to_sql(&self) -> String {
-        let mut sql = format!("SELECT {} FROM {}", 
+        let mut sql = "SELECT".to_string();
+
+        if self.distinct.is_some() {
+            sql = format!("{} {}", sql, self.distinct.as_ref().unwrap().to_sql());
+        }
+
+        sql = format!("{} {} FROM {}", 
+            sql,
             self.select.to_sql(), 
             self.from.as_sql().to_from_sql()
         );

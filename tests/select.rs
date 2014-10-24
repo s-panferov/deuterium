@@ -30,3 +30,16 @@ fn select_from_select() {
     let query = jedi_table.select_all().from_as("j").select_all();
     assert_sql!(query, "SELECT * FROM (SELECT * FROM jedi) as j;");
 }
+
+#[test]
+fn select_distinct() {
+
+    let jedi_table = TableDef::new("jedi");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
+
+    let query = jedi_table.select_all().distinct();
+    assert_sql!(query, "SELECT DISTINCT * FROM jedi;");    
+
+    let query = jedi_table.select_all().distinct_on(&[&name]);
+    assert_sql!(query, "SELECT DISTINCT ON (name) * FROM jedi;");
+}

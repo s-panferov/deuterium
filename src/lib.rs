@@ -72,6 +72,7 @@ mod expression;
 mod order_by;
 mod from;
 mod join;
+mod distinct;
 
 pub struct Query;
 
