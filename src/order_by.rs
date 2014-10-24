@@ -1,5 +1,5 @@
 
-use field::{Field, FieldDef};
+use field::{RcExpression, UntypedExpression};
 
 #[deriving(Clone)]
 pub enum Order {
@@ -9,26 +9,26 @@ pub enum Order {
 
 #[deriving(Clone)]
 pub struct OrderBy {
-    by: FieldDef<()>,
+    by: RcExpression,
     order: Order
 }
 
 impl OrderBy {
-    pub fn by<T: Clone>(field: &Field<T>) -> OrderBy {
+    pub fn by(expression: &UntypedExpression) -> OrderBy {
         OrderBy {
-            by: field.to_def().clone_with_erase(),
+            by: expression.upcast(),
             order: Asc
         }
     }
 
-    pub fn reverse_by<T: Clone>(field: &Field<T>) -> OrderBy {
+    pub fn reverse_by(expression: &UntypedExpression) -> OrderBy {
         OrderBy {
-            by: field.to_def().clone_with_erase(),
+            by: expression.upcast(),
             order: Desc
         }
     }
 
-    pub fn get_by(&self) -> &FieldDef<()> {
+    pub fn get_by(&self) -> &RcExpression {
         &self.by
     }
 

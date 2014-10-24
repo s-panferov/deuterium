@@ -1,17 +1,20 @@
 use serialize::json::Json;
 use time::Timespec;
+use std::sync::Arc;
 
 use to_sql::{ToPredicateValue};
 use expression::{RawExpression};
 use from::{Table};
+use to_sql::{ToSql};
 
-pub trait Field<T>: Send + Sync + Clone {
-    fn to_def(&self) -> FieldDef<T>;
+pub trait Expression<T>: UntypedExpression {}
+pub trait UntypedExpression {
+    fn expression_as_sql(&self) -> &ToSql;
+    fn upcast(&self) -> RcExpression;
 }
 
-pub trait UntypedField: Send + Sync + Clone {
-    fn to_def(&self) -> FieldDef<()>;
-}
+pub type BoxedExpression = Box<UntypedExpression + Send + Sync>;
+pub type RcExpression = Arc<BoxedExpression>;
 
 #[deriving(Clone)]
 pub struct NamedField<T> {
@@ -68,21 +71,17 @@ impl<T: Clone> NamedField<T> {
     }
 }
 
-impl<T: Clone> Field<T> for NamedField<T> {
-    fn to_def(&self) -> FieldDef<T> {
-        self.def.clone()
+impl<T: Clone> UntypedExpression for NamedField<T> {
+    fn expression_as_sql(&self) -> &ToSql {
+        &self.def
+    }
+
+    fn upcast(&self) -> RcExpression {
+        Arc::new(box self.clone() as BoxedExpression)
     }
 }
 
-impl<T: Clone> UntypedField for NamedField<T> {
-    fn to_def(&self) -> FieldDef<()> {
-        FieldDef { 
-            name: self.def.name().to_string(),
-            table_name: self.def.table_name.to_string(),
-            qual: self.def.qual().map(|v| v.to_string())
-        }
-    }
-}
+impl<T: Clone> Expression<T> for NamedField<T> {}
 
 #[deriving(Clone)]
 pub struct FieldDef<T>{

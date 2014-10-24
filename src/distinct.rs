@@ -1,9 +1,9 @@
 
-use field::{UntypedField, FieldDef};
+use field::{UntypedExpression, RcExpression};
 
 #[deriving(Clone)]
 pub struct Distinct {
-    pub on: Option<Vec<FieldDef<()>>>,
+    pub on: Option<Vec<RcExpression>>
 }
 
 impl Distinct {
@@ -11,9 +11,9 @@ impl Distinct {
         Distinct { on: None }
     }
 
-    pub fn on(fields: &[&UntypedField]) -> Distinct {
+    pub fn on(fields: &[&UntypedExpression]) -> Distinct {
         Distinct { on: Some( 
-            fields.iter().map(|f| f.to_def().clone_with_erase()).collect() 
+            fields.iter().map(|f| f.upcast()).collect() 
         )}
     }
 }

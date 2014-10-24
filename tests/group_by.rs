@@ -11,7 +11,7 @@ fn select_group_by() {
     assert_sql!(query, "SELECT * FROM jedi GROUP BY name, side;");
 
     // Edge case where `by` is empty
-    let empty: &[&UntypedField] = &[];
+    let empty: &[&UntypedExpression] = &[];
     let query = jedi_table.select_all().group_by(empty);
     assert_sql!(query, "SELECT * FROM jedi;");
 }

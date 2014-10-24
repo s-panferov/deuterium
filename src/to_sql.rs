@@ -74,7 +74,7 @@ pub trait FromToSql {
 
 impl ToSql for OrderBy {
     fn to_sql(&self) -> String {
-        format!("{} {}", self.get_by().to_sql(), match self.get_order() {
+        format!("{} {}", self.get_by().expression_as_sql().to_sql(), match self.get_order() {
             &Asc => "ASC",
             &Desc => "DESC"
         })
@@ -126,7 +126,7 @@ impl ToSql for Distinct {
             &None => "DISTINCT".to_string(),
             &Some(ref on) if on.is_empty() => "DISTINCT".to_string(),
             &Some(ref on) => {
-                let defs: Vec<String> = on.iter().map(|f| f.to_sql()).collect();
+                let defs: Vec<String> = on.iter().map(|f| f.expression_as_sql().to_sql()).collect();
                 format!("DISTINCT ON ({})", defs.connect(", "))
             }
         }
@@ -136,7 +136,7 @@ impl ToSql for Distinct {
 impl ToSql for GroupBy {
     fn to_sql(&self) -> String {
         if !self.by.is_empty() {
-            let defs: Vec<String> = self.by.iter().map(|f| f.to_sql()).collect();
+            let defs: Vec<String> = self.by.iter().map(|f| f.expression_as_sql().to_sql()).collect();
             format!(" GROUP BY {}", defs.connect(", "))
         } else {
             String::new()
@@ -224,7 +224,7 @@ impl ToSql for Select {
     fn to_sql(&self) -> String {
         match self {
             &SelectOnly(ref fields) => {
-                let defs: Vec<String> = fields.iter().map(|f| f.to_sql()).collect();
+                let defs: Vec<String> = fields.iter().map(|f| f.expression_as_sql().to_sql()).collect();
                 defs.connect(", ")
             },
             &SelectAll => "*".to_string()

@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::mem;
 
 use from::{From, RcFrom, FromSelect};
-use field::{Field, UntypedField};
+use field::{Expression, UntypedExpression, RcExpression};
 use predicate::{
     RcPredicate,
     ToOrPredicate,
@@ -21,7 +21,6 @@ use distinct::{Distinct};
 use group_by::{GroupBy};
 
 use field::{
-    FieldDef,
     I8Comparable,
     I16Comparable,
     I32Comparable,
@@ -45,7 +44,7 @@ use field::{
 
 #[deriving(Clone)]
 pub enum Select {
-    SelectOnly(Vec<FieldDef<()>>),
+    SelectOnly(Vec<RcExpression>),
     SelectAll
 }
 
@@ -164,43 +163,43 @@ pub trait Orderable: Clone {
     fn get_order_by_mut(&mut self) -> &mut Vec<OrderBy>;
     fn set_order_by(&mut self, Vec<OrderBy>);
 
-    fn order_by<F: Clone>(&self, field: &Field<F>) -> Self {
+    fn order_by(&self, field: &UntypedExpression) -> Self {
         with_clone!(self, query, query.set_order_by(
             vec![OrderBy::by(field)]
         ))
     }
 
-    fn order_by_fields<F: Clone>(&self, fields: &[&Field<F>]) -> Self {
+    fn order_by_fields(&self, fields: &[&UntypedExpression]) -> Self {
         with_clone!(self, query, query.set_order_by(
             fields.iter().map(|f| OrderBy::by(*f)).collect()
         ))
     }
 
-    fn reverse_by<F: Clone>(&self, field: &Field<F>) -> Self {
+    fn reverse_by(&self, field: &UntypedExpression) -> Self {
         with_clone!(self, query, query.set_order_by(
             vec![OrderBy::reverse_by(field)]
         ))
     }
 
-    fn reverse_by_fields<F: Clone>(&self, fields: &[&Field<F>]) -> Self {
+    fn reverse_by_fields(&self, fields: &[&UntypedExpression]) -> Self {
         with_clone!(self, query, query.set_order_by(
             fields.iter().map(|f| OrderBy::reverse_by(*f)).collect()
         ))
     }
 
-    fn order_append<F: Clone>(&self, field: &Field<F>) -> Self {
+    fn order_append(&self, field: &UntypedExpression) -> Self {
         with_clone!(self, query, query.get_order_by_mut().push(OrderBy::by(field)))
     }
 
-    fn order_prepend<F: Clone>(&self, field: &Field<F>) -> Self {
+    fn order_prepend(&self, field: &UntypedExpression) -> Self {
         with_clone!(self, query, query.get_order_by_mut().insert(0, OrderBy::by(field)))
     }
 
-    fn reverse_append<F: Clone>(&self, field: &Field<F>) -> Self {
+    fn reverse_append(&self, field: &UntypedExpression) -> Self {
         with_clone!(self, query, query.get_order_by_mut().push(OrderBy::reverse_by(field)))
     }
 
-    fn reverse_prepend<F: Clone>(&self, field: &Field<F>) -> Self {
+    fn reverse_prepend(&self, field: &UntypedExpression) -> Self {
         with_clone!(self, query, query.get_order_by_mut().insert(0, OrderBy::reverse_by(field)))
     }
 
@@ -245,11 +244,11 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
         with_clone!(self, query, query.distinct = Some(Distinct::new()))
     }
 
-    pub fn distinct_on(&self, fields: &[&UntypedField]) -> SelectQuery<T, L, M> {
+    pub fn distinct_on(&self, fields: &[&UntypedExpression]) -> SelectQuery<T, L, M> {
         with_clone!(self, query, query.distinct = Some(Distinct::on(fields)))
     }
 
-    pub fn group_by(&self, fields: &[&UntypedField]) -> SelectQuery<T, L, M> {
+    pub fn group_by(&self, fields: &[&UntypedExpression]) -> SelectQuery<T, L, M> {
         with_clone!(self, query, query.group_by = Some(GroupBy::new(fields)))
     }
 
@@ -333,16 +332,16 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
 pub trait Selectable<M: Clone>: From {
     // FIXME: Unify select_N after [generics](https://github.com/rust-lang/rfcs/issues/376)
 
-    fn select_1<T: Clone>(&self, field: &Field<T>) -> SelectQuery<(T), LimitMany, M> {
-        SelectQuery::new(SelectOnly(vec![field.to_def().clone_with_erase()]), self.upcast_from())
+    fn select_1<T: Clone>(&self, field: &Expression<T>) -> SelectQuery<(T), LimitMany, M> {
+        SelectQuery::new(SelectOnly(vec![field.upcast()]), self.upcast_from())
     }
 
-    fn select_2<T1: Clone, T2: Clone>(&self, field1: &Field<T1>, field2: &Field<T2>) -> SelectQuery<(T1, T2), LimitMany, M> {
-        SelectQuery::new(SelectOnly(vec![field1.to_def().clone_with_erase(), field2.to_def().clone_with_erase()]), self.upcast_from())
+    fn select_2<T1: Clone, T2: Clone>(&self, field1: &Expression<T1>, field2: &Expression<T2>) -> SelectQuery<(T1, T2), LimitMany, M> {
+        SelectQuery::new(SelectOnly(vec![field1.upcast(), field2.upcast()]), self.upcast_from())
     }
 
-    fn select(&self, fields: &[&UntypedField]) -> SelectQuery<(), LimitMany, M> {
-        SelectQuery::new(SelectOnly(fields.iter().map(|f| f.to_def().clone_with_erase()).collect()), self.upcast_from())
+    fn select(&self, fields: &[&UntypedExpression]) -> SelectQuery<(), LimitMany, M> {
+        SelectQuery::new(SelectOnly(fields.iter().map(|f| f.upcast()).collect()), self.upcast_from())
     }
 
     fn select_all(&self) -> SelectQuery<(), LimitMany, M> {
