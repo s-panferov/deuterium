@@ -17,6 +17,7 @@ mod select;
 mod where_;
 mod order;
 mod join;
+mod group_by;
 
 #[test]
 fn select_order() {

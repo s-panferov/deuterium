@@ -64,52 +64,93 @@ pub struct LimitTwo;
 #[deriving(Clone)]
 pub struct LimitMany;
 
-macro_rules! set_where(
-    ($s:ident, $pr:expr, $w:ident, $new_pr:expr) => ({
+macro_rules! set_predicate(
+    ($s:ident, $getter:ident, $setter:ident, $pr:expr, $w:ident, $new_pr:expr) => ({
         let mut query = $s.clone();
-        match $s.get_where() {
+        match $s.$getter() {
             &Some(ref $w) => {
-                query.set_where($new_pr);
+                query.$setter($new_pr);
             },
             &None => {
-                query.set_where($pr);
+                query.$setter($pr);
             }
         }
         query
     })
 )
 
-pub trait Queryable: Clone {
-    fn get_where(&self) -> &Option<RcPredicate>;
-    fn set_where(&mut self, RcPredicate);
-    fn unset_where(&mut self);
+macro_rules! predicate_trait(
+    (
+        $name:ident, 
+        $getter:ident, 
+        $setter:ident, 
+        $unset:ident,
+        $implicit_and:ident,
+        $explicit_and:ident,
+        $or:ident,
+        $exclude:ident,
+        $and_exclude:ident,
+        $or_exclude:ident
+    ) => (
 
-    fn or(&self, predicate: RcPredicate) -> Self {
-        set_where!(self, predicate, w, w.or(predicate))
-    }
+        pub trait $name: Clone {
+            fn $getter(&self) -> &Option<RcPredicate>;
+            fn $setter(&mut self, RcPredicate);
+            fn $unset(&mut self);
 
-    fn where_(&self, predicate: RcPredicate) -> Self {
-        set_where!(self, predicate, w, w.and(predicate))
-    }
+            fn $implicit_and(&self, predicate: RcPredicate) -> Self {
+                set_predicate!(self, $getter, $setter, predicate, w, w.and(predicate))
+            }
 
-    fn and(&self, predicate: RcPredicate) -> Self {
-        self.where_(predicate)
-    }
+            fn $or(&self, predicate: RcPredicate) -> Self {
+                set_predicate!(self, $getter, $setter, predicate, w, w.or(predicate))
+            }
 
-    fn exclude(&self, predicate: RcPredicate) -> Self {
-       set_where!(self, predicate.exclude(), w, w.and(predicate.exclude()))
-    }
+            fn $explicit_and(&self, predicate: RcPredicate) -> Self {
+                self.$implicit_and(predicate)
+            }
 
-    fn and_exclude(&self, predicate: RcPredicate) -> Self {
-       self.exclude(predicate)
-    }
+            fn $exclude(&self, predicate: RcPredicate) -> Self {
+               set_predicate!(self, $getter, $setter, predicate.exclude(), w, w.and(predicate.exclude()))
+            }
 
-    fn or_exclude(&self, predicate: RcPredicate) -> Self {
-       set_where!(self, predicate.exclude(), w, w.or(predicate.exclude()))
-    }
-    
-}
+            fn $and_exclude(&self, predicate: RcPredicate) -> Self {
+               self.$exclude(predicate)
+            }
 
+            fn $or_exclude(&self, predicate: RcPredicate) -> Self {
+               set_predicate!(self, $getter, $setter, predicate.exclude(), w, w.or(predicate.exclude()))
+            }
+        }
+
+    )
+)
+
+predicate_trait!(
+    Queryable,
+    get_where,
+    set_where,
+    unset_where,
+    where_,
+    and,
+    or,
+    exclude,
+    and_exclude,
+    or_exclude
+)
+
+predicate_trait!(
+    HasHaving,
+    get_having,
+    set_having,
+    unset_having,
+    having,
+    and_having,
+    or_having,
+    exclude_having,
+    and_exclude_having,
+    or_exclude_having
+)
 
 macro_rules! with_clone(
     ($slf: ident, $v:ident, $ex:expr) => ({
@@ -193,6 +234,7 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
             joins: vec![],
             where_: None,
             group_by: None,
+            having: None,
             limit: None,
             offset: None,
             order_by: vec![],
@@ -312,6 +354,12 @@ impl<T: Clone, L: Clone, M: Clone> Queryable for SelectQuery<T, L, M> {
     fn get_where(&self) -> &Option<RcPredicate> { &self.where_ }
     fn set_where(&mut self, predicate: RcPredicate) { self.where_ = Some(predicate); }
     fn unset_where(&mut self) { self.where_ = None; }
+}
+
+impl<T: Clone, L: Clone, M: Clone> HasHaving for SelectQuery<T, L, M> { 
+    fn get_having(&self) -> &Option<RcPredicate> { &self.having }
+    fn set_having(&mut self, predicate: RcPredicate) { self.having = Some(predicate); }
+    fn unset_having(&mut self) { self.having = None; }
 }
 
 impl<T: Clone, L: Clone, M: Clone> Orderable for SelectQuery<T, L, M> { 

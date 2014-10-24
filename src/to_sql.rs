@@ -187,6 +187,10 @@ impl<T, L, M> ToSql for SelectQuery<T, L, M> {
             sql = format!("{}{}", sql, self.group_by.as_ref().unwrap().to_sql());
         }
 
+        if self.having.is_some() {
+            sql = format!("{} HAVING {}", sql, self.having.as_ref().unwrap().to_sql(false));
+        }
+
         if !self.order_by.is_empty() {
             let orders: Vec<String> = self.order_by.iter().map(|ord| ord.to_sql()).collect();
             sql = format!("{} ORDER BY {}", sql, orders.connect(", "))
