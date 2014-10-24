@@ -257,6 +257,10 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
     pub fn cross_join(&self, from: &From) -> SelectQuery<T, L, M> {
         with_clone!(self, query, query.joins.push(Join::cross_join(from.upcast_from())))
     }
+
+    pub fn unjoin(&self) -> SelectQuery<T, L, M> {
+        with_clone!(self, query, query.joins = vec![])
+    }
 }
 
 pub trait Selectable<M: Clone>: From {
