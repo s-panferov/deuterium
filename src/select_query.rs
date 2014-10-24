@@ -170,6 +170,10 @@ pub trait Orderable: Clone {
         with_clone!(self, query, query.get_order_by_mut().insert(0, OrderBy::reverse_by(field)))
     }
 
+    fn unorder(&self) -> Self {
+        with_clone!(self, query, query.set_order_by(vec![]))
+    }
+
 }
 
 impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
