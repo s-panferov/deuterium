@@ -13,6 +13,7 @@ use predicate::{
     InRangePredicate, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft,
     InequalityPredicate, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual,
     ExcludePredicate,
+    LikePredicate,
     IsNullPredicate
 };
 use field::{
@@ -311,6 +312,15 @@ impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InPredicate<F,
         let maybe_not = if negation { "NOT " } else { "" };
         let values = self.values.to_predicate_value();
         format!("{} {}IN ({})", self.field.to_predicate_value(), maybe_not, values)
+    }
+}
+
+impl<F: ToPredicateValue> PredicateToSql for LikePredicate<F> {
+    fn to_sql(&self, negation: bool) -> String {
+        let maybe_not = if negation { "NOT " } else { "" };
+        let like = if self.case_sensitive { "LIKE" } else { "ILIKE" };
+        let values = self.value.to_predicate_value();
+        format!("{} {}{} {}", self.field.to_predicate_value(), maybe_not, like, values)
     }
 }
 

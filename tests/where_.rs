@@ -132,12 +132,70 @@ fn predicate_is_null() {
 }
 
 #[test]
-fn predicate_within() {
+fn predicate_in() {
 
     let jedi_table = TableDef::new("jedi");
     let force_level = NamedField::<i8>::field_of("force_level", &jedi_table);
     
     let query = jedi_table.select_all().where_(force_level.in_(vec![100i8, 120i8]));
     assert_sql!(query, "SELECT * FROM jedi WHERE force_level IN (100, 120);");     
+
+    let query = jedi_table.select_all().exclude(force_level.in_(vec![100i8, 120i8]));
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level NOT IN (100, 120);");     
+
+}
+
+#[test]
+fn predicate_in_subquery() {
+
+    let jedi_table = TableDef::new("jedi");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
+    let force_level = NamedField::<i8>::field_of("force_level", &jedi_table);
+    
+    let query = jedi_table.select_all().where_(force_level.in_(
+        jedi_table.alias("j").select_1(&force_level).where_(name.is("Anakin"))
+    ));
+
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level IN (SELECT force_level FROM jedi AS j WHERE name = 'Anakin');");     
+
+}
+
+#[test]
+fn predicate_in_range() {
+
+    let jedi_table = TableDef::new("jedi");
+    let force_level = NamedField::<i8>::field_of("force_level", &jedi_table);
+    
+    let query = jedi_table.select_all().where_(force_level.in_range(100i8, 120i8));
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level >= 100 AND force_level <= 120;");     
+    
+    let query = jedi_table.select_all().where_(force_level.in_range_exclude(100i8, 120i8));
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level > 100 AND force_level < 120;");     
+    
+    let query = jedi_table.select_all().where_(force_level.in_range_exclude_right(100i8, 120i8));
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level >= 100 AND force_level < 120;");  
+
+    let query = jedi_table.select_all().where_(force_level.in_range_exclude_left(100i8, 120i8));
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level > 100 AND force_level <= 120;");     
+
+}
+
+#[test]
+fn predicate_like() {
+
+    let jedi_table = TableDef::new("jedi");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
+    
+    let query = jedi_table.select_all().where_(name.like("Luke%"));
+    assert_sql!(query, "SELECT * FROM jedi WHERE name LIKE 'Luke%';");         
+
+    let query = jedi_table.select_all().where_(name.ilike("Luke%"));
+    assert_sql!(query, "SELECT * FROM jedi WHERE name ILIKE 'Luke%';");  
+
+    let query = jedi_table.select_all().exclude(name.like("Luke%"));
+    assert_sql!(query, "SELECT * FROM jedi WHERE name NOT LIKE 'Luke%';");         
+
+    let query = jedi_table.select_all().exclude(name.ilike("Luke%"));
+    assert_sql!(query, "SELECT * FROM jedi WHERE name NOT ILIKE 'Luke%';");        
 
 }

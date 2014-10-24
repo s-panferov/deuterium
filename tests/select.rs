@@ -21,3 +21,12 @@ fn select() {
     let query: SelectQuery<(String, bool), LimitMany, ()> = jedi_table.select_2(&name, &side);
     assert_sql!(query, "SELECT name, side FROM jedi;");
 }
+
+#[test]
+fn select_from_select() {
+
+    let jedi_table = TableDef::new("jedi");
+    
+    let query = jedi_table.select_all().from_as("j").select_all();
+    assert_sql!(query, "SELECT * FROM (SELECT * FROM jedi) as j;");
+}

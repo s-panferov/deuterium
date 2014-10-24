@@ -41,6 +41,7 @@ pub use predicate::{
     InequalityPredicate, ToInequalityPredicate, 
     Inequality, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual,
     ExcludePredicate, ToExcludePredicate,
+    LikePredicate, ToLikePredicate,
     IsNullPredicate, ToIsNullPredicate
 };
 

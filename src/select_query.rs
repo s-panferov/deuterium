@@ -206,6 +206,10 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
         FromSelect { select: self.clone(), alias: alias.to_string() }
     }
 
+    pub fn from_as(&self, alias: &str) -> FromSelect<T, L, M> {
+        self.alias(alias)
+    }
+
     pub fn inner_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
         with_clone!(self, query, query.joins.push(Join::inner_join(from.upcast_from(), on)))
     }

@@ -13,7 +13,7 @@ macro_rules! assert_sql(
     )
 )
 
-mod simple_select;
+mod select;
 mod where_;
 
 #[test]
