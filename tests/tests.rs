@@ -16,6 +16,7 @@ macro_rules! assert_sql(
 mod select;
 mod where_;
 mod order;
+mod join;
 
 #[test]
 fn select_order() {
