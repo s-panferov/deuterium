@@ -56,7 +56,14 @@ use join::{
     CrossJoin
 };
 
-use function::{Sum, SumArg};
+use function::{
+    Sum, SumArg,
+    Min, MinArg,
+    Max, MaxArg,
+    Avg, AvgArg,
+    Count, CountArg,
+    CountAll
+};
 
 pub trait QueryToSql {
     fn to_final_sql(&self) -> String;
@@ -275,6 +282,8 @@ impl ToPredicateValue for i32 { fn to_predicate_value(&self) -> String { self.to
 impl ToPredicateValue for i64 { fn to_predicate_value(&self) -> String { self.to_string() } }
 impl ToPredicateValue for f32 { fn to_predicate_value(&self) -> String { self.to_string() } }
 impl ToPredicateValue for f64 { fn to_predicate_value(&self) -> String { self.to_string() } }
+impl ToPredicateValue for int { fn to_predicate_value(&self) -> String { self.to_string() } }
+impl ToPredicateValue for uint { fn to_predicate_value(&self) -> String { self.to_string() } }
 impl ToPredicateValue for &'static str {  
     fn to_predicate_value(&self) -> String { format!("'{}'", self) } 
 }
@@ -442,8 +451,24 @@ impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InequalityPred
     }
 }
 
-impl<T, E> ToSql for Sum<T, E> where T: Clone, E: SumArg<T> {
+macro_rules! agg_to_sql(
+    ($foo:ident, $foo_arg:ident, $fmt:expr) => (
+        impl<R, T, E> ToSql for $foo<R, T, E> where R: Clone, T: Clone, E: $foo_arg<R, T> {
+            fn to_sql(&self) -> String {
+                format!($fmt, self.expression.expression_as_sql().to_sql())
+            }    
+        }
+    )
+)
+
+agg_to_sql!(Sum, SumArg, "SUM({})")
+agg_to_sql!(Min, MinArg, "MIN({})")
+agg_to_sql!(Max, MaxArg, "MAX({})")
+agg_to_sql!(Avg, AvgArg, "AVG({})")
+agg_to_sql!(Count, CountArg, "COUNT({})")
+
+impl ToSql for CountAll {
     fn to_sql(&self) -> String {
-        format!("SUM({})", self.expression.expression_as_sql().to_sql())
+        "COUNT(*)".to_string()
     }    
 }

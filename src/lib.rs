@@ -68,7 +68,12 @@ pub use to_sql::{ToSql, QueryToSql, FromToSql};
 pub use from::{TableDef, Table, From, BoxedFrom, RcFrom};
 
 pub use function::{
-    Sum, SumArg
+    Sum, SumArg,
+    Min, MinArg,
+    Max, MaxArg,
+    Avg, AvgArg,
+    Count, CountArg,
+    CountAll
 };
 
 mod field;

@@ -123,6 +123,8 @@ macro_rules! number_comparable(
         impl $comp for i8 {}
         impl $comp for i16 {}
         impl $comp for i32 {}
+        impl $comp for int {}
+        impl $comp for uint {}
         impl $comp for i64 {}
         impl $comp for f32 {}
         impl $comp for f64 {}
