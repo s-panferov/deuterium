@@ -56,6 +56,8 @@ use join::{
     CrossJoin
 };
 
+use function::{Sum, SumArg};
+
 pub trait QueryToSql {
     fn to_final_sql(&self) -> String;
 }
@@ -438,4 +440,10 @@ impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InequalityPred
             }
         }
     }
+}
+
+impl<T, E> ToSql for Sum<T, E> where T: Clone, E: SumArg<T> {
+    fn to_sql(&self) -> String {
+        format!("SUM({})", self.expression.expression_as_sql().to_sql())
+    }    
 }

@@ -67,6 +67,10 @@ pub use raw_expression::{RawExpression};
 pub use to_sql::{ToSql, QueryToSql, FromToSql};
 pub use from::{TableDef, Table, From, BoxedFrom, RcFrom};
 
+pub use function::{
+    Sum, SumArg
+};
+
 mod field;
 pub mod predicate;
 mod select_query;
