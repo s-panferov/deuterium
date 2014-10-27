@@ -8,6 +8,16 @@ use from::{Table};
 use to_sql::{ToSql};
 use expression::{Expression, UntypedExpression, RcExpression, BoxedExpression};
 
+pub trait Field {
+    fn name(&self) -> &str;
+    fn table_name(&self) -> &str;
+    fn qual(&self) -> Option<&String>;
+    fn upcast(&self) -> RcField;
+}
+
+pub type BoxedField = Box<Field + Send + Sync>;
+pub type RcField = Arc<BoxedField>;
+
 #[deriving(Clone)]
 pub struct NamedField<T> {
     pub name: String,
@@ -64,6 +74,24 @@ impl<T: Clone> UntypedExpression for NamedField<T> {
 }
 
 impl<T: Clone> Expression<T> for NamedField<T> {}
+
+impl<T: Clone> Field for NamedField<T> {
+    fn name(&self) -> &str {
+        self.name.as_slice()
+    }
+
+    fn table_name(&self) -> &str {
+        self.table_name.as_slice()
+    }
+
+    fn qual(&self) -> Option<&String> {
+        self.qual.as_ref()
+    }
+
+    fn upcast(&self) -> RcField {
+        Arc::new(box self.clone() as BoxedField)
+    }
+}
 
 pub type BoolField = NamedField<bool>;
 pub type I8Field = NamedField<i8>;

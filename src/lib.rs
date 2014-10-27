@@ -2,6 +2,7 @@
 #![feature(tuple_indexing)]
 #![feature(macro_rules)]
 #![feature(struct_variant)]
+#![feature(concat_idents)]
 #![feature(globs)]
 
 #![deny(warnings)]
@@ -57,6 +58,10 @@ pub use select_query::{
     LimitMany
 };
 
+pub use insert_query::{
+    InsertQuery
+};
+
 pub use expression::{
     UntypedExpression, 
     Expression,
@@ -79,6 +84,7 @@ pub use function::{
 mod field;
 pub mod predicate;
 mod select_query;
+mod insert_query;
 mod to_sql;
 mod expression;
 mod raw_expression;

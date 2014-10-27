@@ -12,9 +12,13 @@ pub type BoxedFrom = Box<From + Send + Sync>;
 pub type RcFrom = Arc<BoxedFrom>;
 
 pub trait Table: Clone {
+    fn upcast_table(&self) -> RcTable;
     fn get_table_name(&self) -> &String;
     fn get_table_alias(&self) -> &Option<String>;
 }
+
+pub type BoxedTable = Box<Table + Send + Sync>;
+pub type RcTable = Arc<BoxedTable>;
 
 #[deriving(Clone)]
 pub struct TableDef {
@@ -39,6 +43,10 @@ impl TableDef {
 }
 
 impl Table for TableDef {
+    fn upcast_table(&self) -> RcTable {
+        Arc::new(box self.clone() as BoxedTable)
+    }
+
     fn get_table_name(&self) -> &String {
         &self.name
     }
