@@ -1,8 +1,17 @@
 use serialize::json::Json;
 use time::Timespec;
 
-use select_query::{SelectQuery, RcSelectQuery};
+use select_query::{
+    SelectQuery, RcSelectQuery,
+    SelectFor,
+    SelectForUpdate,
+    SelectForUpdateNoWait,
+    SelectForShare,
+    SelectForShareNoWait
+};
+
 use {Select, SelectOnly, SelectAll};
+
 use predicate::{
     RcPredicate, 
     RawPredicate,
@@ -169,6 +178,17 @@ impl<T, L, M> FromToSql for FromSelect<T, L, M> {
     }
 }
 
+impl ToSql for SelectFor {
+    fn to_sql(&self) -> String {
+        match self {
+            &SelectForUpdate => "FOR UPDATE",
+            &SelectForUpdateNoWait => "FOR UPDATE NOWAIT",
+            &SelectForShare => "FOR SHARE",
+            &SelectForShareNoWait => "FOR SHARE NOWAIT",
+        }.to_string()
+    }
+}
+
 impl<T, L, M> ToSql for SelectQuery<T, L, M> {
     fn to_sql(&self) -> String {
         let mut sql = "SELECT".to_string();
@@ -211,6 +231,10 @@ impl<T, L, M> ToSql for SelectQuery<T, L, M> {
 
         if self.offset.is_some() {
             sql = format!("{} OFFSET {}", sql, self.offset.unwrap())
+        }
+
+        if self.for_.is_some() {
+            sql = format!("{} {}", sql, self.for_.unwrap().to_sql())
         }
 
         sql

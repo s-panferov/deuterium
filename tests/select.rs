@@ -44,3 +44,21 @@ fn select_distinct() {
     assert_sql!(query, "SELECT DISTINCT ON (name) * FROM jedi;");
 }
 
+#[test]
+fn select_for() {
+
+    let jedi_table = TableDef::new("jedi");
+    
+    let query = jedi_table.select_all().for_update();
+    assert_sql!(query, "SELECT * FROM jedi FOR UPDATE;"); 
+
+    let query = jedi_table.select_all().for_share();
+    assert_sql!(query, "SELECT * FROM jedi FOR SHARE;");     
+
+    let query = jedi_table.select_all().for_update_nowait();
+    assert_sql!(query, "SELECT * FROM jedi FOR UPDATE NOWAIT;");      
+
+    let query = jedi_table.select_all().for_share_nowait();
+    assert_sql!(query, "SELECT * FROM jedi FOR SHARE NOWAIT;");    
+}
+

@@ -55,6 +55,14 @@ pub trait ToSelectQuery: Send + Sync + ToSql {
 }
 
 #[deriving(Clone)]
+pub enum SelectFor {
+    SelectForUpdate,
+    SelectForUpdateNoWait,
+    SelectForShare,
+    SelectForShareNoWait
+}
+
+#[deriving(Clone)]
 pub struct LimitOne;
 
 #[deriving(Clone)]
@@ -221,6 +229,7 @@ pub struct SelectQuery<T, L, M> {
     pub limit: Option<uint>,
     pub offset: Option<uint>,
     pub order_by: Vec<OrderBy>,
+    pub for_: Option<SelectFor>,
 }
 
 impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
@@ -237,6 +246,7 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
             limit: None,
             offset: None,
             order_by: vec![],
+            for_: None
         }
     }
 
@@ -274,6 +284,22 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
 
     pub fn from_as(&self, alias: &str) -> FromSelect<T, L, M> {
         self.alias(alias)
+    }
+
+    pub fn for_update(&self) -> SelectQuery<T, L, M> {
+        with_clone!(self, query, query.for_ = Some(SelectForUpdate))
+    }    
+
+    pub fn for_update_nowait(&self) -> SelectQuery<T, L, M> {
+        with_clone!(self, query, query.for_ = Some(SelectForUpdateNoWait))
+    }
+
+    pub fn for_share(&self) -> SelectQuery<T, L, M> {
+        with_clone!(self, query, query.for_ = Some(SelectForShare))
+    }
+
+    pub fn for_share_nowait(&self) -> SelectQuery<T, L, M> {
+        with_clone!(self, query, query.for_ = Some(SelectForShareNoWait))
     }
 
     pub fn inner_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
