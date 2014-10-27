@@ -3,6 +3,7 @@
 #![feature(macro_rules)]
 #![feature(struct_variant)]
 #![feature(concat_idents)]
+#![feature(default_type_params)]
 #![feature(globs)]
 
 #![deny(warnings)]
@@ -80,6 +81,14 @@ pub use function::{
     Count, CountArg,
     CountAll
 };
+
+macro_rules! with_clone(
+    ($slf: ident, $v:ident, $ex:expr) => ({
+        let mut $v = $slf.clone();
+        $ex;
+        $v
+    })
+)
 
 mod field;
 pub mod predicate;

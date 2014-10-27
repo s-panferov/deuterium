@@ -12,7 +12,7 @@ pub trait Field {
     fn name(&self) -> &str;
     fn table_name(&self) -> &str;
     fn qual(&self) -> Option<&String>;
-    fn upcast(&self) -> RcField;
+    fn upcast_field(&self) -> RcField;
 }
 
 pub type BoxedField = Box<Field + Send + Sync>;
@@ -88,7 +88,7 @@ impl<T: Clone> Field for NamedField<T> {
         self.qual.as_ref()
     }
 
-    fn upcast(&self) -> RcField {
+    fn upcast_field(&self) -> RcField {
         Arc::new(box self.clone() as BoxedField)
     }
 }

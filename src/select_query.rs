@@ -159,14 +159,6 @@ predicate_trait!(
     or_exclude_having
 )
 
-macro_rules! with_clone(
-    ($slf: ident, $v:ident, $ex:expr) => ({
-        let mut $v = $slf.clone();
-        $ex;
-        $v
-    })
-)
-
 pub trait Orderable: Clone {
     fn get_order_by_mut(&mut self) -> &mut Vec<OrderBy>;
     fn set_order_by(&mut self, Vec<OrderBy>);
