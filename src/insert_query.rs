@@ -47,8 +47,7 @@ pub struct InsertQuery<T, V, M> {
 
 macro_rules! insert(
     ($name:ident, $(($t:ident, $arg:ident)),+) => (
-        // FIXME: Make this public after https://github.com/rust-lang/rust/issues/17635:
-        //        Impossible to have a macro expand to `pub` method
+        // FIXME: Make this public after https://github.com/rust-lang/rust/issues/17635
         fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(InsertValue<$t>,)+), M> {
             let mut cols = vec![];
             $(cols.push((*$arg).upcast_field());)+
@@ -62,8 +61,9 @@ macro_rules! insert(
 macro_rules! insertable(
     () => (
         pub trait Insertable<M: Clone>: Table {   
-            // FIXME: It doesn't work for now because of https://github.com/rust-lang/rust/issues/11403:
-            //        Cannot use Macros in Trait Bodies 
+            // FIXME: It doesn't work for now because of :
+            //        [Cannot use Macros in Trait Bodies](https://github.com/rust-lang/rust/issues/11403)
+            //        [Impossible to have a macro expand to `pub` method](https://github.com/rust-lang/rust/issues/17635)
             // FIXME: Rewrite after https://github.com/rust-lang/rfcs/issues/376:
             //        Draft RFC: variadic generics
             // insert!(insert_1, (T0, _t0))
