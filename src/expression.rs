@@ -4,8 +4,10 @@ use std::sync::Arc;
 
 use serialize::json::Json;
 use time::Timespec;
+use std::mem;
 
 pub trait Expression<T>: UntypedExpression {}
+
 pub trait UntypedExpression {
     fn expression_as_sql(&self) -> &ToSql;
     fn upcast_expression(&self) -> RcExpression;
@@ -13,6 +15,34 @@ pub trait UntypedExpression {
 
 pub type BoxedExpression = Box<UntypedExpression + Send + Sync>;
 pub type RcExpression = Arc<BoxedExpression>;
+
+#[deriving(Clone)]
+pub enum ExprValue<T> {
+    ExpressionValue {
+        expression: RcExpression
+    },
+    DefaultValue
+}
+
+pub trait ToExprValue<T> {
+    fn to_expr_val(&self) -> ExprValue<T>;
+}
+
+impl<T> ExprValue<T> {
+    pub fn new(exp: &Expression<T>) -> ExprValue<T> {
+        ExpressionValue {
+            expression: exp.upcast_expression()
+        }
+    }
+}
+
+impl<T: Clone> ToExprValue<()> for ExprValue<T> {
+    fn to_expr_val(&self) -> ExprValue<()> {
+        unsafe {
+            mem::transmute(self.clone())
+        }
+    }
+}
 
 macro_rules! impl_for(
     ($t:ty) => (
@@ -28,6 +58,18 @@ macro_rules! impl_for(
 
         impl Expression<$t> for $t {
             
+        }
+
+        impl ToExprValue<$t> for $t {
+            fn to_expr_val(&self) -> ExprValue<$t> {
+                ExprValue::new(self)
+            }
+        }
+
+        impl ToExprValue<()> for $t {
+            fn to_expr_val(&self) -> ExprValue<()> {
+                ExprValue::new(self).to_expr_val()
+            }
         }
     )
 )

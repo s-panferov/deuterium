@@ -4,7 +4,8 @@ use to_sql::{FromToSql};
 use select_query::{SelectQuery, Selectable};
 
 use field::{NamedField, Field};
-use insert_query::{InsertQuery, Insertable, InsertValue};
+use insert_query::{InsertQuery, Insertable};
+use expression::{ExprValue};
 
 pub trait From { 
     fn as_sql(&self) -> &FromToSql;
@@ -33,7 +34,7 @@ pub struct TableDef {
 macro_rules! insert(
     ($name:ident, $(($t:ident, $arg:ident)),+) => (
         #[doc(hidden)]
-        fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(InsertValue<$t>,)+), ()> {
+        fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(ExprValue<$t>,)+), ()> {
             let mut cols = vec![];
             $(cols.push((*$arg).upcast_field());)+
             InsertQuery::new_with_cols(self, cols)
@@ -60,7 +61,7 @@ impl TableDef {
     // FIXME: Remove after all stuff in InsertQuery will be fixed
     insert!(insert_1, (T0, _t0))
     #[doc(hidden)]
-    pub fn insert_1_for_test(&self, name: &NamedField<String>) -> InsertQuery<(String,), (InsertValue<String>,), ()> {
+    pub fn insert_1_for_test(&self, name: &NamedField<String>) -> InsertQuery<(String,), (ExprValue<String>,), ()> {
         self.insert_1(name)
     }
 }

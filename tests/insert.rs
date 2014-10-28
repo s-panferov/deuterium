@@ -18,7 +18,7 @@ fn insert() {
     assert_sql!(query, "INSERT INTO jedi (name, side) VALUES\n    ('Luke', true);");
 
     let mut query = jedi_table.insert_1_for_test(&name);
-    query.push((InsertValue::new(&"Luke".to_string()), ));
+    query.push((ExprValue::new(&"Luke".to_string()), ));
     query.push((DefaultValue, ));
 
     assert_sql!(query, "INSERT INTO jedi (name) VALUES\n    ('Luke'),\n    (DEFAULT);");

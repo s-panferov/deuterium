@@ -62,15 +62,16 @@ pub use select_query::{
 pub use insert_query::{
     InsertQuery,
     Insertable,
-    InsertValue,
-    ExpressionValue,
-    DefaultValue
 };
 
 pub use expression::{
+    ToExprValue,
     UntypedExpression, 
     Expression,
-    RcExpression
+    RcExpression,
+    ExprValue,
+    ExpressionValue,
+    DefaultValue
 };
 
 pub use raw_expression::{RawExpression};

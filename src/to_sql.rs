@@ -13,13 +13,10 @@ use select_query::{
 use insert_query::{
     InsertQuery, 
     Insert,
-    InsertValue,
     InsertDefaultValues,
     InsertValues,
     InsertUntypedValues,
-    InsertFromSelect,
-    ExpressionValue,
-    DefaultValue
+    InsertFromSelect
 };
 
 use {Select, SelectOnly, SelectAll};
@@ -37,6 +34,7 @@ use predicate::{
     LikePredicate,
     IsNullPredicate
 };
+
 use field::{
     RcField,
     NamedField,
@@ -85,6 +83,12 @@ use function::{
     Avg, AvgArg,
     Count, CountArg,
     CountAll
+};
+
+use expression::{
+    ExprValue,
+    ExpressionValue,
+    DefaultValue,
 };
 
 pub trait QueryToSql {
@@ -536,7 +540,7 @@ impl ToSql for CountAll {
     }    
 }
 
-impl<T> ToSql for InsertValue<T> {
+impl<T> ToSql for ExprValue<T> {
     fn to_sql(&self) -> String {
         match self {
             &ExpressionValue(ref e) => {
@@ -549,7 +553,7 @@ impl<T> ToSql for InsertValue<T> {
 
 macro_rules! to_sql_for_insert_tuple(
     ($fmt:expr, $($t:ident, $var:ident),+) => (
-        impl<$($t,)+> ToSql for ($(InsertValue<$t>),+,)  {
+        impl<$($t,)+> ToSql for ($(ExprValue<$t>),+,)  {
             fn to_sql(&self) -> String {
                 let &($(ref $var,)+) = self;
                 format!($fmt, $($var.to_sql(),)+)
@@ -590,7 +594,7 @@ impl<T: Clone, V: ToSql, M: Clone> ToSql for Insert<T, V, M> {
             },
             &InsertUntypedValues(ref rows) => {
                 let rows_str: Vec<String> = rows.iter().map(|row| {
-                    let values_str: Vec<String> = row.iter().map(|v| v.expression_as_sql().to_sql()).collect();
+                    let values_str: Vec<String> = row.iter().map(|v| v.to_sql()).collect();
                     format!("({})", values_str.connect(", "))
                 }).collect();
                 format!("VALUES\n    {}", rows_str.connect(",\n    "))    
