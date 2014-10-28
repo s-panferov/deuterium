@@ -2,9 +2,10 @@
 use std::sync::Arc;
 use to_sql::{FromToSql};
 use select_query::{SelectQuery, Selectable};
+use insert_query::{InsertQuery, Insertable};
+use update_query::{Updatable};
 
 use field::{NamedField, Field};
-use insert_query::{InsertQuery, Insertable};
 use expression::{ExprValue};
 
 pub trait From { 
@@ -92,6 +93,7 @@ impl From for TableDef {
 
 impl Selectable<()> for TableDef {}
 impl Insertable<()> for TableDef {}
+impl Updatable for TableDef {}
 
 #[deriving(Clone)]
 pub struct FromSelect<T, L, M> {

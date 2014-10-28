@@ -6,7 +6,7 @@
 #![feature(default_type_params)]
 #![feature(globs)]
 
-// #![deny(warnings)]
+#![deny(warnings)]
 #![deny(bad_style)]
 
 extern crate serialize;
@@ -59,6 +59,14 @@ pub use select_query::{
     LimitMany
 };
 
+pub use update_query::{
+    UpdateQuery,
+    FieldUpdate,
+    FieldUpd,
+    Updatable,
+    ToFieldUpdate,
+};
+
 pub use insert_query::{
     InsertQuery,
     Insertable,
@@ -99,6 +107,7 @@ mod field;
 pub mod predicate;
 mod select_query;
 mod insert_query;
+mod update_query;
 mod to_sql;
 mod expression;
 mod raw_expression;
