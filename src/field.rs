@@ -68,7 +68,7 @@ impl<T: Clone> UntypedExpression for NamedField<T> {
         self
     }
 
-    fn upcast(&self) -> RcExpression {
+    fn upcast_expression(&self) -> RcExpression {
         Arc::new(box self.clone() as BoxedExpression)
     }
 }

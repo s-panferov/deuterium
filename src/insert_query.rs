@@ -5,9 +5,27 @@ pub use select_query::{SelectQuery, LimitMany};
 pub use expression::{Expression, UntypedExpression, RcExpression};
 
 #[deriving(Clone)]
-pub enum InsertValue<T, E: Expression<T>> {
-    ExpressionValue(E),
+pub enum InsertValue<T> {
+    ExpressionValue {
+        expression: RcExpression
+    },
     DefaultValue
+}
+
+impl<T> InsertValue<T> {
+    pub fn new(exp: &Expression<T>) -> InsertValue<T> {
+        ExpressionValue {
+            expression: exp.upcast_expression()
+        }
+    }
+}
+
+#[deriving(Clone)]
+pub enum InsertValueUntyped {
+    ExpressionValueUntyped {
+        expression: RcExpression
+    },
+    DefaultValueUntyped
 }
 
 #[allow(dead_code)]
@@ -22,23 +40,62 @@ pub enum Insert<T, V, M> {
 #[allow(dead_code)]
 #[deriving(Clone)]
 pub struct InsertQuery<T, V, M> {
-    pub into: RcTable,
-    pub cols: Option<Vec<RcField>>,
-    pub values: Insert<T, V, M>
+    into: RcTable,
+    cols: Option<Vec<RcField>>,
+    values: Insert<T, V, M>
 }
 
 macro_rules! insert(
-    ($n:ident, $(($t:ident, $e:ident, $t_:ident)),+) => (
-        // FIXME: Make this public after rust#17635
-        fn $n<$($t:Clone, $e: Expression<$t> + Clone,)+>(table: &Table, $($t_: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(InsertValue<$t, $e>,)+), M> {
+    ($name:ident, $(($t:ident, $arg:ident)),+) => (
+        // FIXME: Make this public after https://github.com/rust-lang/rust/issues/17635:
+        //        Impossible to have a macro expand to `pub` method
+        fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(InsertValue<$t>,)+), M> {
             let mut cols = vec![];
-            $(cols.push((*$t_).upcast_field());)+
-            let mut query = InsertQuery::new(table);
+            $(cols.push((*$arg).upcast_field());)+
+            let mut query = InsertQuery::new(self);
             query.cols = Some(cols);
             query
         }
     )
 )
+
+macro_rules! insertable(
+    () => (
+        pub trait Insertable<M: Clone>: Table {   
+            // FIXME: It doesn't work for now because of https://github.com/rust-lang/rust/issues/11403:
+            //        Cannot use Macros in Trait Bodies 
+            // FIXME: Rewrite after https://github.com/rust-lang/rfcs/issues/376:
+            //        Draft RFC: variadic generics
+            // insert!(insert_1, (T0, _t0))
+            // insert!(insert_2, (T0, _t0), (T1, _t1))
+            // insert!(insert_3, (T0, _t0), (T1, _t1), (T2, _t2))
+            // insert!(insert_4, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3))
+            // insert!(insert_5, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4))
+            // insert!(insert_6, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5))
+            // insert!(insert_7, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6))
+            // insert!(insert_8, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7))
+            // insert!(insert_9, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8))
+            // insert!(insert_10, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8), (T9, _t9))
+            // insert!(insert_11, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8), (T9, _t9), (T10, _t10))
+            // insert!(insert_12, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8), (T9, _t9), (T10, _t10), (T11, _t11))
+        
+            fn insert_all(&self) -> InsertQuery<(), (), M> {
+                 InsertQuery::new(self)
+            }
+
+            fn insert_fields(&self, fields: &[&Field]) -> InsertQuery<(), (), M> {
+                let mut cols = vec![];
+                for field in fields.iter() {
+                    cols.push(field.upcast_field())
+                }
+                InsertQuery::new_with_cols(self, cols)
+            }
+        }
+    )
+)
+
+
+insertable!()
 
 #[allow(dead_code)]
 impl<T: Clone, V: Clone, M: Clone> InsertQuery<T, V, M> {
@@ -51,7 +108,20 @@ impl<T: Clone, V: Clone, M: Clone> InsertQuery<T, V, M> {
         }
     }
 
+    pub fn new_with_cols(into: &Table, cols: Vec<RcField>) -> InsertQuery<T, V, M> {
+        InsertQuery {
+            into: into.upcast_table(),
+            cols: Some(cols),
+            values: InsertDefaultValues
+        }
+    }
+
+    pub fn get_into(&self) -> &RcTable { &self.into }
+    pub fn get_cols(&self) -> &Option<Vec<RcField>> { &self.cols }
+    pub fn get_values(&self) -> &Insert<T, V, M> { &self.values }
+
     pub fn push(&mut self, value: V) {
+
         let mut reassign = false;
         match &self.values {
             &InsertDefaultValues | &InsertFromSelect(_) => {
@@ -81,7 +151,7 @@ impl<T: Clone, V: Clone, M: Clone> InsertQuery<T, V, M> {
             _ => ()
         }
 
-        let values_vec = values.iter().map(|v| v.upcast()).collect();
+        let values_vec = values.iter().map(|e| e.upcast_expression()).collect();
 
         if reassign {
             self.values = InsertUntypedValues(vec![values_vec])
@@ -99,19 +169,4 @@ impl<T: Clone, V: Clone, M: Clone> InsertQuery<T, V, M> {
         with_clone!(self, query, query.values = InsertFromSelect(select))
     }
 
-    // FIXME: Make this public after rust-lang/rust#17635 and remove after rust-lang/rfcs#376
-    insert!(insert_1, (T0, T0Expr, _t0))
-    insert!(insert_2, (T0, T0Expr, _t0), (T1, T1Expr, _t1))
-    insert!(insert_3, (T0, T0Expr, _t0), (T1, T1Expr, _t1), (T2, T2Expr, _t2))
-    insert!(insert_4, (T0, T0Expr, _t0), (T1, T1Expr, _t1), (T2, T2Expr, _t2), (T3, T3Expr, _t3))
-    insert!(insert_5, (T0, T0Expr, _t0), (T1, T1Expr, _t1), (T2, T2Expr, _t2), (T3, T3Expr, _t3), (T4, T4Expr, _t4))
-    insert!(insert_6, (T0, T0Expr, _t0), (T1, T1Expr, _t1), (T2, T2Expr, _t2), (T3, T3Expr, _t3), (T4, T4Expr, _t4), (T5, T5Expr, _t5))
-    insert!(insert_7, (T0, T0Expr, _t0), (T1, T1Expr, _t1), (T2, T2Expr, _t2), (T3, T3Expr, _t3), (T4, T4Expr, _t4), (T5, T5Expr, _t5), (T6, T6Expr, _t6))
-    insert!(insert_8, (T0, T0Expr, _t0), (T1, T1Expr, _t1), (T2, T2Expr, _t2), (T3, T3Expr, _t3), (T4, T4Expr, _t4), (T5, T5Expr, _t5), (T6, T6Expr, _t6), (T7, T7Expr, _t7))
-    insert!(insert_9, (T0, T0Expr, _t0), (T1, T1Expr, _t1), (T2, T2Expr, _t2), (T3, T3Expr, _t3), (T4, T4Expr, _t4), (T5, T5Expr, _t5), (T6, T6Expr, _t6), (T7, T7Expr, _t7), (T8, T8Expr, _t8))
-    insert!(insert_10, (T0, T0Expr, _t0), (T1, T1Expr, _t1), (T2, T2Expr, _t2), (T3, T3Expr, _t3), (T4, T4Expr, _t4), (T5, T5Expr, _t5), (T6, T6Expr, _t6), (T7, T7Expr, _t7), (T8, T8Expr, _t8), (T9, T9Expr, _t9))
-    insert!(insert_11, (T0, T0Expr, _t0), (T1, T1Expr, _t1), (T2, T2Expr, _t2), (T3, T3Expr, _t3), (T4, T4Expr, _t4), (T5, T5Expr, _t5), (T6, T6Expr, _t6), (T7, T7Expr, _t7), (T8, T8Expr, _t8), (T9, T9Expr, _t9), (T10, T10Expr, _t10))
-    insert!(insert_12, (T0, T0Expr, _t0), (T1, T1Expr, _t1), (T2, T2Expr, _t2), (T3, T3Expr, _t3), (T4, T4Expr, _t4), (T5, T5Expr, _t5), (T6, T6Expr, _t6), (T7, T7Expr, _t7), (T8, T8Expr, _t8), (T9, T9Expr, _t9), (T10, T10Expr, _t10), (T11, T11Expr, _t11))
-
 }
-

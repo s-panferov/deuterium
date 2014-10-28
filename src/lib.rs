@@ -6,7 +6,7 @@
 #![feature(default_type_params)]
 #![feature(globs)]
 
-#![deny(warnings)]
+// #![deny(warnings)]
 #![deny(bad_style)]
 
 extern crate serialize;
@@ -60,7 +60,11 @@ pub use select_query::{
 };
 
 pub use insert_query::{
-    InsertQuery
+    InsertQuery,
+    Insertable,
+    InsertValue,
+    ExpressionValue,
+    DefaultValue
 };
 
 pub use expression::{
@@ -111,15 +115,15 @@ impl Query {
     // FIXME: Unify select_N after [generics](https://github.com/rust-lang/rfcs/issues/376)
 
     pub fn select_1<T: Clone>(field: &Expression<T>, from: &From) -> SelectQuery<(T), LimitMany, ()> {
-        SelectQuery::new(SelectOnly(vec![field.upcast()]), from.upcast_from())
+        SelectQuery::new(SelectOnly(vec![field.upcast_expression()]), from.upcast_from())
     }
 
     pub fn select_2<T1: Clone, T2: Clone>(field1: &Expression<T1>, field2: &Expression<T2>, from: &From) -> SelectQuery<(T1, T2), LimitMany, ()> {
-        SelectQuery::new(SelectOnly(vec![field1.upcast(), field2.upcast()]), from.upcast_from())
+        SelectQuery::new(SelectOnly(vec![field1.upcast_expression(), field2.upcast_expression()]), from.upcast_from())
     }
 
     pub fn select(fields: &[&UntypedExpression], from: &From) -> SelectQuery<(), LimitMany, ()> {
-        SelectQuery::new(SelectOnly(fields.iter().map(|f| f.upcast()).collect()), from.upcast_from())
+        SelectQuery::new(SelectOnly(fields.iter().map(|f| f.upcast_expression()).collect()), from.upcast_from())
     }
 
     pub fn select_all(from: &From) -> SelectQuery<(), LimitMany, ()> {

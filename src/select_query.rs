@@ -351,15 +351,15 @@ pub trait Selectable<M: Clone>: From {
     // FIXME: Unify select_N after [generics](https://github.com/rust-lang/rfcs/issues/376)
 
     fn select_1<T: Clone>(&self, field: &Expression<T>) -> SelectQuery<(T), LimitMany, M> {
-        SelectQuery::new(SelectOnly(vec![field.upcast()]), self.upcast_from())
+        SelectQuery::new(SelectOnly(vec![field.upcast_expression()]), self.upcast_from())
     }
 
     fn select_2<T1: Clone, T2: Clone>(&self, field1: &Expression<T1>, field2: &Expression<T2>) -> SelectQuery<(T1, T2), LimitMany, M> {
-        SelectQuery::new(SelectOnly(vec![field1.upcast(), field2.upcast()]), self.upcast_from())
+        SelectQuery::new(SelectOnly(vec![field1.upcast_expression(), field2.upcast_expression()]), self.upcast_from())
     }
 
     fn select(&self, fields: &[&UntypedExpression]) -> SelectQuery<(), LimitMany, M> {
-        SelectQuery::new(SelectOnly(fields.iter().map(|f| f.upcast()).collect()), self.upcast_from())
+        SelectQuery::new(SelectOnly(fields.iter().map(|f| f.upcast_expression()).collect()), self.upcast_from())
     }
 
     fn select_all(&self) -> SelectQuery<(), LimitMany, M> {

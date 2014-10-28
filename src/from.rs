@@ -3,6 +3,9 @@ use std::sync::Arc;
 use to_sql::{FromToSql};
 use select_query::{SelectQuery, Selectable};
 
+use field::{NamedField, Field};
+use insert_query::{InsertQuery, Insertable, InsertValue};
+
 pub trait From { 
     fn as_sql(&self) -> &FromToSql;
     fn upcast_from(&self) -> RcFrom;
@@ -26,6 +29,19 @@ pub struct TableDef {
     alias: Option<String>
 }
 
+// FIXME: Remove after all stuff in InsertQuery will be fixed
+macro_rules! insert(
+    ($name:ident, $(($t:ident, $arg:ident)),+) => (
+        #[doc(hidden)]
+        fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(InsertValue<$t>,)+), ()> {
+            let mut cols = vec![];
+            $(cols.push((*$arg).upcast_field());)+
+            InsertQuery::new_with_cols(self, cols)
+        }
+    )
+)
+
+#[allow(dead_code)]
 impl TableDef {
     pub fn new(name: &str) -> TableDef {
         TableDef { name: name.to_string(), alias: None }
@@ -39,6 +55,13 @@ impl TableDef {
         let mut table_def = self.clone();
         table_def.alias = Some(alias.to_string());
         table_def
+    }
+
+    // FIXME: Remove after all stuff in InsertQuery will be fixed
+    insert!(insert_1, (T0, _t0))
+    #[doc(hidden)]
+    pub fn insert_1_for_test(&self, name: &NamedField<String>) -> InsertQuery<(String,), (InsertValue<String>,), ()> {
+        self.insert_1(name)
     }
 }
 
@@ -67,6 +90,7 @@ impl From for TableDef {
 }
 
 impl Selectable<()> for TableDef {}
+impl Insertable<()> for TableDef {}
 
 #[deriving(Clone)]
 pub struct FromSelect<T, L, M> {

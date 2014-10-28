@@ -43,7 +43,7 @@ macro_rules! agg_func(
                 self
             }
 
-            fn upcast(&self) -> RcExpression {
+            fn upcast_expression(&self) -> RcExpression {
                 Arc::new(box self.clone() as BoxedExpression)
             }
         }
@@ -103,7 +103,7 @@ impl UntypedExpression for CountAll {
         self
     }
 
-    fn upcast(&self) -> RcExpression {
+    fn upcast_expression(&self) -> RcExpression {
         Arc::new(box self.clone() as BoxedExpression)
     }
 }

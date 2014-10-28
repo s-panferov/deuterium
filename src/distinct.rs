@@ -13,7 +13,7 @@ impl Distinct {
 
     pub fn on(fields: &[&UntypedExpression]) -> Distinct {
         Distinct { on: Some( 
-            fields.iter().map(|f| f.upcast()).collect() 
+            fields.iter().map(|f| f.upcast_expression()).collect() 
         )}
     }
 }

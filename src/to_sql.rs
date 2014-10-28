@@ -10,6 +10,18 @@ use select_query::{
     SelectForShareNoWait
 };
 
+use insert_query::{
+    InsertQuery, 
+    Insert,
+    InsertValue,
+    InsertDefaultValues,
+    InsertValues,
+    InsertUntypedValues,
+    InsertFromSelect,
+    ExpressionValue,
+    DefaultValue
+};
+
 use {Select, SelectOnly, SelectAll};
 
 use predicate::{
@@ -26,6 +38,7 @@ use predicate::{
     IsNullPredicate
 };
 use field::{
+    RcField,
     NamedField,
     BoolField,
     I8Field,
@@ -275,6 +288,16 @@ impl<T: Clone> ToSql for NamedField<T> {
     }
 }
 
+impl ToSql for RcField {
+    fn to_sql(&self) -> String {
+        let ref name = self.name();
+        match &self.qual() {
+            &Some(ref qual) => format!("{}.{}", qual, name),
+            &None => name.to_string()
+        }
+    }
+}
+
 pub trait ToPredicateValue {
     fn to_predicate_value(&self) -> String;
 }
@@ -317,6 +340,22 @@ impl ToPredicateValue for String {
 impl ToPredicateValue for Vec<u8> { fn to_predicate_value(&self) -> String { self.to_string() } }
 impl ToPredicateValue for Json { fn to_predicate_value(&self) -> String { self.to_string() } }
 impl ToPredicateValue for Timespec { fn to_predicate_value(&self) -> String { self.to_string() } }
+
+impl ToSql for bool { fn to_sql(&self) -> String { self.to_predicate_value() } }
+impl ToSql for i8 { fn to_sql(&self) -> String { self.to_predicate_value() } }
+impl ToSql for i16 { fn to_sql(&self) -> String { self.to_predicate_value() } }
+impl ToSql for i32 { fn to_sql(&self) -> String { self.to_predicate_value() } }
+impl ToSql for i64 { fn to_sql(&self) -> String { self.to_predicate_value() } }
+impl ToSql for f32 { fn to_sql(&self) -> String { self.to_predicate_value() } }
+impl ToSql for f64 { fn to_sql(&self) -> String { self.to_predicate_value() } }
+impl ToSql for int { fn to_sql(&self) -> String { self.to_predicate_value() } }
+impl ToSql for uint { fn to_sql(&self) -> String { self.to_predicate_value() } }
+impl ToSql for &'static str { fn to_sql(&self) -> String { self.to_predicate_value() } }
+impl ToSql for String { fn to_sql(&self) -> String { self.to_predicate_value() } }
+impl ToSql for Vec<u8> { fn to_sql(&self) -> String { self.to_predicate_value() } }
+impl ToSql for Json { fn to_sql(&self) -> String { self.to_predicate_value() } }
+impl ToSql for Timespec { fn to_sql(&self) -> String { self.to_predicate_value() } }
+
 impl ToPredicateValue for RawExpression { fn to_predicate_value(&self) -> String { self.content.to_string() } }
 
 impl<T: ToPredicateValue> ToPredicateValue for Vec<T> {
@@ -495,4 +534,94 @@ impl ToSql for CountAll {
     fn to_sql(&self) -> String {
         "COUNT(*)".to_string()
     }    
+}
+
+impl<T> ToSql for InsertValue<T> {
+    fn to_sql(&self) -> String {
+        match self {
+            &ExpressionValue(ref e) => {
+                e.expression_as_sql().to_sql()
+            },
+            &DefaultValue => "DEFAULT".to_string()
+        }
+    } 
+}
+
+macro_rules! to_sql_for_insert_tuple(
+    ($fmt:expr, $($t:ident, $var:ident),+) => (
+        impl<$($t,)+> ToSql for ($(InsertValue<$t>),+,)  {
+            fn to_sql(&self) -> String {
+                let &($(ref $var,)+) = self;
+                format!($fmt, $($var.to_sql(),)+)
+            }
+        }
+
+    )
+)
+
+impl ToSql for ()  {
+    fn to_sql(&self) -> String {
+        "DEFAULT VALUES".to_string()
+    }
+}
+
+to_sql_for_insert_tuple!("{}", T1, t1)
+to_sql_for_insert_tuple!("{}, {}", T1, t1, T2, t2)
+to_sql_for_insert_tuple!("{}, {}, {}", T1, t1, T2, t2, T3, t3)
+to_sql_for_insert_tuple!("{}, {}, {}, {}", T1, t1, T2, t2, T3, t3, T4, t4)
+to_sql_for_insert_tuple!("{}, {}, {}, {}, {}", T1, t1, T2, t2, T3, t3, T4, t4, T5, t5)
+to_sql_for_insert_tuple!("{}, {}, {}, {}, {}, {}", T1, t1, T2, t2, T3, t3, T4, t4, T5, t5, T6, t6)
+to_sql_for_insert_tuple!("{}, {}, {}, {}, {}, {}, {}", T1, t1, T2, t2, T3, t3, T4, t4, T5, t5, T6, t6, T7, t7)
+to_sql_for_insert_tuple!("{}, {}, {}, {}, {}, {}, {}, {}", T1, t1, T2, t2, T3, t3, T4, t4, T5, t5, T6, t6, T7, t7, T8, t8)
+to_sql_for_insert_tuple!("{}, {}, {}, {}, {}, {}, {}, {}, {}", T1, t1, T2, t2, T3, t3, T4, t4, T5, t5, T6, t6, T7, t7, T8, t8, T9, t9)
+to_sql_for_insert_tuple!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}", T1, t1, T2, t2, T3, t3, T4, t4, T5, t5, T6, t6, T7, t7, T8, t8, T9, t9, T10, t10)
+to_sql_for_insert_tuple!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}", T1, t1, T2, t2, T3, t3, T4, t4, T5, t5, T6, t6, T7, t7, T8, t8, T9, t9, T10, t10, T11, t11)
+to_sql_for_insert_tuple!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}", T1, t1, T2, t2, T3, t3, T4, t4, T5, t5, T6, t6, T7, t7, T8, t8, T9, t9, T10, t10, T11, t11, T12, t12)
+
+impl<T: Clone, V: ToSql, M: Clone> ToSql for Insert<T, V, M> {
+    fn to_sql(&self) -> String {
+        match self {
+            &InsertDefaultValues => {
+                format!("DEFAULT VALUES")
+            },
+            &InsertValues(ref rows) => {
+                let rows_str: Vec<String> = rows.iter().map(|row| { format!("({})", row.to_sql()) }).collect();
+                format!("VALUES\n    {}", rows_str.connect(",\n    "))
+            },
+            &InsertUntypedValues(ref rows) => {
+                let rows_str: Vec<String> = rows.iter().map(|row| {
+                    let values_str: Vec<String> = row.iter().map(|v| v.expression_as_sql().to_sql()).collect();
+                    format!("({})", values_str.connect(", "))
+                }).collect();
+                format!("VALUES\n    {}", rows_str.connect(",\n    "))    
+            },
+            &InsertFromSelect(ref select) => {
+                select.to_sql()
+            }
+        }
+    }
+}
+
+impl<T: Clone, V: Clone+ToSql, M: Clone> ToSql for InsertQuery<T, V, M> {
+    fn to_sql(&self) -> String {
+        let mut sql = format!("INSERT INTO {}", self.get_into().get_table_name());
+
+        let maybe_cols = self.get_cols().as_ref();
+        if maybe_cols.is_some() {
+            let cols = maybe_cols.unwrap();
+
+            if !cols.is_empty() {
+                let cols_str: Vec<String> = cols.iter().map(|col| col.to_sql()).collect();
+                sql = format!("{} ({})", sql, cols_str.connect(", "))
+            }
+        }
+
+        format!("{} {}", sql, self.get_values().to_sql())
+    }
+}
+
+impl<T: Clone, V: Clone+ToSql, M: Clone> QueryToSql for InsertQuery<T, V, M> {
+    fn to_final_sql(&self) -> String {
+        format!("{};", self.to_sql())
+    }
 }

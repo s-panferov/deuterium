@@ -18,6 +18,7 @@ mod where_;
 mod order;
 mod join;
 mod group_by;
+mod insert;
 
 #[test]
 fn select_order() {

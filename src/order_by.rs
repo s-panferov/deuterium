@@ -16,14 +16,14 @@ pub struct OrderBy {
 impl OrderBy {
     pub fn by(expression: &UntypedExpression) -> OrderBy {
         OrderBy {
-            by: expression.upcast(),
+            by: expression.upcast_expression(),
             order: Asc
         }
     }
 
     pub fn reverse_by(expression: &UntypedExpression) -> OrderBy {
         OrderBy {
-            by: expression.upcast(),
+            by: expression.upcast_expression(),
             order: Desc
         }
     }

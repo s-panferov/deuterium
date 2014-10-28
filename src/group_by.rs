@@ -8,6 +8,6 @@ pub struct GroupBy {
 
 impl GroupBy {
     pub fn new(fields: &[&UntypedExpression]) -> GroupBy {
-        GroupBy { by: fields.iter().map(|f| f.upcast()).collect() }
+        GroupBy { by: fields.iter().map(|f| f.upcast_expression()).collect() }
     }
 }
