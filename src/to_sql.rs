@@ -647,7 +647,7 @@ impl<T: Clone, V: Clone+ToSql, M: Clone> QueryToSql for InsertQuery<T, V, M> {
 
 impl<F: ToPredicateValue, T: ToPredicateValue> ToSql for FieldUpdate<F, T> {
     fn to_sql(&self) -> String {
-        format!("{} = {}", self.get_field().to_predicate_value(), self.get_value().to_predicate_value())
+        format!("{} = {}", self.get_field().to_predicate_value(), self.get_value().to_sql())
     }
 }
 
@@ -676,10 +676,11 @@ impl ToSql for UpdateQuery {
             Some(predicate) => {
                 sql = format!("{} WHERE {}", sql, predicate.to_sql(false))
             },
-            None => {
+            None if !self.all => {
                 // http://devopsreactions.tumblr.com/post/47352638154/almost-ran-update-without-where
                 sql = format!("{} WHERE true = false", sql)
-            }
+            },
+            _ => ()
         }
 
         sql

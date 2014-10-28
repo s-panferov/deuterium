@@ -50,7 +50,13 @@ impl<T: Clone> NamedField<T> {
         }
     }
 
-    pub fn qual(&self, qual: &str) -> NamedField<T> {
+    pub fn qual(&self) -> NamedField<T> {
+        let mut field = self.clone();
+        field.qual = Some(self.table_name.to_string());
+        field
+    }
+
+    pub fn qual_with(&self, qual: &str) -> NamedField<T> {
         let mut field = self.clone();
         field.qual = Some(qual.to_string());
         field
@@ -142,9 +148,7 @@ impl ByteListComparableList for Vec<Vec<u8>> {}
 impl JsonComparableList for Vec<Json> {}
 impl TimespecComparableList for Vec<Timespec> {}
 
-impl BoolComparable for bool {}
-impl BoolComparable for BoolField {} 
-impl BoolComparable for RawExpression {} 
+
 
 macro_rules! number_comparable(
     ($comp:ty) => (
@@ -177,6 +181,10 @@ impl StringComparable for String {}
 impl StringComparable for &'static str {}
 impl StringComparable for StringField {}
 impl StringComparable for RawExpression {}
+
+impl BoolComparable for bool {}
+impl BoolComparable for BoolField {} 
+impl BoolComparable for RawExpression {} 
 
 impl ByteListComparable for Vec<u8> {}
 impl ByteListComparable for ByteListField {}

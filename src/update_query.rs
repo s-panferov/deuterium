@@ -4,20 +4,44 @@ use std::sync::Arc;
 use select_query::{Queryable};
 use from::{From, Table, RcTable, RcFrom};
 use predicate::{RcPredicate};
-use raw_expression::{RawExpression, RawExpressionComparable};
+
+use serialize::json::Json;
+use time::Timespec;
+
+use expression::{
+    ExprValue, 
+    DefaultValue,
+
+    ToExpression,
+
+    // ToBoolExpression,
+    // ToI8Expression,
+    // ToI16Expression,
+    // ToI32Expression,
+    // ToI64Expression,
+    // ToF32Expression,
+    // ToF64Expression,
+    // ToStringExpression,
+    // ToByteListExpression,
+    // ToJsonExpression,
+    // ToTimespecExpression,
+    // ToRawExpression,
+};
+
+use raw_expression::{RawExpression};
 use to_sql::{ToSql, ToPredicateValue};
 use field::{
-    BoolField, BoolComparable,
-    I8Field, I8Comparable,
-    I16Field, I16Comparable,
-    I32Field, I32Comparable,
-    I64Field, I64Comparable,
-    F32Field, F32Comparable,
-    F64Field, F64Comparable,
-    StringField, StringComparable,
-    ByteListField, ByteListComparable,
-    JsonField, JsonComparable,
-    TimespecField, TimespecComparable
+    BoolField,
+    I8Field,
+    I16Field,
+    I32Field,
+    I64Field,
+    F32Field,
+    F64Field,
+    StringField,
+    ByteListField,
+    JsonField,
+    TimespecField,
 };
 
 pub trait FieldUpd: ToSql {
@@ -27,7 +51,7 @@ pub trait FieldUpd: ToSql {
 #[deriving(Send, Sync, Clone)]
 pub struct FieldUpdate<F, T> {
     pub field: F,
-    pub value: T
+    pub value: ExprValue<T>
 }
 
 impl<F, T> FieldUpdate<F, T> {
@@ -35,7 +59,7 @@ impl<F, T> FieldUpdate<F, T> {
         &self.field
     }    
 
-    pub fn get_value(&self) -> &T {
+    pub fn get_value(&self) -> &ExprValue<T> {
         &self.value
     }
 }
@@ -50,40 +74,48 @@ impl<F: Clone + Send + Sync + ToPredicateValue, T: Clone + Send + Sync + ToPredi
 }
 
 pub trait ToFieldUpdate<F, T> {
-    fn set(&self, val: T) -> FieldUpdate<F, T>;
+    fn set<B: ToExpression<T>>(&self, val: &B) -> FieldUpdate<F, T>;
+    fn set_default(&self) -> FieldUpdate<F, T>;
 }
 
 macro_rules! set_methods(
-    ($field:ty, $v:ident) => (
-        fn set(&self, val: $v) -> FieldUpdate<$field, $v> {
+    ($field:ty, $v:ty) => (
+        fn set<B: ToExpression<$v>>(&self, val: &B) -> FieldUpdate<$field, $v> {
             FieldUpdate {
                 field: self.clone(),
-                value: val
+                value: ExprValue::new(val.as_expr())
+            }
+        }
+
+        fn set_default(&self) -> FieldUpdate<$field, $v> {
+            FieldUpdate {
+                field: self.clone(),
+                value: DefaultValue
             }
         }
     )
 )
 
 macro_rules! impl_for(
-    ($field:ty, $v:ident) => (
-        impl<T: $v> ToFieldUpdate<$field, T> for $field {
-            set_methods!($field, T) 
+    ($field:ty, $v:ty) => (
+        impl ToFieldUpdate<$field, $v> for $field {
+            set_methods!($field, $v) 
         }
     )
 )
 
-impl_for!(BoolField, BoolComparable)
-impl_for!(I8Field, I8Comparable)
-impl_for!(I16Field, I16Comparable)
-impl_for!(I32Field, I32Comparable)
-impl_for!(I64Field, I64Comparable)
-impl_for!(F32Field, F32Comparable)
-impl_for!(F64Field, F64Comparable)
-impl_for!(StringField, StringComparable)
-impl_for!(ByteListField, ByteListComparable)
-impl_for!(JsonField, JsonComparable)
-impl_for!(TimespecField, TimespecComparable)
-impl_for!(RawExpression, RawExpressionComparable)
+impl_for!(BoolField, bool)
+impl_for!(I8Field, i8)
+impl_for!(I16Field, i16)
+impl_for!(I32Field, i32)
+impl_for!(I64Field, i64)
+impl_for!(F32Field, f32)
+impl_for!(F64Field, f64)
+impl_for!(StringField, String)
+impl_for!(ByteListField, Vec<u8>)
+impl_for!(JsonField, Json)
+impl_for!(TimespecField, Timespec)
+impl_for!(RawExpression, ())
 
 pub trait Updatable: Table { 
     fn update(&self) -> UpdateQuery {
@@ -91,13 +123,16 @@ pub trait Updatable: Table {
     }
 }
 
+// TODO: RETURNING
+
 #[deriving(Clone)]
 pub struct UpdateQuery {
     pub only: bool,
     pub table: RcTable,
     pub updates: Vec<RcFieldUpdate>,
     pub from: Option<Vec<RcFrom>>,
-    pub where_: Option<RcPredicate>
+    pub where_: Option<RcPredicate>,
+    pub all: bool
 }
 
 impl UpdateQuery {
@@ -107,7 +142,8 @@ impl UpdateQuery {
             table: table.upcast_table(),
             updates: vec![],
             from: None,
-            where_: None
+            where_: None,
+            all: false
         }
     }
 
@@ -127,6 +163,12 @@ impl UpdateQuery {
 
     pub fn field<T: FieldUpd>(mut self, update: T) -> UpdateQuery {
         self.updates.push(update.upcast_field_update());
+        self
+    }
+
+    pub fn all(mut self) -> UpdateQuery {
+        self.where_ = None;
+        self.all = true;
         self
     }
 }
