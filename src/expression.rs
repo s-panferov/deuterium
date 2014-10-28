@@ -24,7 +24,7 @@ pub enum ExprValue<T> {
     DefaultValue
 }
 
-pub trait ToExprValue<T> {
+pub trait ToExprValue<T> for Sized? {
     fn to_expr_val(&self) -> ExprValue<T>;
 }
 
