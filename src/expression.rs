@@ -21,6 +21,7 @@ use field::{
 };
 
 pub trait Expression<T> for Sized?: UntypedExpression {}
+pub trait ListExpression<T> for Sized?: UntypedExpression {}
 
 pub trait UntypedExpression for Sized? {
     fn expression_as_sql(&self) -> &ToSql;
@@ -78,6 +79,20 @@ macro_rules! impl_expression_for(
         impl Expression<$t> for $t {
             
         }
+
+        impl UntypedExpression for Vec<$t> {
+            fn expression_as_sql(&self) -> &ToSql {
+                self
+            }
+
+            fn upcast_expression(&self) -> RcExpression {
+                Arc::new(box self.clone() as BoxedExpression)
+            }
+        }
+
+        impl ListExpression<$t> for Vec<$t> {
+            
+        }
     )
 )
 
@@ -100,9 +115,25 @@ impl_expression_for!(Json)
 impl_expression_for!(Timespec)
 impl_expression_for!(RawExpr)
 
-pub trait ToExpression<T>: UntypedExpression {
+pub trait ToExpression<T> for Sized?: UntypedExpression {
     fn as_expr(&self) -> &Expression<T> { unsafe{ mem::transmute(self as &UntypedExpression) } }
 }
+
+pub trait ToListExpression<T> for Sized?: UntypedExpression {
+    fn as_expr(&self) -> &ListExpression<T> { unsafe{ mem::transmute(self as &UntypedExpression) } }
+}
+
+impl ToListExpression<bool> for Vec<bool> {}
+impl ToListExpression<i8> for Vec<i8> {}
+impl ToListExpression<i16> for Vec<i16> {}
+impl ToListExpression<i32> for Vec<i32> {}
+impl ToListExpression<i64> for Vec<i64> {}
+impl ToListExpression<f32> for Vec<f32> {}
+impl ToListExpression<f64> for Vec<f64> {}
+impl ToListExpression<String> for Vec<String> {}
+impl ToListExpression<Vec<u8>> for Vec<Vec<u8>> {}
+impl ToListExpression<Json> for Vec<Json> {}
+impl ToListExpression<Timespec> for Vec<Timespec> {}
 
 macro_rules! cast_numbers(
     ($comp:ty) => (

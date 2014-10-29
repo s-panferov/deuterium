@@ -2,7 +2,6 @@ use serialize::json::Json;
 use time::Timespec;
 use std::sync::Arc;
 
-use to_sql::{ToPredicateValue};
 use from::{Table};
 use to_sql::{ToSql};
 use expression::{Expression, UntypedExpression, RcExpression, BoxedExpression};
@@ -109,28 +108,3 @@ pub type StringField = NamedField<String>;
 pub type ByteListField = NamedField<Vec<u8>>;
 pub type JsonField = NamedField<Json>;
 pub type TimespecField = NamedField<Timespec>;
-
-pub trait BoolComparableList: Send + Clone + Sync + ToPredicateValue { }
-pub trait I8ComparableList: Send + Clone + Sync + ToPredicateValue{ }
-pub trait I16ComparableList: Send + Clone + Sync + ToPredicateValue { }
-pub trait I32ComparableList: Send + Clone + Sync + ToPredicateValue { }
-pub trait I64ComparableList: Send + Clone + Sync + ToPredicateValue { }
-pub trait F32ComparableList: Send + Clone + Sync + ToPredicateValue { }
-pub trait F64ComparableList: Send + Clone + Sync + ToPredicateValue { }
-pub trait StringComparableList: Send + Clone + Sync + ToPredicateValue { }
-pub trait ByteListComparableList: Send + Clone + Sync + ToPredicateValue { }
-pub trait JsonComparableList: Send + Clone + Sync + ToPredicateValue { }
-pub trait TimespecComparableList: Send + Clone + Sync + ToPredicateValue { }
-
-impl BoolComparableList for Vec<bool> {}
-impl I8ComparableList for Vec<i8> {}
-impl I16ComparableList for Vec<i16> {}
-impl I32ComparableList for Vec<i32> {}
-impl I64ComparableList for Vec<i64> {}
-impl F32ComparableList for Vec<f32> {}
-impl F64ComparableList for Vec<f64> {}
-impl StringComparableList for Vec<String> {}
-impl StringComparableList for Vec<&'static str> {}
-impl ByteListComparableList for Vec<Vec<u8>> {}
-impl JsonComparableList for Vec<Json> {}
-impl TimespecComparableList for Vec<Timespec> {}

@@ -384,6 +384,12 @@ impl<T: ToPredicateValue> ToPredicateValue for Vec<T> {
     }  
 }
 
+impl<T: ToPredicateValue> ToSql for Vec<T> {
+    fn to_sql(&self) -> String { 
+        self.to_predicate_value()
+    }  
+}
+
 impl<T, L, M> ToPredicateValue for SelectQuery<T, L, M> {
     fn to_predicate_value(&self) -> String { self.to_sql() }   
 }

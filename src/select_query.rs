@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::mem;
 
 use from::{From, RcFrom, FromSelect};
-use expression::{Expression, ToExpression, UntypedExpression, BoxedExpression, RcExpression};
+use expression::{Expression, ToExpression, ToListExpression, UntypedExpression, BoxedExpression, RcExpression};
 use predicate::{
     RcPredicate,
     ToOrPredicate,
@@ -19,18 +19,6 @@ use order_by::{OrderBy};
 use join::{Join};
 use distinct::{Distinct};
 use group_by::{GroupBy};
-
-use field::{
-    I8ComparableList,
-    I16ComparableList,
-    I32ComparableList,
-    I64ComparableList,
-    F32ComparableList,
-    F64ComparableList,
-    StringComparableList,
-    JsonComparableList,
-    TimespecComparableList
-};
 
 #[deriving(Clone)]
 pub enum Select {
@@ -399,13 +387,13 @@ impl<M: Clone> ToExpression<String> for SelectQuery<(String), LimitOne, M> { }
 impl<M: Clone> ToExpression<Json> for SelectQuery<(Json), LimitOne, M> { }
 impl<M: Clone> ToExpression<Timespec> for SelectQuery<(Timespec), LimitOne, M> { }
 
-impl<M: Clone> I8ComparableList for SelectQuery<(i8), LimitMany, M> { }
-impl<M: Clone> I16ComparableList for SelectQuery<(i16), LimitMany, M> { }
-impl<M: Clone> I32ComparableList for SelectQuery<(i32), LimitMany, M> { }
-impl<M: Clone> I64ComparableList for SelectQuery<(i64), LimitMany, M> { }
-impl<M: Clone> F32ComparableList for SelectQuery<(f32), LimitMany, M> { }
-impl<M: Clone> F64ComparableList for SelectQuery<(f64), LimitMany, M> { }
-impl<M: Clone> StringComparableList for SelectQuery<(String), LimitMany, M> { }
-impl<M: Clone> JsonComparableList for SelectQuery<(Json), LimitMany, M> { }
-impl<M: Clone> TimespecComparableList for SelectQuery<(Timespec), LimitMany, M> { }
+impl<M: Clone> ToListExpression<i8> for SelectQuery<(i8), LimitMany, M> { }
+impl<M: Clone> ToListExpression<i16> for SelectQuery<(i16), LimitMany, M> { }
+impl<M: Clone> ToListExpression<i32> for SelectQuery<(i32), LimitMany, M> { }
+impl<M: Clone> ToListExpression<i64> for SelectQuery<(i64), LimitMany, M> { }
+impl<M: Clone> ToListExpression<f32> for SelectQuery<(f32), LimitMany, M> { }
+impl<M: Clone> ToListExpression<f64> for SelectQuery<(f64), LimitMany, M> { }
+impl<M: Clone> ToListExpression<String> for SelectQuery<(String), LimitMany, M> { }
+impl<M: Clone> ToListExpression<Json> for SelectQuery<(Json), LimitMany, M> { }
+impl<M: Clone> ToListExpression<Timespec> for SelectQuery<(Timespec), LimitMany, M> { }
 
