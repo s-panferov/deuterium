@@ -89,7 +89,7 @@ pub use expression::{
     RawExpr
 };
 
-pub use to_sql::{ToSql, QueryToSql, FromToSql};
+pub use to_sql::{ToSql, QueryToSql, FromToSql, ToPredicateValue};
 pub use from::{TableDef, Table, BoxedTable, RcTable, From, BoxedFrom, RcFrom};
 
 pub use function::{
@@ -99,6 +99,10 @@ pub use function::{
     Avg, AvgArg,
     Count, CountArg,
     CountAll
+};
+
+pub use placeholder::{
+    Placeholder
 };
 
 macro_rules! with_clone(
@@ -125,6 +129,7 @@ mod join;
 mod distinct;
 mod group_by;
 mod function;
+mod placeholder;
 
 pub struct Query;
 

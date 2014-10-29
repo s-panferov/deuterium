@@ -21,6 +21,7 @@ mod group_by;
 mod insert;
 mod update;
 mod delete;
+mod placeholder;
 
 #[test]
 fn select_order() {

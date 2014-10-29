@@ -100,6 +100,10 @@ use expression::{
     DefaultValue,
 };
 
+use placeholder::{
+    Placeholder
+};
+
 pub trait QueryToSql {
     fn to_final_sql(&self) -> String;
 }
@@ -392,6 +396,18 @@ impl<T: ToPredicateValue> ToSql for Vec<T> {
     fn to_sql(&self) -> String { 
         self.to_predicate_value()
     }  
+}
+
+impl ToPredicateValue for Placeholder {
+    fn to_predicate_value(&self) -> String {
+        format!("${}", self.idx)
+    }
+}
+
+impl ToSql for Placeholder {
+    fn to_sql(&self) -> String {
+        self.to_predicate_value()
+    }
 }
 
 impl<T, L, M> ToPredicateValue for SelectQuery<T, L, M> {
