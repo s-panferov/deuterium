@@ -103,17 +103,29 @@ impl<'a, 'b, T> ToExprValue<T> for &'a Expression<T> + 'b {
 }
 
 impl_expression_for!(bool)
+impl_expression_for!(Option<bool>)
 impl_expression_for!(i8)
+impl_expression_for!(Option<i8>)
 impl_expression_for!(i16)
+impl_expression_for!(Option<i16>)
 impl_expression_for!(i32)
+impl_expression_for!(Option<i32>)
 impl_expression_for!(i64)
+impl_expression_for!(Option<i64>)
 impl_expression_for!(f32)
+impl_expression_for!(Option<f32>)
 impl_expression_for!(f64)
+impl_expression_for!(Option<f64>)
 impl_expression_for!(String)
+impl_expression_for!(Option<String>)
 impl_expression_for!(Vec<u8>)
+impl_expression_for!(Option<Vec<u8>>)
 impl_expression_for!(Json)
+impl_expression_for!(Option<Json>)
 impl_expression_for!(Timespec)
+impl_expression_for!(Option<Timespec>)
 impl_expression_for!(RawExpr)
+impl_expression_for!(Option<RawExpr>)
 
 pub trait ToExpression<T> for Sized?: UntypedExpression {
     fn as_expr(&self) -> &Expression<T> { unsafe{ mem::transmute(self as &UntypedExpression) } }
@@ -143,6 +155,12 @@ macro_rules! cast_numbers(
         impl $comp for i64 {}
         impl $comp for f32 {}
         impl $comp for f64 {}
+        impl $comp for Option<i8> {}
+        impl $comp for Option<i16> {}
+        impl $comp for Option<i32> {}
+        impl $comp for Option<i64> {}
+        impl $comp for Option<f32> {}
+        impl $comp for Option<f64> {}
         impl $comp for I8Field {} 
         impl $comp for I16Field {} 
         impl $comp for I32Field {} 
@@ -154,6 +172,7 @@ macro_rules! cast_numbers(
 )
 
 impl ToExpression<String> for String {}
+impl ToExpression<String> for Option<String> {}
 impl ToExpression<String> for StringField {}
 impl ToExpression<String> for RawExpr {}
 
@@ -165,18 +184,22 @@ cast_numbers!(ToExpression<f32>)
 cast_numbers!(ToExpression<f64>)
 
 impl ToExpression<bool> for bool {}
+impl ToExpression<bool> for Option<bool> {}
 impl ToExpression<bool> for BoolField {} 
 impl ToExpression<bool> for RawExpr {} 
 
 impl ToExpression<Vec<u8>> for Vec<u8> {}
+impl ToExpression<Vec<u8>> for Option<Vec<u8>> {}
 impl ToExpression<Vec<u8>> for ByteListField {}
 impl ToExpression<Vec<u8>> for RawExpr {}
 
 impl ToExpression<Json> for Json {}
+impl ToExpression<Json> for Option<Json> {}
 impl ToExpression<Json> for JsonField {}
 impl ToExpression<Json> for RawExpr {}
 
 impl ToExpression<Timespec> for Timespec {}
+impl ToExpression<Timespec> for Option<Timespec> {}
 impl ToExpression<Timespec> for TimespecField {}
 impl ToExpression<Timespec> for RawExpr {}
 
@@ -191,6 +214,17 @@ impl ToExpression<RawExpr> for Vec<u8> {}
 impl ToExpression<RawExpr> for String {}
 impl ToExpression<RawExpr> for Json {}
 impl ToExpression<RawExpr> for Timespec {}
+impl ToExpression<RawExpr> for Option<bool> {}
+impl ToExpression<RawExpr> for Option<i8> {}
+impl ToExpression<RawExpr> for Option<i16> {}
+impl ToExpression<RawExpr> for Option<i32> {}
+impl ToExpression<RawExpr> for Option<i64> {}
+impl ToExpression<RawExpr> for Option<f32> {}
+impl ToExpression<RawExpr> for Option<f64> {}
+impl ToExpression<RawExpr> for Option<Vec<u8>> {}
+impl ToExpression<RawExpr> for Option<String> {}
+impl ToExpression<RawExpr> for Option<Json> {}
+impl ToExpression<RawExpr> for Option<Timespec> {}
 impl ToExpression<RawExpr> for BoolField {} 
 impl ToExpression<RawExpr> for I8Field {} 
 impl ToExpression<RawExpr> for I16Field {} 

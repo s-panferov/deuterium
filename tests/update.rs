@@ -29,6 +29,15 @@ fn update() {
 }
 
 #[test]
+fn update_to_null() {
+    let jedi_table = TableDef::new("jedi");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
+
+    let query = jedi_table.update().all().field(name.set(&None));
+    assert_sql!(query, "UPDATE jedi SET name = NULL;")
+}
+
+#[test]
 fn update_returning() {
 
     let jedi_table = TableDef::new("jedi");
