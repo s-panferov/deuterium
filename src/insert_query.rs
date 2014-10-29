@@ -3,7 +3,7 @@ pub use from::{Table, RcTable};
 pub use field::{NamedField, Field, RcField};
 pub use select_query::{SelectQuery, LimitMany};
 pub use expression::{
-    Expression, UntypedExpression, RcExpression,     
+    Expression, ToExpression, UntypedExpression, RcExpression,     
     ExprValue, ExpressionValue, DefaultValue, ToExprValue};
 
 #[allow(dead_code)]
@@ -120,7 +120,7 @@ impl<T: Clone, V: Clone, M: Clone> InsertQuery<T, V, M> {
         }
     }
 
-    pub fn push_untyped(&mut self, values: &[&ToExprValue<()>]) {
+    pub fn push_untyped(&mut self, values: &[&ToExpression<()>]) {
         let mut reassign = false;
         match &self.values {
             &InsertDefaultValues | &InsertFromSelect(_) => {
@@ -129,7 +129,7 @@ impl<T: Clone, V: Clone, M: Clone> InsertQuery<T, V, M> {
             _ => ()
         }
 
-        let values_vec = values.iter().map(|v| v.to_expr_val()).collect();
+        let values_vec = values.iter().map(|v| v.as_expr().to_expr_val()).collect();
 
         if reassign {
             self.values = InsertUntypedValues(vec![values_vec])

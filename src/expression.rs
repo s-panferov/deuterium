@@ -50,14 +50,6 @@ impl<T> ExprValue<T> {
     }
 }
 
-impl<T: Clone> ToExprValue<()> for ExprValue<T> {
-    fn to_expr_val(&self) -> ExprValue<()> {
-        unsafe {
-            mem::transmute(self.clone())
-        }
-    }
-}
-
 macro_rules! impl_expression_for(
     ($t:ty) => (
         impl UntypedExpression for $t {
@@ -73,20 +65,14 @@ macro_rules! impl_expression_for(
         impl Expression<$t> for $t {
             
         }
-
-        impl ToExprValue<$t> for $t {
-            fn to_expr_val(&self) -> ExprValue<$t> {
-                ExprValue::new(self)
-            }
-        }
-
-        impl ToExprValue<()> for $t {
-            fn to_expr_val(&self) -> ExprValue<()> {
-                ExprValue::new(self).to_expr_val()
-            }
-        }
     )
 )
+
+impl<'a, 'b, T> ToExprValue<T> for &'a Expression<T> + 'b {
+    fn to_expr_val(&self) -> ExprValue<T> {
+        ExprValue::new(*self)
+    }   
+}
 
 impl_expression_for!(bool)
 impl_expression_for!(i8)
