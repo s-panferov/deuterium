@@ -1,5 +1,5 @@
 
-use to_sql::{ToSql};
+use sql::{ToSql};
 use std::sync::Arc;
 
 use serialize::json::Json;

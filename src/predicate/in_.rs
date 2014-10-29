@@ -2,7 +2,7 @@ use time::Timespec;
 
 use predicate::{Predicate, RcPredicate};
 use expression::{ToListExpression, RawExpr};
-use to_sql::{ToPredicateValue};
+use sql::{ToPredicateValue};
 
 use field::{
     I8Field,

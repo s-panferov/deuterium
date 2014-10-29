@@ -4,7 +4,7 @@ use time::Timespec;
 use serialize::json::Json;
 
 use expression::{UntypedExpression, RcExpression, RawExpr, BoxedExpression, ToExpression};
-use to_sql::{ToSql};
+use sql::{ToSql};
 
 #[deriving(Clone)]
 pub struct Placeholder {

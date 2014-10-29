@@ -13,7 +13,7 @@ use field::{
     TimespecField,
 };
 
-use to_sql::{ToPredicateValue};
+use sql::{ToPredicateValue};
 
 #[deriving(Clone)]
 pub enum Inequality {

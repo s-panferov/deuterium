@@ -3,7 +3,7 @@ use std::sync::Arc;
 use time::Timespec;
 
 use expression::{Expression, BoxedExpression, RcExpression, UntypedExpression};
-use to_sql::{ToSql};
+use sql::{ToSql};
 use field::{
     NamedField,
     I8Field,

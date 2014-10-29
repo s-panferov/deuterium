@@ -89,7 +89,7 @@ pub use expression::{
     RawExpr
 };
 
-pub use to_sql::{ToSql, QueryToSql, FromToSql, ToPredicateValue};
+pub use sql::{ToSql, QueryToSql, FromToSql, ToPredicateValue};
 pub use from::{TableDef, Table, BoxedTable, RcTable, From, BoxedFrom, RcFrom};
 
 pub use function::{
@@ -121,7 +121,7 @@ mod insert_query;
 #[macro_escape]
 mod delete_query;
 mod update_query;
-mod to_sql;
+mod sql;
 mod expression;
 mod order_by;
 mod from;

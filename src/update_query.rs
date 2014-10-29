@@ -18,7 +18,7 @@ use expression::{
     ToExpression,
 };
 
-use to_sql::{ToSql, ToPredicateValue};
+use sql::{ToSql, ToPredicateValue};
 use field::{
     BoolField,
     I8Field,

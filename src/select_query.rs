@@ -14,7 +14,7 @@ use predicate::{
     ToExcludePredicate
 };
 
-use to_sql::{ToSql};
+use sql::{ToSql};
 use order_by::{OrderBy};
 use join::{Join};
 use distinct::{Distinct};

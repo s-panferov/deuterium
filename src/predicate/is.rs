@@ -2,7 +2,7 @@
 use time::Timespec;
 use serialize::json::Json;
 
-use to_sql::{ToPredicateValue};
+use sql::{ToPredicateValue};
 use expression::{ToExpression, RawExpr};
 use predicate::{Predicate, RcPredicate};
 use field::{

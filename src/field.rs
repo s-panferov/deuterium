@@ -3,7 +3,7 @@ use time::Timespec;
 use std::sync::Arc;
 
 use from::{Table};
-use to_sql::{ToSql};
+use sql::{ToSql};
 use expression::{Expression, UntypedExpression, RcExpression, BoxedExpression};
 
 pub trait Field {

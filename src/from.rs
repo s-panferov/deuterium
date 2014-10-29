@@ -1,6 +1,6 @@
 
 use std::sync::Arc;
-use to_sql::{FromToSql};
+use sql::{FromToSql};
 use select_query::{SelectQuery, Selectable};
 use insert_query::{InsertQuery, Insertable};
 use update_query::{Updatable};

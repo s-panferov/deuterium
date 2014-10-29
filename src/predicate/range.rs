@@ -1,7 +1,7 @@
 use time::Timespec;
 
 use predicate::{Predicate, RcPredicate};
-use to_sql::{ToPredicateValue};
+use sql::{ToPredicateValue};
 use expression::{ToExpression, RawExpr};
 
 use field::{

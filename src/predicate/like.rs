@@ -2,7 +2,7 @@
 use predicate::{Predicate, RcPredicate};
 use expression::{ToExpression, RawExpr};
 use field::{StringField};
-use to_sql::{ToPredicateValue};
+use sql::{ToPredicateValue};
 
 #[deriving(Send, Clone)]
 pub struct LikePredicate<F, T> {
