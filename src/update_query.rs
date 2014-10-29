@@ -9,26 +9,13 @@ use serialize::json::Json;
 use time::Timespec;
 
 use expression::{
+    RawExpr,
+    ToExprValue,
     ExprValue, 
     DefaultValue,
-
     ToExpression,
-
-    // ToBoolExpression,
-    // ToI8Expression,
-    // ToI16Expression,
-    // ToI32Expression,
-    // ToI64Expression,
-    // ToF32Expression,
-    // ToF64Expression,
-    // ToStringExpression,
-    // ToByteListExpression,
-    // ToJsonExpression,
-    // ToTimespecExpression,
-    // ToRawExpression,
 };
 
-use raw_expression::{RawExpression};
 use to_sql::{ToSql, ToPredicateValue};
 use field::{
     BoolField,
@@ -83,7 +70,7 @@ macro_rules! set_methods(
         fn set<B: ToExpression<$v>>(&self, val: &B) -> FieldUpdate<$field, $v> {
             FieldUpdate {
                 field: self.clone(),
-                value: ExprValue::new(val.as_expr())
+                value: val.as_expr().to_expr_val()
             }
         }
 
@@ -115,7 +102,7 @@ impl_for!(StringField, String)
 impl_for!(ByteListField, Vec<u8>)
 impl_for!(JsonField, Json)
 impl_for!(TimespecField, Timespec)
-impl_for!(RawExpression, ())
+impl_for!(RawExpr, RawExpr)
 
 pub trait Updatable: Table { 
     fn update(&self) -> UpdateQuery {

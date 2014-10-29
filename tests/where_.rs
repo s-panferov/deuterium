@@ -7,7 +7,7 @@ fn simple_where() {
     let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
     
-    let query = jedi_table.select_all().where_(name.is("Luke"));
+    let query = jedi_table.select_all().where_(name.is("Luke".to_string()));
     assert_sql!(query, "SELECT * FROM jedi WHERE name = 'Luke';");
 }
 
@@ -21,10 +21,10 @@ fn query_level_and() {
     
     let and_sql = "SELECT * FROM jedi WHERE (name = 'Luke') AND (side = true);";
 
-    let query = jedi_table.select_all().where_(name.is("Luke")).where_(side.is(true));
+    let query = jedi_table.select_all().where_(name.is("Luke".to_string())).where_(side.is(true));
     assert_sql!(query, and_sql);
 
-    let query = jedi_table.select_all().where_(name.is("Luke")).and(side.is(true));
+    let query = jedi_table.select_all().where_(name.is("Luke".to_string())).and(side.is(true));
     assert_sql!(query, and_sql);
 
     let query = query.and(force_level.lt(100i8));
@@ -39,7 +39,7 @@ fn query_level_or() {
     let side = NamedField::<bool>::field_of("side", &jedi_table);
     let force_level = NamedField::<i8>::field_of("force_level", &jedi_table);
     
-    let query = jedi_table.select_all().where_(name.is("Luke")).or(side.is(true));
+    let query = jedi_table.select_all().where_(name.is("Luke".to_string())).or(side.is(true));
     assert_sql!(query, "SELECT * FROM jedi WHERE (name = 'Luke') OR (side = true);"); 
 
     let query = query.or(force_level.lt(100i8));
@@ -53,7 +53,7 @@ fn predicate_and_or() {
     let name = NamedField::<String>::field_of("name", &jedi_table);
     let side = NamedField::<bool>::field_of("side", &jedi_table);
     
-    let query = jedi_table.select_all().where_(name.is("Luke").or(name.is("Joda").and(side.is(true))));
+    let query = jedi_table.select_all().where_(name.is("Luke".to_string()).or(name.is("Joda".to_string()).and(side.is(true))));
     assert_sql!(query, "SELECT * FROM jedi WHERE (name = 'Luke') OR ((name = 'Joda') AND (side = true));"); 
 }
 
@@ -64,7 +64,7 @@ fn exclude_and() {
     let name = NamedField::<String>::field_of("name", &jedi_table);
     let side = NamedField::<bool>::field_of("side", &jedi_table);
     
-    let query = jedi_table.select_all().exclude(name.is("Luke").and(side.is(true)));
+    let query = jedi_table.select_all().exclude(name.is("Luke".to_string()).and(side.is(true)));
     assert_sql!(query, "SELECT * FROM jedi WHERE (name != 'Luke') AND (side != true);"); 
 }
 
@@ -75,7 +75,7 @@ fn exclude_or() {
     let name = NamedField::<String>::field_of("name", &jedi_table);
     let side = NamedField::<bool>::field_of("side", &jedi_table);
     
-    let query = jedi_table.select_all().exclude(name.is("Luke").or(side.is(true)));
+    let query = jedi_table.select_all().exclude(name.is("Luke".to_string()).or(side.is(true)));
     assert_sql!(query, "SELECT * FROM jedi WHERE (name != 'Luke') AND (side != true);"); 
 }
 
@@ -153,7 +153,7 @@ fn predicate_in_subquery() {
     let force_level = NamedField::<i8>::field_of("force_level", &jedi_table);
     
     let query = jedi_table.select_all().where_(force_level.in_(
-        jedi_table.alias("j").select_1(&force_level).where_(name.is("Anakin"))
+        jedi_table.alias("j").select_1(&force_level).where_(name.is("Anakin".to_string()))
     ));
 
     assert_sql!(query, "SELECT * FROM jedi WHERE force_level IN (SELECT force_level FROM jedi AS j WHERE name = 'Anakin');");     
@@ -186,16 +186,16 @@ fn predicate_like() {
     let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
     
-    let query = jedi_table.select_all().where_(name.like("Luke%"));
+    let query = jedi_table.select_all().where_(name.like("Luke%".to_string()));
     assert_sql!(query, "SELECT * FROM jedi WHERE name LIKE 'Luke%';");         
 
-    let query = jedi_table.select_all().where_(name.ilike("Luke%"));
+    let query = jedi_table.select_all().where_(name.ilike("Luke%".to_string()));
     assert_sql!(query, "SELECT * FROM jedi WHERE name ILIKE 'Luke%';");  
 
-    let query = jedi_table.select_all().exclude(name.like("Luke%"));
+    let query = jedi_table.select_all().exclude(name.like("Luke%".to_string()));
     assert_sql!(query, "SELECT * FROM jedi WHERE name NOT LIKE 'Luke%';");         
 
-    let query = jedi_table.select_all().exclude(name.ilike("Luke%"));
+    let query = jedi_table.select_all().exclude(name.ilike("Luke%".to_string()));
     assert_sql!(query, "SELECT * FROM jedi WHERE name NOT ILIKE 'Luke%';");        
 
 }

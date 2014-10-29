@@ -1,18 +1,22 @@
 
+use time::Timespec;
+use serialize::json::Json;
+
+use to_sql::{ToPredicateValue};
+use expression::{ToExpression, RawExpr};
 use predicate::{Predicate, RcPredicate};
-use raw_expression::{RawExpression, RawExpressionComparable};
 use field::{
-    BoolField, BoolComparable,
-    I8Field, I8Comparable,
-    I16Field, I16Comparable,
-    I32Field, I32Comparable,
-    I64Field, I64Comparable,
-    F32Field, F32Comparable,
-    F64Field, F64Comparable,
-    StringField, StringComparable,
-    ByteListField, ByteListComparable,
-    JsonField, JsonComparable,
-    TimespecField, TimespecComparable
+    BoolField,
+    I8Field,
+    I16Field,
+    I32Field,
+    I64Field,
+    F32Field,
+    F64Field,
+    StringField,
+    ByteListField,
+    JsonField,
+    TimespecField,
 };
 
 #[deriving(Send, Clone)]
@@ -37,23 +41,23 @@ macro_rules! is_methods(
 )
 
 macro_rules! impl_for(
-    ($field:ty, $v:ident) => (
-        impl<T: $v> Predicate for IsPredicate<$field, T> { }
-        impl<T: $v> ToIsPredicate<$field, T> for $field {
+    ($field:ty, $v:ty) => (
+        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue> Predicate for IsPredicate<$field, T> { }
+        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue> ToIsPredicate<$field, T> for $field {
             is_methods!(T) 
         }
     )
 )
 
-impl_for!(BoolField, BoolComparable)
-impl_for!(I8Field, I8Comparable)
-impl_for!(I16Field, I16Comparable)
-impl_for!(I32Field, I32Comparable)
-impl_for!(I64Field, I64Comparable)
-impl_for!(F32Field, F32Comparable)
-impl_for!(F64Field, F64Comparable)
-impl_for!(StringField, StringComparable)
-impl_for!(ByteListField, ByteListComparable)
-impl_for!(JsonField, JsonComparable)
-impl_for!(TimespecField, TimespecComparable)
-impl_for!(RawExpression, RawExpressionComparable)
+impl_for!(BoolField, bool)
+impl_for!(I8Field, i8)
+impl_for!(I16Field, i16)
+impl_for!(I32Field, i32)
+impl_for!(I64Field, i64)
+impl_for!(F32Field, f32)
+impl_for!(F64Field, f64)
+impl_for!(StringField, String)
+impl_for!(ByteListField, Vec<u8>)
+impl_for!(JsonField, Json)
+impl_for!(TimespecField, Timespec)
+impl_for!(RawExpr, RawExpr)

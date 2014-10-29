@@ -3,7 +3,6 @@ use time::Timespec;
 use std::sync::Arc;
 
 use to_sql::{ToPredicateValue};
-use raw_expression::{RawExpression};
 use from::{Table};
 use to_sql::{ToSql};
 use expression::{Expression, UntypedExpression, RcExpression, BoxedExpression};
@@ -111,18 +110,6 @@ pub type ByteListField = NamedField<Vec<u8>>;
 pub type JsonField = NamedField<Json>;
 pub type TimespecField = NamedField<Timespec>;
 
-pub trait BoolComparable: Send + Clone + Sync + ToPredicateValue { }
-pub trait I8Comparable: Send + Clone + Sync + ToPredicateValue { }
-pub trait I16Comparable: Send + Clone + Sync + ToPredicateValue { }
-pub trait I32Comparable: Send + Clone + Sync + ToPredicateValue { }
-pub trait I64Comparable: Send + Clone + Sync + ToPredicateValue { }
-pub trait F32Comparable: Send + Clone + Sync + ToPredicateValue { }
-pub trait F64Comparable: Send + Clone + Sync + ToPredicateValue { }
-pub trait StringComparable: Send + Clone + Sync + ToPredicateValue { }
-pub trait ByteListComparable: Send + Clone + Sync + ToPredicateValue { }
-pub trait JsonComparable: Send + Clone + Sync + ToPredicateValue { }
-pub trait TimespecComparable: Send + Clone + Sync + ToPredicateValue { }
-
 pub trait BoolComparableList: Send + Clone + Sync + ToPredicateValue { }
 pub trait I8ComparableList: Send + Clone + Sync + ToPredicateValue{ }
 pub trait I16ComparableList: Send + Clone + Sync + ToPredicateValue { }
@@ -147,53 +134,3 @@ impl StringComparableList for Vec<&'static str> {}
 impl ByteListComparableList for Vec<Vec<u8>> {}
 impl JsonComparableList for Vec<Json> {}
 impl TimespecComparableList for Vec<Timespec> {}
-
-
-
-macro_rules! number_comparable(
-    ($comp:ty) => (
-        impl $comp for i8 {}
-        impl $comp for i16 {}
-        impl $comp for i32 {}
-        impl $comp for int {}
-        impl $comp for uint {}
-        impl $comp for i64 {}
-        impl $comp for f32 {}
-        impl $comp for f64 {}
-        impl $comp for I8Field {} 
-        impl $comp for I16Field {} 
-        impl $comp for I32Field {} 
-        impl $comp for I64Field {} 
-        impl $comp for F32Field {} 
-        impl $comp for F64Field {} 
-        impl $comp for RawExpression {}
-    )
-)
-
-number_comparable!(I8Comparable)
-number_comparable!(I16Comparable)
-number_comparable!(I32Comparable)
-number_comparable!(I64Comparable)
-number_comparable!(F32Comparable)
-number_comparable!(F64Comparable)
-
-impl StringComparable for String {}
-impl StringComparable for &'static str {}
-impl StringComparable for StringField {}
-impl StringComparable for RawExpression {}
-
-impl BoolComparable for bool {}
-impl BoolComparable for BoolField {} 
-impl BoolComparable for RawExpression {} 
-
-impl ByteListComparable for Vec<u8> {}
-impl ByteListComparable for ByteListField {}
-impl ByteListComparable for RawExpression {}
-
-impl JsonComparable for Json {}
-impl JsonComparable for JsonField {}
-impl JsonComparable for RawExpression {}
-
-impl TimespecComparable for Timespec {}
-impl TimespecComparable for TimespecField {}
-impl TimespecComparable for RawExpression {}

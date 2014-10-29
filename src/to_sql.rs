@@ -57,7 +57,6 @@ use field::{
 };
 
 use order_by::{OrderBy, Asc, Desc};
-use raw_expression::{RawExpression};
 use from::{Table, RcTable, TableDef, FromSelect};
 use distinct::{Distinct};
 use group_by::{GroupBy};
@@ -91,6 +90,7 @@ use function::{
 };
 
 use expression::{
+    RawExpr,
     ExprValue,
     ExpressionValue,
     DefaultValue,
@@ -359,6 +359,7 @@ impl ToPredicateValue for String {
 impl ToPredicateValue for Vec<u8> { fn to_predicate_value(&self) -> String { self.to_string() } }
 impl ToPredicateValue for Json { fn to_predicate_value(&self) -> String { self.to_string() } }
 impl ToPredicateValue for Timespec { fn to_predicate_value(&self) -> String { self.to_string() } }
+impl ToPredicateValue for RawExpr { fn to_predicate_value(&self) -> String { self.content.to_string() } }
 
 impl ToSql for bool { fn to_sql(&self) -> String { self.to_predicate_value() } }
 impl ToSql for i8 { fn to_sql(&self) -> String { self.to_predicate_value() } }
@@ -374,8 +375,7 @@ impl ToSql for String { fn to_sql(&self) -> String { self.to_predicate_value() }
 impl ToSql for Vec<u8> { fn to_sql(&self) -> String { self.to_predicate_value() } }
 impl ToSql for Json { fn to_sql(&self) -> String { self.to_predicate_value() } }
 impl ToSql for Timespec { fn to_sql(&self) -> String { self.to_predicate_value() } }
-
-impl ToPredicateValue for RawExpression { fn to_predicate_value(&self) -> String { self.content.to_string() } }
+impl ToSql for RawExpr { fn to_sql(&self) -> String { self.to_predicate_value() } }
 
 impl<T: ToPredicateValue> ToPredicateValue for Vec<T> {
     fn to_predicate_value(&self) -> String { 

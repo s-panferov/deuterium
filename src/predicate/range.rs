@@ -1,15 +1,17 @@
+use time::Timespec;
 
 use predicate::{Predicate, RcPredicate};
-use raw_expression::{RawExpression, RawExpressionComparable};
+use to_sql::{ToPredicateValue};
+use expression::{ToExpression, RawExpr};
 
 use field::{
-    I8Field, I8Comparable,
-    I16Field, I16Comparable,
-    I32Field, I32Comparable,
-    I64Field, I64Comparable,
-    F32Field, F32Comparable,
-    F64Field, F64Comparable,
-    TimespecField, TimespecComparable
+    I8Field,
+    I16Field,
+    I32Field,
+    I64Field,
+    F32Field,
+    F64Field,
+    TimespecField,
 };
 
 #[deriving(Clone)]
@@ -76,20 +78,20 @@ macro_rules! in_range_methods(
 )
 
 macro_rules! impl_for(
-    ($field:ty, $v:ident) => (
-        impl<T: $v> Predicate for InRangePredicate<$field, T> { }
+    ($field:ty, $v:ty) => (
+        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue> Predicate for InRangePredicate<$field, T> { }
 
-        impl<T: $v> ToInRangePredicate<$field, T> for $field {
+        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue> ToInRangePredicate<$field, T> for $field {
             in_range_methods!(T)    
         }
     )
 )
 
-impl_for!(I8Field, I8Comparable)
-impl_for!(I16Field, I16Comparable)
-impl_for!(I32Field, I32Comparable)
-impl_for!(I64Field, I64Comparable)
-impl_for!(F32Field, F32Comparable)
-impl_for!(F64Field, F64Comparable)
-impl_for!(TimespecField, TimespecComparable)
-impl_for!(RawExpression, RawExpressionComparable)
+impl_for!(I8Field, i8)
+impl_for!(I16Field, i16)
+impl_for!(I32Field, i32)
+impl_for!(I64Field, i64)
+impl_for!(F32Field, f32)
+impl_for!(F64Field, f64)
+impl_for!(TimespecField, Timespec)
+impl_for!(RawExpr, RawExpr)

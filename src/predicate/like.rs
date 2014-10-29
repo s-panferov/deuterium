@@ -1,7 +1,8 @@
 
 use predicate::{Predicate, RcPredicate};
-use raw_expression::{RawExpression};
-use field::{StringField, StringComparable};
+use expression::{ToExpression, RawExpr};
+use field::{StringField};
+use to_sql::{ToPredicateValue};
 
 #[deriving(Send, Clone)]
 pub struct LikePredicate<F, T> {
@@ -37,13 +38,12 @@ macro_rules! is_methods(
 
 macro_rules! impl_for(
     ($field:ty, $v:ident) => (
-        impl<T: $v> Predicate for LikePredicate<$field, T> { }
-        impl<T: $v> ToLikePredicate<$field, T> for $field {
+        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue> Predicate for LikePredicate<$field, T> { }
+        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue> ToLikePredicate<$field, T> for $field {
             is_methods!(T) 
         }
     )
 )
 
-
-impl_for!(StringField, StringComparable)
-impl_for!(RawExpression, StringComparable)
+impl_for!(StringField, String)
+impl_for!(RawExpr, String)

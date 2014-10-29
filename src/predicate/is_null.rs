@@ -1,6 +1,6 @@
 
 use predicate::{Predicate, RcPredicate};
-use raw_expression::{RawExpression};
+use expression::{RawExpr};
 use field::{
     BoolField,
     I8Field,
@@ -60,5 +60,5 @@ impl_for!(StringField)
 impl_for!(ByteListField)
 impl_for!(JsonField)
 impl_for!(TimespecField)
-impl_for!(RawExpression)
+impl_for!(RawExpr)
 

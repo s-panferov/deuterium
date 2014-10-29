@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::mem;
 
 use from::{From, RcFrom, FromSelect};
-use expression::{Expression, UntypedExpression, RcExpression};
+use expression::{Expression, ToExpression, UntypedExpression, BoxedExpression, RcExpression};
 use predicate::{
     RcPredicate,
     ToOrPredicate,
@@ -21,16 +21,6 @@ use distinct::{Distinct};
 use group_by::{GroupBy};
 
 use field::{
-    I8Comparable,
-    I16Comparable,
-    I32Comparable,
-    I64Comparable,
-    F32Comparable,
-    F64Comparable,
-    StringComparable,
-    JsonComparable,
-    TimespecComparable,
-
     I8ComparableList,
     I16ComparableList,
     I32ComparableList,
@@ -389,15 +379,25 @@ impl<T: Clone, L: Clone, M: Clone> ToSelectQuery for SelectQuery<T, L, M> { }
 pub type BoxedSelectQuery = Box<ToSelectQuery + Send + Sync>;
 pub type RcSelectQuery = Arc<BoxedSelectQuery>;
 
-impl<M: Clone> I8Comparable for SelectQuery<(i8), LimitOne, M> { }
-impl<M: Clone> I16Comparable for SelectQuery<(i16), LimitOne, M> { }
-impl<M: Clone> I32Comparable for SelectQuery<(i32), LimitOne, M> { }
-impl<M: Clone> I64Comparable for SelectQuery<(i64), LimitOne, M> { }
-impl<M: Clone> F32Comparable for SelectQuery<(f32), LimitOne, M> { }
-impl<M: Clone> F64Comparable for SelectQuery<(f64), LimitOne, M> { }
-impl<M: Clone> StringComparable for SelectQuery<(String), LimitOne, M> { }
-impl<M: Clone> JsonComparable for SelectQuery<(Json), LimitOne, M> { }
-impl<M: Clone> TimespecComparable for SelectQuery<(Timespec), LimitOne, M> { }
+impl<T: Clone, L: Clone, M: Clone> UntypedExpression for SelectQuery<T, L, M> {
+    fn expression_as_sql(&self) -> &ToSql {
+                self
+    }
+
+    fn upcast_expression(&self) -> RcExpression {
+        Arc::new(box self.clone() as BoxedExpression)
+    }
+}
+
+impl<M: Clone> ToExpression<i8> for SelectQuery<(i8), LimitOne, M> { }
+impl<M: Clone> ToExpression<i16> for SelectQuery<(i16), LimitOne, M> { }
+impl<M: Clone> ToExpression<i32> for SelectQuery<(i32), LimitOne, M> { }
+impl<M: Clone> ToExpression<i64> for SelectQuery<(i64), LimitOne, M> { }
+impl<M: Clone> ToExpression<f32> for SelectQuery<(f32), LimitOne, M> { }
+impl<M: Clone> ToExpression<f64> for SelectQuery<(f64), LimitOne, M> { }
+impl<M: Clone> ToExpression<String> for SelectQuery<(String), LimitOne, M> { }
+impl<M: Clone> ToExpression<Json> for SelectQuery<(Json), LimitOne, M> { }
+impl<M: Clone> ToExpression<Timespec> for SelectQuery<(Timespec), LimitOne, M> { }
 
 impl<M: Clone> I8ComparableList for SelectQuery<(i8), LimitMany, M> { }
 impl<M: Clone> I16ComparableList for SelectQuery<(i16), LimitMany, M> { }

@@ -41,7 +41,8 @@ pub use predicate::{
     Inequality, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual,
     ExcludePredicate, ToExcludePredicate,
     LikePredicate, ToLikePredicate,
-    IsNullPredicate, ToIsNullPredicate
+    IsNullPredicate, ToIsNullPredicate,
+    RawPredicate
 };
 
 pub use select_query::{
@@ -79,10 +80,10 @@ pub use expression::{
     RcExpression,
     ExprValue,
     ExpressionValue,
-    DefaultValue
+    DefaultValue,
+    RawExpr
 };
 
-pub use raw_expression::{RawExpression};
 pub use to_sql::{ToSql, QueryToSql, FromToSql};
 pub use from::{TableDef, Table, From, BoxedFrom, RcFrom};
 
@@ -104,13 +105,12 @@ macro_rules! with_clone(
 )
 
 mod field;
-pub mod predicate;
+mod predicate;
 mod select_query;
 mod insert_query;
 mod update_query;
 mod to_sql;
 mod expression;
-mod raw_expression;
 mod order_by;
 mod from;
 mod join;
