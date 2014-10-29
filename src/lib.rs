@@ -73,6 +73,11 @@ pub use insert_query::{
     Insertable,
 };
 
+pub use delete_query::{
+    DeleteQuery,
+    Deletable,
+};
+
 pub use expression::{
     ToExprValue,
     UntypedExpression, 
@@ -109,6 +114,7 @@ mod predicate;
 mod select_query;
 mod insert_query;
 mod update_query;
+mod delete_query;
 mod to_sql;
 mod expression;
 mod order_by;

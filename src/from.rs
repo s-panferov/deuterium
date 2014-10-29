@@ -4,6 +4,7 @@ use to_sql::{FromToSql};
 use select_query::{SelectQuery, Selectable};
 use insert_query::{InsertQuery, Insertable};
 use update_query::{Updatable};
+use delete_query::{Deletable};
 
 use field::{NamedField, Field};
 use expression::{ExprValue};
@@ -94,6 +95,7 @@ impl From for TableDef {
 impl Selectable<()> for TableDef {}
 impl Insertable<()> for TableDef {}
 impl Updatable for TableDef {}
+impl Deletable for TableDef {}
 
 #[deriving(Clone)]
 pub struct FromSelect<T, L, M> {

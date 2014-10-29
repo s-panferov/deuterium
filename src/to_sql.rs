@@ -24,6 +24,10 @@ use update_query::{
     FieldUpdate,
 };
 
+use delete_query::{
+    DeleteQuery,
+};
+
 use {Select, SelectOnly, SelectAll};
 
 use predicate::{
@@ -694,6 +698,45 @@ impl ToSql for UpdateQuery {
 }
 
 impl QueryToSql for UpdateQuery {
+    fn to_final_sql(&self) -> String {
+        format!("{};", self.to_sql())
+    }
+}
+
+impl ToSql for DeleteQuery {
+    fn to_sql(&self) -> String {
+        let mut sql = "DELETE FROM".to_string();
+
+        if self.only {
+            sql = format!("{} ONLY", sql)
+        }
+
+        sql = format!("{} {}", sql, self.table.to_from_sql());
+
+        if self.using.is_some() {
+            let using = self.using.as_ref().unwrap();
+            if !using.is_empty() {
+                let tables_str: Vec<String> = using.iter().map(|v| v.as_sql().to_from_sql()).collect();
+                sql = format!("{} USING {}", sql, tables_str.connect(", "))
+            }
+        }
+
+        match self.where_.as_ref() {
+            Some(predicate) => {
+                sql = format!("{} WHERE {}", sql, predicate.to_sql(false))
+            },
+            None if !self.all => {
+                // http://devopsreactions.tumblr.com/post/47352638154/almost-ran-update-without-where
+                sql = format!("{} WHERE true = false", sql)
+            },
+            _ => ()
+        }
+
+        sql
+    }
+}
+
+impl QueryToSql for DeleteQuery {
     fn to_final_sql(&self) -> String {
         format!("{};", self.to_sql())
     }

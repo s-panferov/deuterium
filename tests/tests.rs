@@ -20,6 +20,7 @@ mod join;
 mod group_by;
 mod insert;
 mod update;
+mod delete;
 
 #[test]
 fn select_order() {
