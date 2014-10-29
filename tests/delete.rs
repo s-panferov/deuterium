@@ -27,3 +27,18 @@ fn delete() {
     assert_sql!(query, "DELETE FROM ONLY jedi USING table_b WHERE jedi.name = table_b.name;");
 
 }
+
+
+#[test]
+fn delete_returning() {
+
+    let jedi_table = TableDef::new("jedi");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
+
+    let query: DeleteQuery<(), LimitMany, ()> = jedi_table.delete().all().returning_all();
+    assert_sql!(query, "DELETE FROM jedi RETURNING *;")
+
+    let query: DeleteQuery<(String), LimitMany, ()> = jedi_table.delete().all().returning_1(&name);
+    assert_sql!(query, "DELETE FROM jedi RETURNING name;")
+
+}

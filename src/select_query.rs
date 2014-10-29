@@ -49,6 +49,9 @@ pub struct LimitTwo;
 #[deriving(Clone)]
 pub struct LimitMany;
 
+#[deriving(Clone)]
+pub struct NoResult;
+
 macro_rules! set_predicate(
     ($s:ident, $getter:ident, $setter:ident, $pr:expr, $w:ident, $new_pr:expr) => ({
         let mut query = $s.clone();

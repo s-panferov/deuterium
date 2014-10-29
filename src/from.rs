@@ -94,8 +94,8 @@ impl From for TableDef {
 
 impl Selectable<()> for TableDef {}
 impl Insertable<()> for TableDef {}
-impl Updatable for TableDef {}
-impl Deletable for TableDef {}
+impl Updatable<()> for TableDef {}
+impl Deletable<()> for TableDef {}
 
 #[deriving(Clone)]
 pub struct FromSelect<T, L, M> {

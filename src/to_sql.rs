@@ -661,7 +661,7 @@ impl<F: ToPredicateValue, T: ToPredicateValue> ToSql for FieldUpdate<F, T> {
     }
 }
 
-impl ToSql for UpdateQuery {
+impl<T, L, M> ToSql for UpdateQuery<T, L, M> {
     fn to_sql(&self) -> String {
         let mut sql = "UPDATE".to_string();
 
@@ -693,17 +693,22 @@ impl ToSql for UpdateQuery {
             _ => ()
         }
 
+        match &self.returning {
+            &Some(ref select) => sql = format!("{} RETURNING {}", sql, select.to_sql()),
+            &None => ()
+        }
+
         sql
     }
 }
 
-impl QueryToSql for UpdateQuery {
+impl<T, L, M> QueryToSql for UpdateQuery<T, L, M> {
     fn to_final_sql(&self) -> String {
         format!("{};", self.to_sql())
     }
 }
 
-impl ToSql for DeleteQuery {
+impl<T, L, M> ToSql for DeleteQuery<T, L, M> {
     fn to_sql(&self) -> String {
         let mut sql = "DELETE FROM".to_string();
 
@@ -732,11 +737,16 @@ impl ToSql for DeleteQuery {
             _ => ()
         }
 
+        match &self.returning {
+            &Some(ref select) => sql = format!("{} RETURNING {}", sql, select.to_sql()),
+            &None => ()
+        }
+
         sql
     }
 }
 
-impl QueryToSql for DeleteQuery {
+impl<T, L, M> QueryToSql for DeleteQuery<T, L, M> {
     fn to_final_sql(&self) -> String {
         format!("{};", self.to_sql())
     }

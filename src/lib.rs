@@ -113,8 +113,10 @@ mod field;
 mod predicate;
 mod select_query;
 mod insert_query;
-mod update_query;
+
+#[macro_escape]
 mod delete_query;
+mod update_query;
 mod to_sql;
 mod expression;
 mod order_by;

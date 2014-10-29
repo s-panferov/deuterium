@@ -27,3 +27,17 @@ fn update() {
     assert_sql!(query, "UPDATE jedi SET name = DEFAULT FROM table_b WHERE jedi.name = table_b.name;");
 
 }
+
+#[test]
+fn update_returning() {
+
+    let jedi_table = TableDef::new("jedi");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
+
+    let query = jedi_table.update().all().field(name.set(&"Luke".to_string())).returning_all();
+    assert_sql!(query, "UPDATE jedi SET name = 'Luke' RETURNING *;")
+
+    let query = jedi_table.update().all().field(name.set(&"Luke".to_string())).returning_1(&name.qual());
+    assert_sql!(query, "UPDATE jedi SET name = 'Luke' RETURNING jedi.name;")
+
+}

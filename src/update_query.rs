@@ -1,9 +1,11 @@
+use std::mem;
 
 use std::sync::Arc;
 
-use select_query::{Queryable};
+use select_query::{Queryable, Select, SelectOnly, SelectAll, LimitMany, NoResult};
 use from::{From, Table, RcTable, RcFrom};
 use predicate::{RcPredicate};
+use expression::{Expression, UntypedExpression};
 
 use serialize::json::Json;
 use time::Timespec;
@@ -104,42 +106,42 @@ impl_for!(JsonField, Json)
 impl_for!(TimespecField, Timespec)
 impl_for!(RawExpr, RawExpr)
 
-pub trait Updatable: Table { 
-    fn update(&self) -> UpdateQuery {
+pub trait Updatable<M>: Table { 
+    fn update(&self) -> UpdateQuery<(), NoResult, M> {
         UpdateQuery::new(self)
     }
 }
 
-// TODO: RETURNING
-
 #[deriving(Clone)]
-pub struct UpdateQuery {
+pub struct UpdateQuery<T, L, M> {
     pub only: bool,
     pub table: RcTable,
     pub updates: Vec<RcFieldUpdate>,
     pub from: Option<Vec<RcFrom>>,
     pub where_: Option<RcPredicate>,
-    pub all: bool
+    pub all: bool,
+    pub returning: Option<Select>
 }
 
-impl UpdateQuery {
-    pub fn new(table: &Table) -> UpdateQuery {
+impl<T, L, M> UpdateQuery<T, L, M> {
+    pub fn new(table: &Table) -> UpdateQuery<T, L, M> {
         UpdateQuery {
             only: false,
             table: table.upcast_table(),
             updates: vec![],
             from: None,
             where_: None,
-            all: false
+            all: false,
+            returning: None
         }
     }
 
-    pub fn only(mut self) -> UpdateQuery {
+    pub fn only(mut self) -> UpdateQuery<T, L, M> {
         self.only = true;
         self
     }
 
-    pub fn from(mut self, from: &From) -> UpdateQuery {
+    pub fn from(mut self, from: &From) -> UpdateQuery<T, L, M> {
         if self.from.is_none() {
             self.from = Some(vec![])
         }
@@ -148,19 +150,21 @@ impl UpdateQuery {
         self
     }
 
-    pub fn field<T: FieldUpd>(mut self, update: T) -> UpdateQuery {
+    pub fn field<F: FieldUpd>(mut self, update: F) -> UpdateQuery<T, L, M> {
         self.updates.push(update.upcast_field_update());
         self
     }
 
-    pub fn all(mut self) -> UpdateQuery {
+    pub fn all(mut self) -> UpdateQuery<T, L, M> {
         self.where_ = None;
         self.all = true;
         self
     }
 }
 
-impl Queryable for UpdateQuery { 
+returning_for!(UpdateQuery)
+
+impl<T:Clone, L:Clone, M:Clone> Queryable for UpdateQuery<T, L, M> { 
     fn get_where(&self) -> &Option<RcPredicate> { &self.where_ }
     fn set_where(&mut self, predicate: RcPredicate) { self.where_ = Some(predicate); }
     fn unset_where(&mut self) { self.where_ = None; }
