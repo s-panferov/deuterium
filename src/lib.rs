@@ -90,7 +90,7 @@ pub use expression::{
 };
 
 pub use to_sql::{ToSql, QueryToSql, FromToSql};
-pub use from::{TableDef, Table, From, BoxedFrom, RcFrom};
+pub use from::{TableDef, Table, BoxedTable, RcTable, From, BoxedFrom, RcFrom};
 
 pub use function::{
     Sum, SumArg,
