@@ -1,7 +1,7 @@
 use deuterium::*;
 
 #[test]
-fn update() {
+fn delete() {
 
     let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
