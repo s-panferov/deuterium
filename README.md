@@ -1,4 +1,4 @@
-## What is Rustless?
+## What is Deuterium?
 
 [![Build Status](https://travis-ci.org/deuterium-orm/deuterium.svg?branch=master)](https://travis-ci.org/deuterium-orm/deuterium)
 
