@@ -89,7 +89,7 @@ pub use expression::{
     RawExpr
 };
 
-pub use sql::{ToSql, QueryToSql, FromToSql, ToPredicateValue};
+pub use sql::{SqlContext, ToSql, QueryToSql, FromToSql, ToPredicateValue};
 pub use from::{TableDef, Table, BoxedTable, RcTable, From, BoxedFrom, RcFrom};
 
 pub use function::{

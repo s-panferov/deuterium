@@ -1,5 +1,4 @@
 
-
 use function::{
     Sum, SumArg,
     Min, MinArg,
@@ -9,13 +8,13 @@ use function::{
     CountAll
 };
 
-use sql::{ToSql};
+use sql::{SqlContext, ToSql};
 
 macro_rules! agg_to_sql(
     ($foo:ident, $foo_arg:ident, $fmt:expr) => (
         impl<R, T, E> ToSql for $foo<R, T, E> where R: Clone, T: Clone, E: $foo_arg<R, T> {
-            fn to_sql(&self) -> String {
-                format!($fmt, self.expression.expression_as_sql().to_sql())
+            fn to_sql(&self, ctx: &mut SqlContext) -> String {
+                format!($fmt, self.expression.expression_as_sql().to_sql(ctx))
             }    
         }
     )
@@ -28,7 +27,7 @@ agg_to_sql!(Avg, AvgArg, "AVG({})")
 agg_to_sql!(Count, CountArg, "COUNT({})")
 
 impl ToSql for CountAll {
-    fn to_sql(&self) -> String {
+    fn to_sql(&self, _ctx: &mut SqlContext) -> String {
         "COUNT(*)".to_string()
     }    
 }

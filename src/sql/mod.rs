@@ -20,9 +20,27 @@ pub mod update;
 pub mod value;
 
 pub trait QueryToSql {
-    fn to_final_sql(&self) -> String;
+    fn to_final_sql(&self, &mut SqlContext) -> String;
 }
 
 pub trait ToSql {
-    fn to_sql(&self) -> String;
+    fn to_sql(&self, ctx: &mut SqlContext) -> String;
+}
+
+#[allow(dead_code)]
+pub struct SqlContext {
+    impl_placeholders: uint,
+    expl_placeholders: uint,
+    placeholder_data: Vec<Box<ToPredicateValue + Send + Sync>>
+}
+
+#[allow(dead_code)]
+impl SqlContext {
+    pub fn new() -> SqlContext {
+        SqlContext {
+            impl_placeholders: 0,
+            expl_placeholders: 0,
+            placeholder_data: vec![]
+        }
+    }
 }

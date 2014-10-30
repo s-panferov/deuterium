@@ -4,13 +4,13 @@ use expression::{
     DefaultValue,
 };
 
-use sql::{ToSql};
+use sql::{SqlContext, ToSql};
 
 impl<T> ToSql for ExprValue<T> {
-    fn to_sql(&self) -> String {
+    fn to_sql(&self, ctx: &mut SqlContext) -> String {
         match self {
             &ExpressionValue(ref e) => {
-                e.expression_as_sql().to_sql()
+                e.expression_as_sql().to_sql(ctx)
             },
             &DefaultValue => "DEFAULT".to_string()
         }
@@ -20,9 +20,9 @@ impl<T> ToSql for ExprValue<T> {
 macro_rules! to_sql_for_insert_tuple(
     ($fmt:expr, $($t:ident, $var:ident),+) => (
         impl<$($t,)+> ToSql for ($(ExprValue<$t>),+,)  {
-            fn to_sql(&self) -> String {
+            fn to_sql(&self, ctx: &mut SqlContext) -> String {
                 let &($(ref $var,)+) = self;
-                format!($fmt, $($var.to_sql(),)+)
+                format!($fmt, $($var.to_sql(ctx),)+)
             }
         }
 
@@ -30,7 +30,7 @@ macro_rules! to_sql_for_insert_tuple(
 )
 
 impl ToSql for ()  {
-    fn to_sql(&self) -> String {
+    fn to_sql(&self, _ctx: &mut SqlContext) -> String {
         "DEFAULT VALUES".to_string()
     }
 }

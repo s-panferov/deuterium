@@ -9,7 +9,7 @@ use deuterium::*;
 #[macro_export]
 macro_rules! assert_sql(
     ($query:expr, $s:expr) => (
-        assert_eq!($query.to_final_sql().as_slice(), $s)
+        assert_eq!($query.to_final_sql(&mut SqlContext::new()).as_slice(), $s)
     )
 )
 

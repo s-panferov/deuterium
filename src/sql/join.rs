@@ -19,10 +19,10 @@ use join::{
     CrossJoin
 };
 
-use sql::{ToSql};
+use sql::{SqlContext, ToSql};
 
 impl ToSql for ConditionedJoinType {
-    fn to_sql(&self) -> String {
+    fn to_sql(&self, _ctx: &mut SqlContext) -> String {
         match self {
             &InnerJoin => "INNER JOIN",
             &FullOuterJoin => "FULL OUTER JOIN",
@@ -36,7 +36,7 @@ impl ToSql for ConditionedJoinType {
 }
 
 impl ToSql for UnconditionedJoinType {
-    fn to_sql(&self) -> String {
+    fn to_sql(&self, _ctx: &mut SqlContext) -> String {
         match self {
             &NaturalJoin => "NATURAL JOIN",
             &NaturalLeftJoin => "NATURAL LEFT JOIN",
@@ -48,13 +48,13 @@ impl ToSql for UnconditionedJoinType {
 }
 
 impl ToSql for Join {
-    fn to_sql(&self) -> String {
+    fn to_sql(&self, ctx: &mut SqlContext) -> String {
         match self {
             &ConditionedJoin(ref join_type, ref from, ref on) => {
-                format!("{} {} ON {}", join_type.to_sql(), from.as_sql().to_from_sql(), on.to_sql(false))
+                format!("{} {} ON {}", join_type.to_sql(ctx), from.as_sql().to_from_sql(ctx), on.to_sql(false, ctx))
             },
             &UnconditionedJoin(ref join_type, ref from) => {
-                format!("{} {}", join_type.to_sql(), from.as_sql().to_from_sql())
+                format!("{} {}", join_type.to_sql(ctx), from.as_sql().to_from_sql(ctx))
             }
         }
     }
