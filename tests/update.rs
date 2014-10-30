@@ -7,13 +7,13 @@ fn update() {
     let name = NamedField::<String>::field_of("name", &jedi_table);
 
     let query = jedi_table.update().all().field(name.set(&"Luke".to_string()));
-    assert_sql!(query, "UPDATE jedi SET name = 'Luke';")
+    assert_sql!(query, "UPDATE jedi SET name = $1;")
 
     let query = jedi_table.update().field(name.set(&"Luke".to_string()));
-    assert_sql!(query, "UPDATE jedi SET name = 'Luke' WHERE true = false;");
+    assert_sql!(query, "UPDATE jedi SET name = $1 WHERE true = false;");
 
     let query = jedi_table.update().field(name.set(&"Darth Vader".to_string())).where_(name.is("Anakin Skywalker".to_string()));
-    assert_sql!(query, "UPDATE jedi SET name = 'Darth Vader' WHERE name = 'Anakin Skywalker';");
+    assert_sql!(query, "UPDATE jedi SET name = $1 WHERE name = $2;");
 
     let table_b = TableDef::new("table_b");
     let name_b = NamedField::<String>::field_of("name", &table_b).qual();
@@ -44,9 +44,9 @@ fn update_returning() {
     let name = NamedField::<String>::field_of("name", &jedi_table);
 
     let query = jedi_table.update().all().field(name.set(&"Luke".to_string())).returning_all();
-    assert_sql!(query, "UPDATE jedi SET name = 'Luke' RETURNING *;")
+    assert_sql!(query, "UPDATE jedi SET name = $1 RETURNING *;")
 
     let query = jedi_table.update().all().field(name.set(&"Luke".to_string())).returning_1(&name.qual());
-    assert_sql!(query, "UPDATE jedi SET name = 'Luke' RETURNING jedi.name;")
+    assert_sql!(query, "UPDATE jedi SET name = $1 RETURNING jedi.name;")
 
 }

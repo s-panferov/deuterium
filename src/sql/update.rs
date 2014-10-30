@@ -55,8 +55,4 @@ impl<T, L, M> ToSql for UpdateQuery<T, L, M> {
     }
 }
 
-impl<T, L, M> QueryToSql for UpdateQuery<T, L, M> {
-     fn to_final_sql(&self, ctx: &mut SqlContext) -> String {
-        format!("{};", self.to_sql(ctx))
-    }
-}
+impl<T, L, M> QueryToSql for UpdateQuery<T, L, M> {}

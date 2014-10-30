@@ -13,7 +13,7 @@ fn delete() {
     assert_sql!(query, "DELETE FROM jedi WHERE true = false;")
 
     let query = jedi_table.delete().where_(name.is("Anakin Skywalker".to_string()));
-    assert_sql!(query, "DELETE FROM jedi WHERE name = 'Anakin Skywalker';");
+    assert_sql!(query, "DELETE FROM jedi WHERE name = $1;");
 
     let table_b = TableDef::new("table_b");
     let name_b = NamedField::<String>::field_of("name", &table_b).qual();

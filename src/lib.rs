@@ -121,7 +121,7 @@ mod insert_query;
 #[macro_escape]
 mod delete_query;
 mod update_query;
-mod sql;
+pub mod sql;
 mod expression;
 mod order_by;
 mod from;

@@ -51,8 +51,4 @@ impl<T: Clone, V: Clone+ToSql, M: Clone> ToSql for InsertQuery<T, V, M> {
     }
 }
 
-impl<T: Clone, V: Clone+ToSql, M: Clone> QueryToSql for InsertQuery<T, V, M> {
-     fn to_final_sql(&self, ctx: &mut SqlContext) -> String {
-        format!("{};", self.to_sql(ctx))
-    }
-}
+impl<T: Clone, V: Clone+ToSql, M: Clone> QueryToSql for InsertQuery<T, V, M> {}

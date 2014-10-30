@@ -44,8 +44,4 @@ impl<T, L, M> ToSql for DeleteQuery<T, L, M> {
     }
 }
 
-impl<T, L, M> QueryToSql for DeleteQuery<T, L, M> {
-     fn to_final_sql(&self, ctx: &mut SqlContext) -> String {
-        format!("{};", self.to_sql(ctx))
-    }
-}
+impl<T, L, M> QueryToSql for DeleteQuery<T, L, M> {}

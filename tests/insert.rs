@@ -15,11 +15,11 @@ fn insert() {
 
     let mut query = jedi_table.insert_fields(&[&name, &side]);
     query.push_untyped(&[&"Luke".to_string(), &true]);
-    assert_sql!(query, "INSERT INTO jedi (name, side) VALUES\n    ('Luke', true);");
+    assert_sql!(query, "INSERT INTO jedi (name, side) VALUES\n    ($1, $2);");
 
     let mut query = jedi_table.insert_1_for_test(&name);
     query.push((ExprValue::new(&"Luke".to_string()), ));
     query.push((DefaultValue, ));
 
-    assert_sql!(query, "INSERT INTO jedi (name) VALUES\n    ('Luke'),\n    (DEFAULT);");
+    assert_sql!(query, "INSERT INTO jedi (name) VALUES\n    ($1),\n    (DEFAULT);");
 }

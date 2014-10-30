@@ -43,26 +43,35 @@ to_predicate_for_field!(ByteListField)
 to_predicate_for_field!(JsonField)
 to_predicate_for_field!(TimespecField)
 
-impl ToPredicateValue for bool { fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { self.to_string() } }
-impl ToPredicateValue for i8 { fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { self.to_string() } }
-impl ToPredicateValue for i16 { fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { self.to_string() } }
-impl ToPredicateValue for i32 { fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { self.to_string() } }
-impl ToPredicateValue for i64 { fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { self.to_string() } }
-impl ToPredicateValue for f32 { fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { self.to_string() } }
-impl ToPredicateValue for f64 { fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { self.to_string() } }
-impl ToPredicateValue for int { fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { self.to_string() } }
-impl ToPredicateValue for uint { fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { self.to_string() } }
-impl ToPredicateValue for String { 
-    fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { format!("'{}'", self) } 
-}
-impl ToPredicateValue for Vec<u8> { fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { self.to_string() } }
-impl ToPredicateValue for Json { fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { self.to_string() } }
-impl ToPredicateValue for Timespec { fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { self.to_string() } }
-impl ToPredicateValue for RawExpr { fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { self.content.to_string() } }
+macro_rules! raw_value_to_predicate_value(
+    ($t:ty) => (
+        impl ToPredicateValue for $t { 
+            fn to_predicate_value(&self, ctx: &mut SqlContext) -> String { 
+                ctx.hold(box self.clone())
+            }
+        }
+    )
+)
+
+raw_value_to_predicate_value!(bool)
+raw_value_to_predicate_value!(i8)
+raw_value_to_predicate_value!(i16)
+raw_value_to_predicate_value!(i32)
+raw_value_to_predicate_value!(i64)
+raw_value_to_predicate_value!(f32)
+raw_value_to_predicate_value!(f64)
+raw_value_to_predicate_value!(int)
+raw_value_to_predicate_value!(uint)
+raw_value_to_predicate_value!(String)
+raw_value_to_predicate_value!(Vec<u8>)
+raw_value_to_predicate_value!(Json)
+raw_value_to_predicate_value!(Timespec)
+raw_value_to_predicate_value!(RawExpr)
 
 macro_rules! extended_impl(
     ($t:ty) => (
         impl ToSql for $t { fn to_sql(&self, ctx: &mut SqlContext) -> String { self.to_predicate_value(ctx) } }
+        impl ToSql for Option<$t> { fn to_sql(&self, ctx: &mut SqlContext) -> String { self.to_predicate_value(ctx) } }
 
         impl ToPredicateValue for Option<$t> { 
             fn to_predicate_value(&self, ctx: &mut SqlContext) -> String { 
@@ -70,12 +79,6 @@ macro_rules! extended_impl(
                     &Some(ref predicate) => predicate.to_predicate_value(ctx),
                     &None => "NULL".to_string()
                 }
-            }
-        }
-
-        impl ToSql for Option<$t> {
-            fn to_sql(&self, ctx: &mut SqlContext) -> String { 
-                self.to_predicate_value(ctx) 
             }
         }
     )

@@ -84,11 +84,7 @@ impl<T, L, M> ToSql for SelectQuery<T, L, M> {
     }
 }
 
-impl<T, L, M> QueryToSql for SelectQuery<T, L, M> {
-     fn to_final_sql(&self, ctx: &mut SqlContext) -> String {
-        format!("{};", self.to_sql(ctx))
-    }
-}
+impl<T, L, M> QueryToSql for SelectQuery<T, L, M> {}
 
 impl ToSql for RcSelectQuery {
     fn to_sql(&self, ctx: &mut SqlContext) -> String {
