@@ -1,6 +1,7 @@
 
 pub use self::predicate::{PredicateToSql};
 pub use self::value::{ToPredicateValue};
+#[cfg(feature = "postgres")] pub use self::value::{AsPostgresValue};
 pub use self::from::{FromToSql};
 pub use self::adapter::{
     SqlAdapter,
@@ -41,7 +42,7 @@ pub trait ToSql {
     fn to_sql(&self, ctx: &mut SqlContext) -> String;
 }
 
-pub type BoxedValue = Box<ToPredicateValue + Send + Sync>;
+pub type BoxedValue = Box<AsPostgresValue + Send + Sync>;
 pub type BoxedAdapter = Box<SqlAdapter + Send + Sync>;
 
 #[allow(dead_code)]
@@ -84,5 +85,9 @@ impl SqlContext {
 
     pub fn expl_indexed_placeholder(&mut self, idx: uint) {
         if idx > self.expl_placeholders { self.expl_placeholders = idx; }
+    }
+
+    pub fn data(&self) -> &[BoxedValue] {
+        self.placeholder_data.as_slice()
     }
 }

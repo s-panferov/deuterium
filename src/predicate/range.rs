@@ -2,7 +2,9 @@ use time::Timespec;
 
 use predicate::{Predicate, RcPredicate};
 use sql::{ToPredicateValue};
-use expression::{ToExpression, RawExpr};
+use expression::{ToExpression};
+#[cfg(feature = "raw_expr")]
+use expression::{RawExpr};
 
 use field::{
     I8Field,
@@ -94,4 +96,6 @@ impl_for!(I64Field, i64)
 impl_for!(F32Field, f32)
 impl_for!(F64Field, f64)
 impl_for!(TimespecField, Timespec)
+
+#[cfg(feature = "raw_expr")]
 impl_for!(RawExpr, RawExpr)

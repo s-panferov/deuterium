@@ -3,6 +3,7 @@ use time::Timespec;
 
 use sql::{SqlContext, ToSql};
 
+#[cfg(feature = "raw_expr")]
 use expression::{RawExpr};
 use field::{
     BoolField,
@@ -18,9 +19,18 @@ use field::{
     TimespecField,
 };
 
+use postgres;
 
 pub trait ToPredicateValue {
     fn to_predicate_value(&self, ctx: &mut SqlContext) -> String;
+}
+
+// Trait to connect Deuterium and rust-postgres
+#[cfg(feature = "postgres")]
+pub trait AsPostgresValue: postgres::types::ToSql {
+    fn as_postgres_value(&self) -> &postgres::types::ToSql {
+        self
+    }
 }
 
 macro_rules! to_predicate_for_field(
@@ -45,6 +55,9 @@ to_predicate_for_field!(TimespecField)
 
 macro_rules! raw_value_to_predicate_value(
     ($t:ty) => (
+        #[cfg(feature = "postgres")]
+        impl AsPostgresValue for $t {}
+
         impl ToPredicateValue for $t { 
             fn to_predicate_value(&self, ctx: &mut SqlContext) -> String { 
                 ctx.hold(box self.clone())
@@ -60,12 +73,11 @@ raw_value_to_predicate_value!(i32)
 raw_value_to_predicate_value!(i64)
 raw_value_to_predicate_value!(f32)
 raw_value_to_predicate_value!(f64)
-raw_value_to_predicate_value!(int)
-raw_value_to_predicate_value!(uint)
 raw_value_to_predicate_value!(String)
 raw_value_to_predicate_value!(Vec<u8>)
 raw_value_to_predicate_value!(Json)
 raw_value_to_predicate_value!(Timespec)
+#[cfg(feature = "raw_expr")]
 raw_value_to_predicate_value!(RawExpr)
 
 macro_rules! extended_impl(
@@ -91,12 +103,12 @@ extended_impl!(i32)
 extended_impl!(i64)
 extended_impl!(f32)
 extended_impl!(f64)
-extended_impl!(int)
-extended_impl!(uint)
 extended_impl!(String)
 extended_impl!(Vec<u8>)
 extended_impl!(Json)
 extended_impl!(Timespec)
+
+#[cfg(feature = "raw_expr")]
 extended_impl!(RawExpr)
 
 impl<T: ToPredicateValue> ToPredicateValue for Vec<T> {

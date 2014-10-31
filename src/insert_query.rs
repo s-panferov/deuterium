@@ -4,14 +4,14 @@ pub use field::{NamedField, Field, RcField};
 pub use select_query::{SelectQuery, LimitMany};
 pub use expression::{
     Expression, ToExpression, UntypedExpression, RcExpression,     
-    ExprValue, ExpressionValue, DefaultValue, ToExprValue, RawExpr};
+    ExprValue, ExpressionValue, DefaultValue, ToExprValue};
 
 #[allow(dead_code)]
 #[deriving(Clone)]
 pub enum Insert<T, V, M> {
     InsertDefaultValues,
     InsertValues(Vec<V>),
-    InsertUntypedValues(Vec<Vec<ExprValue<RawExpr>>>),
+    InsertUntypedValues(Vec<Vec<ExprValue<()>>>),
     InsertFromSelect(SelectQuery<T, LimitMany, M>)
 }
 
@@ -120,7 +120,7 @@ impl<T: Clone, V: Clone, M: Clone> InsertQuery<T, V, M> {
         }
     }
 
-    pub fn push_untyped(&mut self, values: &[&ToExpression<RawExpr>]) {
+    pub fn push_untyped(&mut self, values: &[&ToExpression<()>]) {
         let mut reassign = false;
         match &self.values {
             &InsertDefaultValues | &InsertFromSelect(_) => {

@@ -3,7 +3,9 @@ use time::Timespec;
 use serialize::json::Json;
 
 use sql::{ToPredicateValue};
-use expression::{ToExpression, RawExpr};
+use expression::{ToExpression};
+#[cfg(feature = "raw_expr")]
+use expression::{RawExpr};
 use predicate::{Predicate, RcPredicate};
 use field::{
     BoolField,
@@ -60,4 +62,6 @@ impl_for!(StringField, String)
 impl_for!(ByteListField, Vec<u8>)
 impl_for!(JsonField, Json)
 impl_for!(TimespecField, Timespec)
+
+#[cfg(feature = "raw_expr")]
 impl_for!(RawExpr, RawExpr)

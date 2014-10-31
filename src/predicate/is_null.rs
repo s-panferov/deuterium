@@ -1,5 +1,6 @@
 
 use predicate::{Predicate, RcPredicate};
+#[cfg(feature = "raw_expr")]
 use expression::{RawExpr};
 use field::{
     BoolField,
@@ -60,5 +61,7 @@ impl_for!(StringField)
 impl_for!(ByteListField)
 impl_for!(JsonField)
 impl_for!(TimespecField)
+
+#[cfg(feature = "raw_expr")]
 impl_for!(RawExpr)
 

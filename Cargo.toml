@@ -6,3 +6,11 @@ authors = ["Stanislav Panferov <fnight.m@gmail.com>"]
 
 [[test]]
 name = "tests"
+
+[features]
+default = ["postgres"]
+raw_expr = []
+
+[dependencies.postgres]
+optional = true
+git = "https://github.com/sfackler/rust-postgres.git"

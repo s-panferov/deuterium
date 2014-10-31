@@ -11,6 +11,7 @@
 
 extern crate serialize;
 extern crate time;
+extern crate postgres;
 
 pub use field::{
     NamedField,
@@ -90,6 +91,7 @@ pub use expression::{
 };
 
 pub use sql::{SqlContext, ToSql, QueryToSql, FromToSql, ToPredicateValue};
+#[cfg(feature = "postgres")] pub use sql::{AsPostgresValue};
 pub use from::{TableDef, Table, BoxedTable, RcTable, From, BoxedFrom, RcFrom};
 
 pub use function::{
