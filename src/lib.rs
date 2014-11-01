@@ -11,6 +11,8 @@
 
 extern crate serialize;
 extern crate time;
+
+#[cfg(feature = "postgres")]
 extern crate postgres;
 
 pub use field::{

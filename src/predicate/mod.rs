@@ -35,9 +35,9 @@ pub mod exclude;
 pub mod like;
 pub mod raw;
 
-pub trait Predicate: Sync + Send + PredicateToSql { 
-    fn upcast(self) -> RcPredicate {
-        Arc::new(box self as BoxedPredicate)
+pub trait Predicate: Clone + Sync + Send + PredicateToSql { 
+    fn upcast(&self) -> RcPredicate {
+        Arc::new(box self.clone() as BoxedPredicate)
     }
 }
 

@@ -41,9 +41,9 @@ macro_rules! in_methods(
 
 macro_rules! impl_for(
     ($field:ty, $v:ty) => (
-        impl<T: ToListExpression<$v> + Send + Sync + ToPredicateValue> Predicate for InPredicate<$field, T> { }
+        impl<T: ToListExpression<$v> + Send + Sync + ToPredicateValue + Clone> Predicate for InPredicate<$field, T> { }
 
-        impl<T: ToListExpression<$v> + Send + Sync + ToPredicateValue> ToInPredicate<$field, T> for $field {
+        impl<T: ToListExpression<$v> + Send + Sync + ToPredicateValue + Clone> ToInPredicate<$field, T> for $field {
             in_methods!(T)   
         }
     )

@@ -77,9 +77,9 @@ macro_rules! inequality_methods(
 
 macro_rules! impl_for(
     ($field:ty, $v:ident) => (
-        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue> Predicate for InequalityPredicate<$field, T> { }
+        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone> Predicate for InequalityPredicate<$field, T> { }
 
-        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue> ToInequalityPredicate<$field, T> for $field {
+        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone> ToInequalityPredicate<$field, T> for $field {
             inequality_methods!(T)    
         }
     )

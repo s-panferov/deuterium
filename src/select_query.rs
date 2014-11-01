@@ -26,9 +26,9 @@ pub enum Select {
     SelectAll
 }
 
-pub trait ToSelectQuery: Send + Sync + ToSql {
-    fn upcast(self) -> RcSelectQuery {
-        Arc::new(box self as BoxedSelectQuery)
+pub trait ToSelectQuery: Clone + Send + Sync + ToSql {
+    fn upcast(&self) -> RcSelectQuery {
+        Arc::new(box self.clone() as BoxedSelectQuery)
     }
 }
 

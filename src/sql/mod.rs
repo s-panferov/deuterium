@@ -42,7 +42,10 @@ pub trait ToSql {
     fn to_sql(&self, ctx: &mut SqlContext) -> String;
 }
 
+#[cfg(feature = "postgres")]
 pub type BoxedValue = Box<AsPostgresValue + Send + Sync>;
+#[cfg(not(feature = "postgres"))]
+pub type BoxedValue = Box<ToPredicateValue + Send + Sync>;
 pub type BoxedAdapter = Box<SqlAdapter + Send + Sync>;
 
 #[allow(dead_code)]

@@ -19,6 +19,7 @@ use field::{
     TimespecField,
 };
 
+#[cfg(feature = "postgres")]
 use postgres;
 
 pub trait ToPredicateValue {

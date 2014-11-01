@@ -40,8 +40,8 @@ macro_rules! is_methods(
 
 macro_rules! impl_for(
     ($field:ty, $v:ident) => (
-        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue> Predicate for LikePredicate<$field, T> { }
-        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue> ToLikePredicate<$field, T> for $field {
+        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone> Predicate for LikePredicate<$field, T> { }
+        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone> ToLikePredicate<$field, T> for $field {
             is_methods!(T) 
         }
     )

@@ -81,9 +81,9 @@ macro_rules! in_range_methods(
 
 macro_rules! impl_for(
     ($field:ty, $v:ty) => (
-        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue> Predicate for InRangePredicate<$field, T> { }
+        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone> Predicate for InRangePredicate<$field, T> { }
 
-        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue> ToInRangePredicate<$field, T> for $field {
+        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone> ToInRangePredicate<$field, T> for $field {
             in_range_methods!(T)    
         }
     )

@@ -17,6 +17,12 @@ impl<T> ToSql for ExprValue<T> {
     } 
 }
 
+impl ToSql for ()  {
+    fn to_sql(&self, _ctx: &mut SqlContext) -> String {
+        "DEFAULT VALUES".to_string()
+    }
+}
+
 macro_rules! to_sql_for_insert_tuple(
     ($fmt:expr, $($t:ident, $var:ident),+) => (
         impl<$($t,)+> ToSql for ($(ExprValue<$t>),+,)  {
@@ -28,12 +34,6 @@ macro_rules! to_sql_for_insert_tuple(
 
     )
 )
-
-impl ToSql for ()  {
-    fn to_sql(&self, _ctx: &mut SqlContext) -> String {
-        "DEFAULT VALUES".to_string()
-    }
-}
 
 to_sql_for_insert_tuple!("{}", T1, t1)
 to_sql_for_insert_tuple!("{}, {}", T1, t1, T2, t2)
