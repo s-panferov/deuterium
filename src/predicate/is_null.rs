@@ -3,17 +3,17 @@ use predicate::{Predicate, RcPredicate};
 #[cfg(feature = "raw_expr")]
 use expression::{RawExpr};
 use field::{
-    BoolField,
-    I8Field,
-    I16Field,
-    I32Field,
-    I64Field,
-    F32Field,
-    F64Field,
-    StringField,
-    ByteListField,
-    JsonField,
-    TimespecField
+    OptionalBoolField,
+    OptionalI8Field,
+    OptionalI16Field,
+    OptionalI32Field,
+    OptionalI64Field,
+    OptionalF32Field,
+    OptionalF64Field,
+    OptionalStringField,
+    OptionalByteListField,
+    OptionalJsonField,
+    OptionalTimespecField
 };
 
 #[deriving(Send, Clone)]
@@ -50,17 +50,17 @@ macro_rules! impl_for(
     )
 )
 
-impl_for!(BoolField)
-impl_for!(I8Field)
-impl_for!(I16Field)
-impl_for!(I32Field)
-impl_for!(I64Field)
-impl_for!(F32Field)
-impl_for!(F64Field)
-impl_for!(StringField)
-impl_for!(ByteListField)
-impl_for!(JsonField)
-impl_for!(TimespecField)
+impl_for!(OptionalBoolField)
+impl_for!(OptionalI8Field)
+impl_for!(OptionalI16Field)
+impl_for!(OptionalI32Field)
+impl_for!(OptionalI64Field)
+impl_for!(OptionalF32Field)
+impl_for!(OptionalF64Field)
+impl_for!(OptionalStringField)
+impl_for!(OptionalByteListField)
+impl_for!(OptionalJsonField)
+impl_for!(OptionalTimespecField)
 
 #[cfg(feature = "raw_expr")]
 impl_for!(RawExpr)

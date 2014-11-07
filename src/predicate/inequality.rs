@@ -13,6 +13,14 @@ use field::{
     F32Field,
     F64Field,
     TimespecField,
+
+    OptionalI8Field,
+    OptionalI16Field,
+    OptionalI32Field,
+    OptionalI64Field,
+    OptionalF32Field,
+    OptionalF64Field,
+    OptionalTimespecField,
 };
 
 use sql::{ToPredicateValue};
@@ -76,7 +84,7 @@ macro_rules! inequality_methods(
 )
 
 macro_rules! impl_for(
-    ($field:ty, $v:ident) => (
+    ($field:ty, $v:ty) => (
         impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone> Predicate for InequalityPredicate<$field, T> { }
 
         impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone> ToInequalityPredicate<$field, T> for $field {
@@ -92,6 +100,14 @@ impl_for!(I64Field, i64)
 impl_for!(F32Field, f32)
 impl_for!(F64Field, f64)
 impl_for!(TimespecField, Timespec)
+
+impl_for!(OptionalI8Field, Option<i8>)
+impl_for!(OptionalI16Field, Option<i16>)
+impl_for!(OptionalI32Field, Option<i32>)
+impl_for!(OptionalI64Field, Option<i64>)
+impl_for!(OptionalF32Field, Option<f32>)
+impl_for!(OptionalF64Field, Option<f64>)
+impl_for!(OptionalTimespecField, Option<Timespec>)
 
 #[cfg(feature = "raw_expr")]
 impl_for!(RawExpr, RawExpr)

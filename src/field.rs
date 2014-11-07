@@ -108,3 +108,15 @@ pub type StringField = NamedField<String>;
 pub type ByteListField = NamedField<Vec<u8>>;
 pub type JsonField = NamedField<Json>;
 pub type TimespecField = NamedField<Timespec>;
+
+pub type OptionalBoolField = NamedField<Option<bool>>;
+pub type OptionalI8Field = NamedField<Option<i8>>;
+pub type OptionalI16Field = NamedField<Option<i16>>;
+pub type OptionalI32Field = NamedField<Option<i32>>;
+pub type OptionalI64Field = NamedField<Option<i64>>;
+pub type OptionalF32Field = NamedField<Option<f32>>;
+pub type OptionalF64Field = NamedField<Option<f64>>;
+pub type OptionalStringField = NamedField<Option<String>>;
+pub type OptionalByteListField = NamedField<Option<Vec<u8>>>;
+pub type OptionalJsonField = NamedField<Option<Json>>;
+pub type OptionalTimespecField = NamedField<Option<Timespec>>;

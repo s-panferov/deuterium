@@ -19,6 +19,18 @@ use field::{
     ByteListField,
     JsonField,
     TimespecField,
+
+    OptionalBoolField,
+    OptionalI8Field,
+    OptionalI16Field,
+    OptionalI32Field,
+    OptionalI64Field,
+    OptionalF32Field,
+    OptionalF64Field,
+    OptionalStringField,
+    OptionalByteListField,
+    OptionalJsonField,
+    OptionalTimespecField,
 };
 
 #[deriving(Send, Clone)]
@@ -44,8 +56,8 @@ macro_rules! is_methods(
 
 macro_rules! impl_for(
     ($field:ty, $v:ty) => (
-        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone> Predicate for IsPredicate<$field, T> { }
-        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone> ToIsPredicate<$field, T> for $field {
+        impl<T> Predicate for IsPredicate<$field, T> where T: Send + Sync + ToPredicateValue + Clone { }
+        impl<T> ToIsPredicate<$field, T> for $field where T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone {
             is_methods!(T) 
         }
     )
@@ -62,6 +74,18 @@ impl_for!(StringField, String)
 impl_for!(ByteListField, Vec<u8>)
 impl_for!(JsonField, Json)
 impl_for!(TimespecField, Timespec)
+
+impl_for!(OptionalBoolField, Option<bool>)
+impl_for!(OptionalI8Field, Option<i8>)
+impl_for!(OptionalI16Field, Option<i16>)
+impl_for!(OptionalI32Field, Option<i32>)
+impl_for!(OptionalI64Field, Option<i64>)
+impl_for!(OptionalF32Field, Option<f32>)
+impl_for!(OptionalF64Field, Option<f64>)
+impl_for!(OptionalStringField, Option<String>)
+impl_for!(OptionalByteListField, Option<Vec<u8>>)
+impl_for!(OptionalJsonField, Option<Json>)
+impl_for!(OptionalTimespecField, Option<Timespec>)
 
 #[cfg(feature = "raw_expr")]
 impl_for!(RawExpr, RawExpr)

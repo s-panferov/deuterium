@@ -6,17 +6,7 @@ use sql::{SqlContext, ToSql};
 #[cfg(feature = "raw_expr")]
 use expression::{RawExpr};
 use field::{
-    BoolField,
-    I8Field,
-    I16Field,
-    I32Field,
-    I64Field,
-    F32Field,
-    F64Field,
-    StringField,
-    ByteListField,
-    JsonField,
-    TimespecField,
+    NamedField,
 };
 
 #[cfg(feature = "postgres")]
@@ -42,17 +32,9 @@ macro_rules! to_predicate_for_field(
     )
 )
 
-to_predicate_for_field!(BoolField)
-to_predicate_for_field!(I8Field)
-to_predicate_for_field!(I16Field)
-to_predicate_for_field!(I32Field)
-to_predicate_for_field!(I64Field)
-to_predicate_for_field!(F32Field)
-to_predicate_for_field!(F64Field)
-to_predicate_for_field!(StringField)
-to_predicate_for_field!(ByteListField)
-to_predicate_for_field!(JsonField)
-to_predicate_for_field!(TimespecField)
+impl<T: Clone> ToPredicateValue for NamedField<T> {
+    fn to_predicate_value(&self, ctx: &mut SqlContext) -> String { self.to_sql(ctx) }
+}
 
 macro_rules! raw_value_to_predicate_value(
     ($t:ty) => (

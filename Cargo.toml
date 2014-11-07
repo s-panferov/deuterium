@@ -14,3 +14,7 @@ raw_expr = []
 [dependencies.postgres]
 optional = true
 git = "https://github.com/sfackler/rust-postgres.git"
+
+[dependencies.uuid]
+optional = true
+git = "https://github.com/rust-lang/uuid.git"
