@@ -23,3 +23,15 @@ fn insert() {
 
     assert_sql!(query, "INSERT INTO jedi (name) VALUES\n    ($1),\n    (DEFAULT);");
 }
+
+#[test]
+fn insert_returning() {
+
+    let jedi_table = TableDef::new("jedi");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
+    let side = NamedField::<bool>::field_of("side", &jedi_table);
+
+    let mut query = jedi_table.insert_fields(&[&name, &side]).returning_1(&name.qual());
+    query.push_untyped(&[&"Luke".to_string(), &true]);
+    assert_sql!(query, "INSERT INTO jedi (name, side) VALUES\n    ($1, $2) RETURNING jedi.name;");
+}

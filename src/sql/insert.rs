@@ -33,7 +33,7 @@ impl<T: Clone, V: ToSql, M: Clone> ToSql for Insert<T, V, M> {
     }
 }
 
-impl<T: Clone, V: Clone+ToSql, M: Clone> ToSql for InsertQuery<T, V, M> {
+impl<T: Clone, V: Clone+ToSql, M: Clone, RT: Clone, RL: Clone> ToSql for InsertQuery<T, V, M, RT, RL> {
     fn to_sql(&self, ctx: &mut SqlContext) -> String {
         let mut sql = format!("INSERT INTO {}", self.get_into().get_table_name());
 
@@ -47,8 +47,15 @@ impl<T: Clone, V: Clone+ToSql, M: Clone> ToSql for InsertQuery<T, V, M> {
             }
         }
 
-        format!("{} {}", sql, self.get_values().to_sql(ctx))
+        sql = format!("{} {}", sql, self.get_values().to_sql(ctx));
+
+        match self.get_returning() {
+            &Some(ref select) => sql = format!("{} RETURNING {}", sql, select.to_sql(ctx)),
+            &None => ()
+        }
+
+        sql
     }
 }
 
-impl<T: Clone, V: Clone+ToSql, M: Clone> QueryToSql for InsertQuery<T, V, M> {}
+impl<T: Clone, V: Clone+ToSql, M: Clone, RT: Clone, RL: Clone> QueryToSql for InsertQuery<T, V, M, RT, RL> {}
