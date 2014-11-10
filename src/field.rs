@@ -1,5 +1,6 @@
 use serialize::json::Json;
 use time::Timespec;
+use uuid::Uuid;
 use std::sync::Arc;
 
 use from::{Table};
@@ -108,6 +109,7 @@ pub type StringField = NamedField<String>;
 pub type ByteListField = NamedField<Vec<u8>>;
 pub type JsonField = NamedField<Json>;
 pub type TimespecField = NamedField<Timespec>;
+pub type UuidField = NamedField<Uuid>;
 
 pub type OptionalBoolField = NamedField<Option<bool>>;
 pub type OptionalI8Field = NamedField<Option<i8>>;
@@ -120,3 +122,4 @@ pub type OptionalStringField = NamedField<Option<String>>;
 pub type OptionalByteListField = NamedField<Option<Vec<u8>>>;
 pub type OptionalJsonField = NamedField<Option<Json>>;
 pub type OptionalTimespecField = NamedField<Option<Timespec>>;
+pub type OptionalUuidField = NamedField<Option<Uuid>>;

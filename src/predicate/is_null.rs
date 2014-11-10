@@ -13,7 +13,8 @@ use field::{
     OptionalStringField,
     OptionalByteListField,
     OptionalJsonField,
-    OptionalTimespecField
+    OptionalTimespecField,
+    OptionalUuidField,
 };
 
 #[deriving(Send, Clone)]
@@ -61,6 +62,7 @@ impl_for!(OptionalStringField)
 impl_for!(OptionalByteListField)
 impl_for!(OptionalJsonField)
 impl_for!(OptionalTimespecField)
+impl_for!(OptionalUuidField)
 
 #[cfg(feature = "raw_expr")]
 impl_for!(RawExpr)

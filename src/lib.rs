@@ -14,8 +14,10 @@ extern crate time;
 
 #[cfg(feature = "postgres")]
 extern crate postgres;
+extern crate uuid;
 
 pub use field::{
+    Field,
     NamedField,
 
     BoolField,
@@ -58,6 +60,7 @@ pub use select_query::{
     Select, 
     SelectAll, 
     SelectOnly, 
+    NoResult, 
     LimitOne, 
     LimitTwo, 
     LimitMany
@@ -82,6 +85,7 @@ pub use delete_query::{
 };
 
 pub use expression::{
+    ToExpression,
     ToExprValue,
     UntypedExpression, 
     Expression,

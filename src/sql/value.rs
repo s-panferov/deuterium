@@ -1,5 +1,6 @@
 use serialize::json::Json;
 use time::Timespec;
+use uuid::Uuid;
 
 use sql::{SqlContext, ToSql};
 
@@ -60,6 +61,7 @@ raw_value_to_predicate_value!(String)
 raw_value_to_predicate_value!(Vec<u8>)
 raw_value_to_predicate_value!(Json)
 raw_value_to_predicate_value!(Timespec)
+raw_value_to_predicate_value!(Uuid)
 #[cfg(feature = "raw_expr")]
 raw_value_to_predicate_value!(RawExpr)
 
@@ -90,6 +92,7 @@ extended_impl!(String)
 extended_impl!(Vec<u8>)
 extended_impl!(Json)
 extended_impl!(Timespec)
+extended_impl!(Uuid)
 
 #[cfg(feature = "raw_expr")]
 extended_impl!(RawExpr)

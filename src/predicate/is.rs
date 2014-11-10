@@ -1,6 +1,7 @@
 
 use time::Timespec;
 use serialize::json::Json;
+use uuid::Uuid;
 
 use sql::{ToPredicateValue};
 use expression::{ToExpression};
@@ -19,6 +20,7 @@ use field::{
     ByteListField,
     JsonField,
     TimespecField,
+    UuidField,
 
     OptionalBoolField,
     OptionalI8Field,
@@ -31,6 +33,7 @@ use field::{
     OptionalByteListField,
     OptionalJsonField,
     OptionalTimespecField,
+    OptionalUuidField,
 };
 
 #[deriving(Send, Clone)]
@@ -74,6 +77,7 @@ impl_for!(StringField, String)
 impl_for!(ByteListField, Vec<u8>)
 impl_for!(JsonField, Json)
 impl_for!(TimespecField, Timespec)
+impl_for!(UuidField, Uuid)
 
 impl_for!(OptionalBoolField, Option<bool>)
 impl_for!(OptionalI8Field, Option<i8>)
@@ -86,6 +90,7 @@ impl_for!(OptionalStringField, Option<String>)
 impl_for!(OptionalByteListField, Option<Vec<u8>>)
 impl_for!(OptionalJsonField, Option<Json>)
 impl_for!(OptionalTimespecField, Option<Timespec>)
+impl_for!(OptionalUuidField, Option<Uuid>)
 
 #[cfg(feature = "raw_expr")]
 impl_for!(RawExpr, RawExpr)
