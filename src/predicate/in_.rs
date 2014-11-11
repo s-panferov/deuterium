@@ -4,7 +4,7 @@ use uuid::Uuid;
 use predicate::{Predicate, RcPredicate};
 use expression::{ToListExpression};
 
-#[cfg(feature = "raw_expr")]
+
 use expression::{RawExpr};
 use sql::{ToPredicateValue};
 
@@ -81,5 +81,4 @@ impl_for!(OptionalStringField, Option<String>)
 impl_for!(OptionalTimespecField, Option<Timespec>)
 impl_for!(OptionalUuidField, Option<Uuid>)
 
-#[cfg(feature = "raw_expr")]
 impl_for!(RawExpr, RawExpr)

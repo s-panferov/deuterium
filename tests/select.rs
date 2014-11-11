@@ -62,3 +62,14 @@ fn select_for() {
     assert_sql!(query, "SELECT * FROM jedi FOR SHARE NOWAIT;");    
 }
 
+
+#[test]
+fn select_exists() {
+
+    let jedi_table = TableDef::new("jedi");
+    let name = NamedField::<String>::field_of("name", &jedi_table);
+    
+    let query = jedi_table.exists().where_(name.is("Luke".to_string()));
+    assert_sql!(query, "SELECT 1 FROM jedi WHERE name = $1;");    
+}
+

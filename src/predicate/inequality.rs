@@ -3,7 +3,7 @@ use time::Timespec;
 
 use predicate::{Predicate, RcPredicate};
 use expression::{ToExpression};
-#[cfg(feature = "raw_expr")]
+
 use expression::{RawExpr};
 use field::{
     I8Field,
@@ -109,5 +109,4 @@ impl_for!(OptionalF32Field, Option<f32>)
 impl_for!(OptionalF64Field, Option<f64>)
 impl_for!(OptionalTimespecField, Option<Timespec>)
 
-#[cfg(feature = "raw_expr")]
 impl_for!(RawExpr, RawExpr)

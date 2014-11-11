@@ -1,7 +1,7 @@
 
 use predicate::{Predicate, RcPredicate};
 use expression::{ToExpression};
-#[cfg(feature = "raw_expr")]
+
 use expression::{RawExpr};
 use field::{StringField, OptionalStringField};
 use sql::{ToPredicateValue};
@@ -50,5 +50,4 @@ macro_rules! impl_for(
 impl_for!(StringField, String)
 impl_for!(OptionalStringField, String)
 
-#[cfg(feature = "raw_expr")]
 impl_for!(RawExpr, String)

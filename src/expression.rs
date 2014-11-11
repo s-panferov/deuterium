@@ -72,9 +72,9 @@ pub struct RawExpr {
 }
 
 impl RawExpr {
-    pub fn new(content: String) -> RawExpr { 
+    pub fn new(content: &str) -> RawExpr { 
         RawExpr {
-            content: content
+            content: content.to_string()
         }
     }
 }
@@ -141,10 +141,7 @@ impl_expression_for!(Timespec)
 impl_expression_for!(Option<Timespec>)
 impl_expression_for!(Uuid)
 impl_expression_for!(Option<Uuid>)
-
-#[cfg(feature = "raw_expr")]
 impl_expression_for!(RawExpr)
-#[cfg(feature = "raw_expr")]
 impl_expression_for!(Option<RawExpr>)
 
 pub trait ToExpression<T> for Sized?: UntypedExpression {
@@ -174,14 +171,12 @@ impl ToListExpression<Uuid> for Vec<Uuid> {}
 
 impl ToExpression<String> for String {}
 impl ToExpression<String> for StringField {}
-#[cfg(feature = "raw_expr")]
 impl ToExpression<String> for RawExpr {}
 
 impl ToExpression<Option<String>> for String {}
 impl ToExpression<Option<String>> for Option<String> {}
 impl ToExpression<Option<String>> for StringField {}
 impl ToExpression<Option<String>> for OptionalStringField {}
-#[cfg(feature = "raw_expr")]
 impl ToExpression<Option<String>> for RawExpr {}
 
 //
@@ -201,9 +196,7 @@ macro_rules! cast_numbers(
         impl $comp for I32Field {} 
         impl $comp for I64Field {} 
         impl $comp for F32Field {} 
-        impl $comp for F64Field {} 
-
-        #[cfg(feature = "raw_expr")]
+        impl $comp for F64Field {}         
         impl $comp for RawExpr {}
     )
 )
@@ -228,8 +221,6 @@ macro_rules! cast_numbers_optional(
         impl $comp for OptionalI64Field {} 
         impl $comp for OptionalF32Field {} 
         impl $comp for OptionalF64Field {} 
-
-        #[cfg(feature = "raw_expr")]
         impl $comp for RawExpr {}
     )
 )
@@ -254,14 +245,12 @@ cast_numbers_optional!(ToExpression<Option<f64>>)
 
 impl ToExpression<bool> for bool {}
 impl ToExpression<bool> for BoolField {} 
-#[cfg(feature = "raw_expr")]
 impl ToExpression<bool> for RawExpr {} 
 
 impl ToExpression<Option<bool>> for bool {}
 impl ToExpression<Option<bool>> for Option<bool> {}
 impl ToExpression<Option<bool>> for BoolField {} 
 impl ToExpression<Option<bool>> for OptionalBoolField {} 
-#[cfg(feature = "raw_expr")]
 impl ToExpression<Option<bool>> for RawExpr {} 
 
 //
@@ -270,14 +259,12 @@ impl ToExpression<Option<bool>> for RawExpr {}
 
 impl ToExpression<Vec<u8>> for Vec<u8> {}
 impl ToExpression<Vec<u8>> for ByteListField {}
-#[cfg(feature = "raw_expr")]
 impl ToExpression<Vec<u8>> for RawExpr {}
 
 impl ToExpression<Option<Vec<u8>>> for Vec<u8> {}
 impl ToExpression<Option<Vec<u8>>> for Option<Vec<u8>> {}
 impl ToExpression<Option<Vec<u8>>> for ByteListField {}
 impl ToExpression<Option<Vec<u8>>> for OptionalByteListField {}
-#[cfg(feature = "raw_expr")]
 impl ToExpression<Option<Vec<u8>>> for RawExpr {}
 
 //
@@ -286,14 +273,12 @@ impl ToExpression<Option<Vec<u8>>> for RawExpr {}
 
 impl ToExpression<Json> for Json {}
 impl ToExpression<Json> for JsonField {}
-#[cfg(feature = "raw_expr")]
 impl ToExpression<Json> for RawExpr {}
 
 impl ToExpression<Option<Json>> for Json {}
 impl ToExpression<Option<Json>> for Option<Json> {}
 impl ToExpression<Option<Json>> for JsonField {}
 impl ToExpression<Option<Json>> for OptionalJsonField {}
-#[cfg(feature = "raw_expr")]
 impl ToExpression<Option<Json>> for RawExpr {}
 
 //
@@ -302,14 +287,12 @@ impl ToExpression<Option<Json>> for RawExpr {}
 
 impl ToExpression<Timespec> for Timespec {}
 impl ToExpression<Timespec> for TimespecField {}
-#[cfg(feature = "raw_expr")]
 impl ToExpression<Timespec> for RawExpr {}
 
 impl ToExpression<Option<Timespec>> for Timespec {}
 impl ToExpression<Option<Timespec>> for Option<Timespec> {}
 impl ToExpression<Option<Timespec>> for TimespecField {}
 impl ToExpression<Option<Timespec>> for OptionalTimespecField {}
-#[cfg(feature = "raw_expr")]
 impl ToExpression<Option<Timespec>> for RawExpr {}
 
 //
@@ -318,14 +301,12 @@ impl ToExpression<Option<Timespec>> for RawExpr {}
 
 impl ToExpression<Uuid> for Uuid {}
 impl ToExpression<Uuid> for UuidField {}
-#[cfg(feature = "raw_expr")]
 impl ToExpression<Uuid> for RawExpr {}
 
 impl ToExpression<Option<Uuid>> for Uuid {}
 impl ToExpression<Option<Uuid>> for Option<Uuid> {}
 impl ToExpression<Option<Uuid>> for UuidField {}
 impl ToExpression<Option<Uuid>> for OptionalUuidField {}
-#[cfg(feature = "raw_expr")]
 impl ToExpression<Option<Uuid>> for RawExpr {}
 
 //
@@ -380,53 +361,53 @@ impl ToExpression<()> for OptionalJsonField {}
 impl ToExpression<()> for OptionalByteListField {} 
 impl ToExpression<()> for OptionalTimespecField {}
 impl ToExpression<()> for OptionalUuidField {}
-#[cfg(feature = "raw_expr")] impl ToExpression<()> for RawExpr {}
+impl ToExpression<()> for RawExpr {}
 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for bool {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for i8 {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for i16 {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for i32 {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for i64 {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for f32 {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for f64 {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Vec<u8> {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for String {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Json {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Timespec {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Uuid {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Option<bool> {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Option<i8> {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Option<i16> {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Option<i32> {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Option<i64> {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Option<f32> {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Option<f64> {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Option<Vec<u8>> {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Option<String> {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Option<Json> {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Option<Timespec> {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for Option<Uuid> {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for BoolField {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for I8Field {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for I16Field {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for I32Field {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for I64Field {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for F32Field {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for F64Field {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for StringField {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for JsonField {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for ByteListField {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for TimespecField {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for UuidField {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for OptionalBoolField {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for OptionalI8Field {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for OptionalI16Field {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for OptionalI32Field {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for OptionalI64Field {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for OptionalF32Field {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for OptionalF64Field {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for OptionalStringField {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for OptionalJsonField {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for OptionalByteListField {} 
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for OptionalTimespecField {}
-#[cfg(feature = "raw_expr")] impl ToExpression<RawExpr> for OptionalUuidField {}
+impl ToExpression<RawExpr> for bool {}
+impl ToExpression<RawExpr> for i8 {}
+impl ToExpression<RawExpr> for i16 {}
+impl ToExpression<RawExpr> for i32 {}
+impl ToExpression<RawExpr> for i64 {}
+impl ToExpression<RawExpr> for f32 {}
+impl ToExpression<RawExpr> for f64 {}
+impl ToExpression<RawExpr> for Vec<u8> {}
+impl ToExpression<RawExpr> for String {}
+impl ToExpression<RawExpr> for Json {}
+impl ToExpression<RawExpr> for Timespec {}
+impl ToExpression<RawExpr> for Uuid {}
+impl ToExpression<RawExpr> for Option<bool> {}
+impl ToExpression<RawExpr> for Option<i8> {}
+impl ToExpression<RawExpr> for Option<i16> {}
+impl ToExpression<RawExpr> for Option<i32> {}
+impl ToExpression<RawExpr> for Option<i64> {}
+impl ToExpression<RawExpr> for Option<f32> {}
+impl ToExpression<RawExpr> for Option<f64> {}
+impl ToExpression<RawExpr> for Option<Vec<u8>> {}
+impl ToExpression<RawExpr> for Option<String> {}
+impl ToExpression<RawExpr> for Option<Json> {}
+impl ToExpression<RawExpr> for Option<Timespec> {}
+impl ToExpression<RawExpr> for Option<Uuid> {}
+impl ToExpression<RawExpr> for BoolField {} 
+impl ToExpression<RawExpr> for I8Field {} 
+impl ToExpression<RawExpr> for I16Field {} 
+impl ToExpression<RawExpr> for I32Field {} 
+impl ToExpression<RawExpr> for I64Field {} 
+impl ToExpression<RawExpr> for F32Field {} 
+impl ToExpression<RawExpr> for F64Field {} 
+impl ToExpression<RawExpr> for StringField {} 
+impl ToExpression<RawExpr> for JsonField {} 
+impl ToExpression<RawExpr> for ByteListField {} 
+impl ToExpression<RawExpr> for TimespecField {}
+impl ToExpression<RawExpr> for UuidField {}
+impl ToExpression<RawExpr> for OptionalBoolField {} 
+impl ToExpression<RawExpr> for OptionalI8Field {} 
+impl ToExpression<RawExpr> for OptionalI16Field {} 
+impl ToExpression<RawExpr> for OptionalI32Field {} 
+impl ToExpression<RawExpr> for OptionalI64Field {} 
+impl ToExpression<RawExpr> for OptionalF32Field {} 
+impl ToExpression<RawExpr> for OptionalF64Field {} 
+impl ToExpression<RawExpr> for OptionalStringField {} 
+impl ToExpression<RawExpr> for OptionalJsonField {} 
+impl ToExpression<RawExpr> for OptionalByteListField {} 
+impl ToExpression<RawExpr> for OptionalTimespecField {}
+impl ToExpression<RawExpr> for OptionalUuidField {}

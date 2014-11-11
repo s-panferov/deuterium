@@ -9,7 +9,6 @@ name = "tests"
 
 [features]
 default = ["postgres"]
-raw_expr = []
 
 [dependencies.postgres]
 optional = true

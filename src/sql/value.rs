@@ -4,7 +4,7 @@ use uuid::Uuid;
 
 use sql::{SqlContext, ToSql};
 
-#[cfg(feature = "raw_expr")]
+
 use expression::{RawExpr};
 use field::{
     NamedField,
@@ -62,8 +62,13 @@ raw_value_to_predicate_value!(Vec<u8>)
 raw_value_to_predicate_value!(Json)
 raw_value_to_predicate_value!(Timespec)
 raw_value_to_predicate_value!(Uuid)
-#[cfg(feature = "raw_expr")]
-raw_value_to_predicate_value!(RawExpr)
+
+
+impl ToPredicateValue for RawExpr { 
+    fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { 
+        self.content.to_string()
+    }
+}
 
 macro_rules! extended_impl(
     ($t:ty) => (
@@ -94,7 +99,7 @@ extended_impl!(Json)
 extended_impl!(Timespec)
 extended_impl!(Uuid)
 
-#[cfg(feature = "raw_expr")]
+
 extended_impl!(RawExpr)
 
 impl<T: ToPredicateValue> ToPredicateValue for Vec<T> {

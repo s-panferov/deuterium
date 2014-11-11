@@ -6,7 +6,10 @@ use std::sync::Arc;
 use std::mem;
 
 use from::{From, RcFrom, FromSelect};
-use expression::{Expression, ToExpression, ToListExpression, UntypedExpression, BoxedExpression, RcExpression};
+use expression::{
+    Expression, ToExpression, ToListExpression, 
+    UntypedExpression, BoxedExpression, RcExpression, RawExpr
+};
 use predicate::{
     RcPredicate,
     ToOrPredicate,
@@ -345,6 +348,10 @@ pub trait Selectable<M: Clone>: From {
 
     fn select_all(&self) -> SelectQuery<(), LimitMany, M> {
         SelectQuery::new(SelectAll, self.upcast_from())
+    }
+
+    fn exists(&self) -> SelectQuery<(), LimitMany, M> {
+        SelectQuery::new(SelectOnly(vec![RawExpr::new("1").upcast_expression()]), self.upcast_from())
     }
 }
 
