@@ -87,6 +87,7 @@ pub use delete_query::{
 pub use expression::{
     ToExpression,
     ToExprValue,
+    BoxedExpression, 
     UntypedExpression, 
     Expression,
     RcExpression,

@@ -6,7 +6,8 @@ fn update() {
     let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
 
-    let query = jedi_table.update().all().field(name.set(&"Luke".to_string()));
+    let update: FieldUpdate<NamedField<String>, String> = name.set(&"Luke".to_string());
+    let query = jedi_table.update().all().field(update);
     assert_sql!(query, "UPDATE jedi SET name = $1;")
 
     let query = jedi_table.update().field(name.set(&"Luke".to_string()));

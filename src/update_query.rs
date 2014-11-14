@@ -7,10 +7,6 @@ use from::{From, Table, RcTable, RcFrom};
 use predicate::{RcPredicate};
 use expression::{Expression, UntypedExpression};
 
-use serialize::json::Json;
-use time::Timespec;
-use uuid::Uuid;
-
 use expression::{
     RawExpr,
     ToExprValue,
@@ -21,31 +17,7 @@ use expression::{
 
 use sql::{ToSql, ToPredicateValue};
 use field::{
-    BoolField,
-    I8Field,
-    I16Field,
-    I32Field,
-    I64Field,
-    F32Field,
-    F64Field,
-    StringField,
-    ByteListField,
-    JsonField,
-    TimespecField,    
-    UuidField,    
-
-    OptionalBoolField,
-    OptionalI8Field,
-    OptionalI16Field,
-    OptionalI32Field,
-    OptionalI64Field,
-    OptionalF32Field,
-    OptionalF64Field,
-    OptionalStringField,
-    OptionalByteListField,
-    OptionalJsonField,
-    OptionalTimespecField,
-    OptionalUuidField,
+    NamedField,
 };
 
 pub trait FieldUpd: ToSql {
@@ -101,40 +73,46 @@ macro_rules! set_methods(
 )
 
 macro_rules! impl_for(
-    ($field:ty, $v:ty) => (
+    ($field:ty, $v:ident) => (
         impl ToFieldUpdate<$field, $v> for $field {
             set_methods!($field, $v) 
         }
     )
 )
 
-impl_for!(BoolField, bool) 
-impl_for!(I8Field, i8)
-impl_for!(I16Field, i16)
-impl_for!(I32Field, i32)
-impl_for!(I64Field, i64)
-impl_for!(F32Field, f32)
-impl_for!(F64Field, f64)
-impl_for!(StringField, String)
-impl_for!(ByteListField, Vec<u8>)
-impl_for!(JsonField, Json)
-impl_for!(TimespecField, Timespec)
-impl_for!(UuidField, Uuid)
+impl<T> ToFieldUpdate<NamedField<T>, T> for NamedField<T> where T: Clone {
+    fn set<B: ToExpression<T>>(&self, val: &B) -> FieldUpdate<NamedField<T>, T> {
+        FieldUpdate {
+            field: self.clone(),
+            value: val.as_expr().to_expr_val()
+        }
+    }
 
-impl_for!(OptionalBoolField, Option<bool>)
-impl_for!(OptionalI8Field, Option<i8>)
-impl_for!(OptionalI16Field, Option<i16>)
-impl_for!(OptionalI32Field, Option<i32>)
-impl_for!(OptionalI64Field, Option<i64>)
-impl_for!(OptionalF32Field, Option<f32>)
-impl_for!(OptionalF64Field, Option<f64>)
-impl_for!(OptionalStringField, Option<String>)
-impl_for!(OptionalByteListField, Option<Vec<u8>>)
-impl_for!(OptionalJsonField, Option<Json>)
-impl_for!(OptionalTimespecField, Option<Timespec>)
-impl_for!(OptionalUuidField, Option<Uuid>)
+    fn set_default(&self) -> FieldUpdate<NamedField<T>, T> {
+        FieldUpdate {
+            field: self.clone(),
+            value: DefaultValue
+        }
+    }
+}
 
-impl_for!(RawExpr, RawExpr)
+impl ToFieldUpdate<RawExpr, RawExpr> for RawExpr {
+    fn set<B: ToExpression<RawExpr>>(&self, val: &B) -> FieldUpdate<RawExpr, RawExpr> {
+        FieldUpdate {
+            field: self.clone(),
+            value: val.as_expr().to_expr_val()
+        }
+    }
+
+    fn set_default(&self) -> FieldUpdate<RawExpr, RawExpr> {
+        FieldUpdate {
+            field: self.clone(),
+            value: DefaultValue
+        }
+    }
+}
+
+// impl_for!(RawExpr, RawExpr)
 
 pub trait Updatable<M>: Table { 
     fn update(&self) -> UpdateQuery<(), NoResult, M> {
