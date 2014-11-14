@@ -1,7 +1,3 @@
-
-use serialize::json::Json;
-use time::Timespec;
-
 use std::sync::Arc;
 use std::mem;
 
@@ -387,23 +383,5 @@ impl<T: Clone, L: Clone, M: Clone> UntypedExpression for SelectQuery<T, L, M> {
     }
 }
 
-impl<M: Clone> ToExpression<i8> for SelectQuery<(i8), LimitOne, M> { }
-impl<M: Clone> ToExpression<i16> for SelectQuery<(i16), LimitOne, M> { }
-impl<M: Clone> ToExpression<i32> for SelectQuery<(i32), LimitOne, M> { }
-impl<M: Clone> ToExpression<i64> for SelectQuery<(i64), LimitOne, M> { }
-impl<M: Clone> ToExpression<f32> for SelectQuery<(f32), LimitOne, M> { }
-impl<M: Clone> ToExpression<f64> for SelectQuery<(f64), LimitOne, M> { }
-impl<M: Clone> ToExpression<String> for SelectQuery<(String), LimitOne, M> { }
-impl<M: Clone> ToExpression<Json> for SelectQuery<(Json), LimitOne, M> { }
-impl<M: Clone> ToExpression<Timespec> for SelectQuery<(Timespec), LimitOne, M> { }
-
-impl<M: Clone> ToListExpression<i8> for SelectQuery<(i8), LimitMany, M> { }
-impl<M: Clone> ToListExpression<i16> for SelectQuery<(i16), LimitMany, M> { }
-impl<M: Clone> ToListExpression<i32> for SelectQuery<(i32), LimitMany, M> { }
-impl<M: Clone> ToListExpression<i64> for SelectQuery<(i64), LimitMany, M> { }
-impl<M: Clone> ToListExpression<f32> for SelectQuery<(f32), LimitMany, M> { }
-impl<M: Clone> ToListExpression<f64> for SelectQuery<(f64), LimitMany, M> { }
-impl<M: Clone> ToListExpression<String> for SelectQuery<(String), LimitMany, M> { }
-impl<M: Clone> ToListExpression<Json> for SelectQuery<(Json), LimitMany, M> { }
-impl<M: Clone> ToListExpression<Timespec> for SelectQuery<(Timespec), LimitMany, M> { }
-
+impl<M: Clone, T: Clone> ToExpression<T> for SelectQuery<(T), LimitOne, M> { }
+impl<M: Clone, T: Clone> ToListExpression<T> for SelectQuery<(T), LimitMany, M> { }
