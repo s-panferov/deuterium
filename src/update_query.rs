@@ -86,8 +86,6 @@ impl ToFieldUpdate<RawExpr, RawExpr> for RawExpr {
     }
 }
 
-// impl_for!(RawExpr, RawExpr)
-
 pub trait Updatable<M>: Table { 
     fn update(&self) -> UpdateQuery<(), NoResult, M> {
         UpdateQuery::new(self)
