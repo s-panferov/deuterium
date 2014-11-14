@@ -10,31 +10,6 @@ use expression::{RawExpr};
 use predicate::{Predicate, RcPredicate};
 use field::{
     NamedField,
-    // BoolField,
-    // I8Field,
-    // I16Field,
-    // I32Field,
-    // I64Field,
-    // F32Field,
-    // F64Field,
-    // StringField,
-    // ByteListField,
-    // JsonField,
-    // TimespecField,
-    // UuidField,
-
-    // OptionalBoolField,
-    // OptionalI8Field,
-    // OptionalI16Field,
-    // OptionalI32Field,
-    // OptionalI64Field,
-    // OptionalF32Field,
-    // OptionalF64Field,
-    // OptionalStringField,
-    // OptionalByteListField,
-    // OptionalJsonField,
-    // OptionalTimespecField,
-    // OptionalUuidField,
 };
 
 #[deriving(Send, Clone)]

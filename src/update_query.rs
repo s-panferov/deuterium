@@ -54,32 +54,6 @@ pub trait ToFieldUpdate<F, T> {
     fn set_default(&self) -> FieldUpdate<F, T>;
 }
 
-macro_rules! set_methods(
-    ($field:ty, $v:ty) => (
-        fn set<B: ToExpression<$v>>(&self, val: &B) -> FieldUpdate<$field, $v> {
-            FieldUpdate {
-                field: self.clone(),
-                value: val.as_expr().to_expr_val()
-            }
-        }
-
-        fn set_default(&self) -> FieldUpdate<$field, $v> {
-            FieldUpdate {
-                field: self.clone(),
-                value: DefaultValue
-            }
-        }
-    )
-)
-
-macro_rules! impl_for(
-    ($field:ty, $v:ident) => (
-        impl ToFieldUpdate<$field, $v> for $field {
-            set_methods!($field, $v) 
-        }
-    )
-)
-
 impl<T> ToFieldUpdate<NamedField<T>, T> for NamedField<T> where T: Clone {
     fn set<B: ToExpression<T>>(&self, val: &B) -> FieldUpdate<NamedField<T>, T> {
         FieldUpdate {
