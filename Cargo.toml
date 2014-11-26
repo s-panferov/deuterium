@@ -10,13 +10,10 @@ name = "tests"
 [features]
 default = ["postgres"]
 
+[dependencies]
+uuid = "*"
+time = "*"
+
 [dependencies.postgres]
+varsion = "*"
 optional = true
-features = ["uuid_type"]
-git = "https://github.com/sfackler/rust-postgres.git"
-
-[dependencies.uuid]
-git = "https://github.com/rust-lang/uuid.git"
-
-[dependencies.time]
-git = "https://github.com/rust-lang/time"

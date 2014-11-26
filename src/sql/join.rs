@@ -1,17 +1,26 @@
 
 use join::{
-    Join, 
-    ConditionedJoin, 
-    UnconditionedJoin,
+    Join,
     ConditionedJoinType,
-    UnconditionedJoinType,
+    UnconditionedJoinType
+};
+
+use join::Join::{
+    ConditionedJoin,
+    UnconditionedJoin,
+};
+
+use join::ConditionedJoinType::{
     InnerJoin,
     FullOuterJoin,
     RightOuterJoin, 
     LeftOuterJoin,
     FullJoin,
     RightJoin,
-    LeftJoin,
+    LeftJoin
+};
+
+use join::UnconditionedJoinType::{
     NaturalJoin,
     NaturalLeftJoin,
     NaturalRightJoin,
@@ -50,10 +59,10 @@ impl ToSql for UnconditionedJoinType {
 impl ToSql for Join {
     fn to_sql(&self, ctx: &mut SqlContext) -> String {
         match self {
-            &ConditionedJoin(ref join_type, ref from, ref on) => {
+            &ConditionedJoin{ref join_type, ref from, ref on} => {
                 format!("{} {} ON {}", join_type.to_sql(ctx), from.as_sql().to_from_sql(ctx), on.to_sql(false, ctx))
             },
-            &UnconditionedJoin(ref join_type, ref from) => {
+            &UnconditionedJoin{ref join_type, ref from} => {
                 format!("{} {}", join_type.to_sql(ctx), from.as_sql().to_from_sql(ctx))
             }
         }

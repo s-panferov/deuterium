@@ -1,6 +1,6 @@
 use std::mem;
 
-use select_query::{Queryable, Select, SelectOnly, SelectAll, LimitMany, NoResult};
+use select_query::{Queryable, Select, LimitMany, NoResult};
 use from::{From, Table, RcTable, RcFrom};
 use predicate::{RcPredicate};
 use expression::{Expression, UntypedExpression};
@@ -15,22 +15,22 @@ macro_rules! returning_for(
     ($query:ident) => (
         impl<T, L, M> $query<T, L, M> {
             pub fn returning_1<T: Clone>(mut self, field: &Expression<T>) -> $query<(T), LimitMany, M> {
-                self.returning = Some(SelectOnly(vec![field.upcast_expression()]));
+                self.returning = Some(Select::Only(vec![field.upcast_expression()]));
                 unsafe{ mem::transmute(self) }
             }
 
             pub fn returning_2<T1: Clone, T2: Clone>(mut self, field1: &Expression<T1>, field2: &Expression<T2>) -> $query<(T1, T2), LimitMany, M> {
-                self.returning = Some(SelectOnly(vec![field1.upcast_expression(), field2.upcast_expression()]));
+                self.returning = Some(Select::Only(vec![field1.upcast_expression(), field2.upcast_expression()]));
                 unsafe{ mem::transmute(self) }
             }
 
             pub fn returning(mut self, fields: &[&UntypedExpression]) -> $query<(), LimitMany, M> {
-                self.returning = Some(SelectOnly(fields.iter().map(|f| f.upcast_expression()).collect()));
+                self.returning = Some(Select::Only(fields.iter().map(|f| f.upcast_expression()).collect()));
                 unsafe{ mem::transmute(self) }
             }
 
             pub fn returning_all(mut self) -> $query<(), LimitMany, M> {
-                self.returning = Some(SelectAll);
+                self.returning = Some(Select::All);
                 unsafe{ mem::transmute(self) }
             }
             

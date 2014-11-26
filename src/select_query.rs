@@ -21,8 +21,8 @@ use group_by::{GroupBy};
 
 #[deriving(Clone)]
 pub enum Select {
-    SelectOnly(Vec<RcExpression>),
-    SelectAll
+    Only(Vec<RcExpression>),
+    All
 }
 
 pub trait ToSelectQuery: Clone + Send + Sync + ToSql {
@@ -33,10 +33,10 @@ pub trait ToSelectQuery: Clone + Send + Sync + ToSql {
 
 #[deriving(Clone)]
 pub enum SelectFor {
-    SelectForUpdate,
-    SelectForUpdateNoWait,
-    SelectForShare,
-    SelectForShareNoWait
+    Update,
+    UpdateNoWait,
+    Share,
+    ShareNoWait
 }
 
 #[deriving(Clone)]
@@ -259,19 +259,19 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
     }
 
     pub fn for_update(&self) -> SelectQuery<T, L, M> {
-        with_clone!(self, query, query.for_ = Some(SelectForUpdate))
+        with_clone!(self, query, query.for_ = Some(SelectFor::Update))
     }    
 
     pub fn for_update_nowait(&self) -> SelectQuery<T, L, M> {
-        with_clone!(self, query, query.for_ = Some(SelectForUpdateNoWait))
+        with_clone!(self, query, query.for_ = Some(SelectFor::UpdateNoWait))
     }
 
     pub fn for_share(&self) -> SelectQuery<T, L, M> {
-        with_clone!(self, query, query.for_ = Some(SelectForShare))
+        with_clone!(self, query, query.for_ = Some(SelectFor::Share))
     }
 
     pub fn for_share_nowait(&self) -> SelectQuery<T, L, M> {
-        with_clone!(self, query, query.for_ = Some(SelectForShareNoWait))
+        with_clone!(self, query, query.for_ = Some(SelectFor::ShareNoWait))
     }
 
     pub fn inner_join(&self, from: &From, on: RcPredicate) -> SelectQuery<T, L, M> {
@@ -331,23 +331,23 @@ pub trait Selectable<M: Clone>: From {
     // FIXME: Unify select_N after [generics](https://github.com/rust-lang/rfcs/issues/376)
 
     fn select_1<T: Clone>(&self, field: &Expression<T>) -> SelectQuery<(T), LimitMany, M> {
-        SelectQuery::new(SelectOnly(vec![field.upcast_expression()]), self.upcast_from())
+        SelectQuery::new(Select::Only(vec![field.upcast_expression()]), self.upcast_from())
     }
 
     fn select_2<T1: Clone, T2: Clone>(&self, field1: &Expression<T1>, field2: &Expression<T2>) -> SelectQuery<(T1, T2), LimitMany, M> {
-        SelectQuery::new(SelectOnly(vec![field1.upcast_expression(), field2.upcast_expression()]), self.upcast_from())
+        SelectQuery::new(Select::Only(vec![field1.upcast_expression(), field2.upcast_expression()]), self.upcast_from())
     }
 
     fn select(&self, fields: &[&UntypedExpression]) -> SelectQuery<(), LimitMany, M> {
-        SelectQuery::new(SelectOnly(fields.iter().map(|f| f.upcast_expression()).collect()), self.upcast_from())
+        SelectQuery::new(Select::Only(fields.iter().map(|f| f.upcast_expression()).collect()), self.upcast_from())
     }
 
     fn select_all(&self) -> SelectQuery<(), LimitMany, M> {
-        SelectQuery::new(SelectAll, self.upcast_from())
+        SelectQuery::new(Select::All, self.upcast_from())
     }
 
     fn exists(&self) -> SelectQuery<(), LimitMany, M> {
-        SelectQuery::new(SelectOnly(vec![RawExpr::new("1").upcast_expression()]), self.upcast_from())
+        SelectQuery::new(Select::Only(vec![RawExpr::new("1").upcast_expression()]), self.upcast_from())
     }
 }
 

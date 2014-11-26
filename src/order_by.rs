@@ -17,14 +17,14 @@ impl OrderBy {
     pub fn by(expression: &UntypedExpression) -> OrderBy {
         OrderBy {
             by: expression.upcast_expression(),
-            order: Asc
+            order: Order::Asc
         }
     }
 
     pub fn reverse_by(expression: &UntypedExpression) -> OrderBy {
         OrderBy {
             by: expression.upcast_expression(),
-            order: Desc
+            order: Order::Desc
         }
     }
 

@@ -7,8 +7,8 @@ use predicate::{
     OrPredicate, 
     AndPredicate,
     InPredicate,
-    InRangePredicate, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft,
-    InequalityPredicate, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual,
+    InRangePredicate, InRangeBounds,
+    InequalityPredicate, Inequality,
     ExcludePredicate,
     LikePredicate,
     IsNullPredicate
@@ -96,28 +96,28 @@ impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InRangePredica
         let from = self.from.to_predicate_value(ctx); 
         let to = self.to.to_predicate_value(ctx);
         match self.bounds {
-            IncludeBoth => {
+            InRangeBounds::IncludeBoth => {
                 if !negation {
                     format!("{} >= {} AND {} <= {}", name, from, name, to)
                 } else {
                     format!("{} < {} OR {} > {}", name, from, name, to)
                 }
             },
-            ExcludeBoth => {
+            InRangeBounds::ExcludeBoth => {
                 if !negation {
                     format!("{} > {} AND {} < {}", name, from, name, to)
                 } else {
                     format!("{} <= {} OR {} >= {}", name, from, name, to)
                 }
             },
-            ExcludeLeft => {
+            InRangeBounds::ExcludeLeft => {
                 if !negation {
                     format!("{} > {} AND {} <= {}", name, from, name, to)
                 } else {
                     format!("{} <= {} OR {} > {}", name, from, name, to)
                 }
             },
-            ExcludeRight => {
+            InRangeBounds::ExcludeRight => {
                 if !negation {
                     format!("{} >= {} AND {} < {}", name, from, name, to)
                 } else {
@@ -133,28 +133,28 @@ impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InequalityPred
         let ref name = self.field.to_predicate_value(ctx);
         let value = self.value.to_predicate_value(ctx);
         match self.inequality {
-            LessThan => {
+            Inequality::LessThan => {
                 if !negation {
                     format!("{} < {}", name, value)
                 } else {
                     format!("{} >= {}", name, value)
                 }
             },
-            LessThanEqual => {
+            Inequality::LessThanEqual => {
                 if !negation {
                     format!("{} <= {}", name, value)
                 } else {
                     format!("{} > {}", name, value)
                 }
             },
-            GreaterThan => {
+            Inequality::GreaterThan => {
                 if !negation {
                     format!("{} > {}", name, value)
                 } else {
                     format!("{} <= {}", name, value)
                 }
             },
-            GreaterThanEqual => {
+            Inequality::GreaterThanEqual => {
                 if !negation {
                     format!("{} >= {}", name, value)
                 } else {

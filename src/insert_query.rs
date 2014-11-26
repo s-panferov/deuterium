@@ -2,7 +2,7 @@ use std::mem;
 
 use from::{Table, RcTable};
 use field::{Field, RcField};
-use select_query::{SelectQuery, SelectOnly, SelectAll, LimitMany, Select, NoResult};
+use select_query::{SelectQuery, LimitMany, Select, NoResult};
 use expression::{
     Expression, ToExpression, UntypedExpression,     
     ExprValue, ToExprValue};
@@ -10,10 +10,10 @@ use expression::{
 #[allow(dead_code)]
 #[deriving(Clone)]
 pub enum Insert<T, V, M> {
-    InsertDefaultValues,
-    InsertValues(Vec<V>),
-    InsertUntypedValues(Vec<Vec<ExprValue<()>>>),
-    InsertFromSelect(SelectQuery<T, LimitMany, M>)
+    DefaultValues,
+    Values(Vec<V>),
+    UntypedValues(Vec<Vec<ExprValue<()>>>),
+    FromSelect(SelectQuery<T, LimitMany, M>)
 }
 
 #[allow(dead_code)]
@@ -84,7 +84,7 @@ impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT
         InsertQuery {
             into: into.upcast_table(),
             cols: None,
-            values: InsertDefaultValues,
+            values: Insert::DefaultValues,
             returning: None
         }
     }
@@ -93,7 +93,7 @@ impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT
         InsertQuery {
             into: into.upcast_table(),
             cols: Some(cols),
-            values: InsertDefaultValues,
+            values: Insert::DefaultValues,
             returning: None
         }
     }
@@ -107,17 +107,17 @@ impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT
 
         let mut reassign = false;
         match &self.values {
-            &InsertDefaultValues | &InsertFromSelect(_) => {
+            &Insert::DefaultValues | &Insert::FromSelect(_) => {
                 reassign = true;
             },
             _ => ()
         }
 
         if reassign {
-            self.values = InsertValues(vec![value])
+            self.values = Insert::Values(vec![value])
         } else {
             match &mut self.values {
-                &InsertValues(ref mut values) => {
+                &Insert::Values(ref mut values) => {
                     values.push(value)
                 },
                 _ => ()
@@ -128,7 +128,7 @@ impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT
     pub fn push_untyped(&mut self, values: &[&ToExpression<()>]) {
         let mut reassign = false;
         match &self.values {
-            &InsertDefaultValues | &InsertFromSelect(_) => {
+            &Insert::DefaultValues | &Insert::FromSelect(_) => {
                 reassign = true;
             },
             _ => ()
@@ -137,10 +137,10 @@ impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT
         let values_vec = values.iter().map(|v| v.as_expr().to_expr_val()).collect();
 
         if reassign {
-            self.values = InsertUntypedValues(vec![values_vec])
+            self.values = Insert::UntypedValues(vec![values_vec])
         } else {
             match &mut self.values {
-                &InsertUntypedValues(ref mut values) => {
+                &Insert::UntypedValues(ref mut values) => {
                     values.push(values_vec)
                 },
                 _ => ()
@@ -149,29 +149,29 @@ impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT
     }
 
     pub fn from_select(&self, select: SelectQuery<T, LimitMany, M>) -> InsertQuery<T, V, M, RT, RL> {
-        with_clone!(self, query, query.values = InsertFromSelect(select))
+        with_clone!(self, query, query.values = Insert::FromSelect(select))
     }
 
 }
 
 impl<T: Clone, V: Clone, M: Clone, RT, RL> InsertQuery<T, V, M, RT, RL> {
     pub fn returning_1<T1: Clone>(mut self, field: &Expression<T1>) -> InsertQuery<T, V, M, (T1), LimitMany> {
-        self.returning = Some(SelectOnly(vec![field.upcast_expression()]));
+        self.returning = Some(Select::Only(vec![field.upcast_expression()]));
         unsafe{ mem::transmute(self) }
     }
 
     pub fn returning_2<T1: Clone, T2: Clone>(mut self, field1: &Expression<T1>, field2: &Expression<T2>) -> InsertQuery<T, V, M, (T1, T2), LimitMany> {
-        self.returning = Some(SelectOnly(vec![field1.upcast_expression(), field2.upcast_expression()]));
+        self.returning = Some(Select::Only(vec![field1.upcast_expression(), field2.upcast_expression()]));
         unsafe{ mem::transmute(self) }
     }
 
     pub fn returning(mut self, fields: &[&UntypedExpression]) -> InsertQuery<T, V, M, (), LimitMany> {
-        self.returning = Some(SelectOnly(fields.iter().map(|f| f.upcast_expression()).collect()));
+        self.returning = Some(Select::Only(fields.iter().map(|f| f.upcast_expression()).collect()));
         unsafe{ mem::transmute(self) }
     }
 
     pub fn returning_all(mut self) -> InsertQuery<T, V, M, (), LimitMany> {
-        self.returning = Some(SelectAll);
+        self.returning = Some(Select::All);
         unsafe{ mem::transmute(self) }
     }
     

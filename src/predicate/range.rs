@@ -54,7 +54,7 @@ macro_rules! in_range_methods(
                 field: self.clone(),
                 from: from,
                 to: to,
-                bounds: IncludeBoth
+                bounds: InRangeBounds::IncludeBoth
             }.upcast()
         }
 
@@ -63,7 +63,7 @@ macro_rules! in_range_methods(
                 field: self.clone(),
                 from: from,
                 to: to,
-                bounds: ExcludeLeft
+                bounds: InRangeBounds::ExcludeLeft
             }.upcast()
         }
 
@@ -72,7 +72,7 @@ macro_rules! in_range_methods(
                 field: self.clone(),
                 from: from,
                 to: to,
-                bounds: ExcludeRight
+                bounds: InRangeBounds::ExcludeRight
             }.upcast()
         }
 
@@ -81,7 +81,7 @@ macro_rules! in_range_methods(
                 field: self.clone(),
                 from: from,
                 to: to,
-                bounds: ExcludeBoth
+                bounds: InRangeBounds::ExcludeBoth
             }.upcast()
         }
     )

@@ -1,10 +1,6 @@
 use insert_query::{
     InsertQuery, 
     Insert,
-    InsertDefaultValues,
-    InsertValues,
-    InsertUntypedValues,
-    InsertFromSelect,
 };
 
 use sql::{SqlContext, ToSql, QueryToSql};
@@ -12,21 +8,21 @@ use sql::{SqlContext, ToSql, QueryToSql};
 impl<T: Clone, V: ToSql, M: Clone> ToSql for Insert<T, V, M> {
     fn to_sql(&self, ctx: &mut SqlContext) -> String {
         match self {
-            &InsertDefaultValues => {
+            &Insert::DefaultValues => {
                 format!("DEFAULT VALUES")
             },
-            &InsertValues(ref rows) => {
+            &Insert::Values(ref rows) => {
                 let rows_str: Vec<String> = rows.iter().map(|row| { format!("({})", row.to_sql(ctx)) }).collect();
                 format!("VALUES\n    {}", rows_str.connect(",\n    "))
             },
-            &InsertUntypedValues(ref rows) => {
+            &Insert::UntypedValues(ref rows) => {
                 let rows_str: Vec<String> = rows.iter().map(|row| {
                     let values_str: Vec<String> = row.iter().map(|v| v.to_sql(ctx)).collect();
                     format!("({})", values_str.connect(", "))
                 }).collect();
                 format!("VALUES\n    {}", rows_str.connect(",\n    "))    
             },
-            &InsertFromSelect(ref select) => {
+            &Insert::FromSelect(ref select) => {
                 select.to_sql(ctx)
             }
         }

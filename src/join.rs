@@ -2,6 +2,10 @@
 use from::{RcFrom};
 use predicate::{RcPredicate};
 
+use self::Join::*;
+use self::ConditionedJoinType::*;
+use self::UnconditionedJoinType::*;
+
 #[allow(dead_code)]
 #[deriving(Clone)]
 pub enum ConditionedJoinType {

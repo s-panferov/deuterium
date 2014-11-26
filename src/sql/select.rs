@@ -1,14 +1,8 @@
 use from::{FromSelect};
 use select_query::{
     Select,
-    SelectOnly,
-    SelectAll,
     SelectQuery, RcSelectQuery,
-    SelectFor,
-    SelectForUpdate,
-    SelectForUpdateNoWait,
-    SelectForShare,
-    SelectForShareNoWait
+    SelectFor
 };
 
 use sql::{SqlContext, ToSql, QueryToSql};
@@ -24,10 +18,10 @@ impl<T, L, M> FromToSql for FromSelect<T, L, M> {
 impl ToSql for SelectFor {
     fn to_sql(&self, _ctx: &mut SqlContext) -> String {
         match self {
-            &SelectForUpdate => "FOR UPDATE",
-            &SelectForUpdateNoWait => "FOR UPDATE NOWAIT",
-            &SelectForShare => "FOR SHARE",
-            &SelectForShareNoWait => "FOR SHARE NOWAIT",
+            &SelectFor::Update => "FOR UPDATE",
+            &SelectFor::UpdateNoWait => "FOR UPDATE NOWAIT",
+            &SelectFor::Share => "FOR SHARE",
+            &SelectFor::ShareNoWait => "FOR SHARE NOWAIT",
         }.to_string()
     }
 }
@@ -95,11 +89,11 @@ impl ToSql for RcSelectQuery {
 impl ToSql for Select {
     fn to_sql(&self, ctx: &mut SqlContext) -> String {
         match self {
-            &SelectOnly(ref fields) => {
+            &Select::Only(ref fields) => {
                 let defs: Vec<String> = fields.iter().map(|f| f.expression_as_sql().to_sql(ctx)).collect();
                 defs.connect(", ")
             },
-            &SelectAll => "*".to_string()
+            &Select::All => "*".to_string()
         }
     }
 }

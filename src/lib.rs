@@ -1,11 +1,9 @@
 
 #![feature(tuple_indexing)]
 #![feature(macro_rules)]
-#![feature(struct_variant)]
 #![feature(concat_idents)]
 #![feature(default_type_params)]
 #![feature(globs)]
-
 #![deny(warnings)]
 #![deny(bad_style)]
 
@@ -41,9 +39,9 @@ pub use predicate::{
     AndPredicate, ToAndPredicate,
     InPredicate, ToInPredicate,
     InRangePredicate, ToInRangePredicate, 
-    InRangeBounds, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft,
+    InRangeBounds,
     InequalityPredicate, ToInequalityPredicate, 
-    Inequality, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual,
+    Inequality,
     ExcludePredicate, ToExcludePredicate,
     LikePredicate, ToLikePredicate,
     IsNullPredicate, ToIsNullPredicate,
@@ -58,8 +56,6 @@ pub use select_query::{
     RcSelectQuery, 
     ToSelectQuery, 
     Select, 
-    SelectAll, 
-    SelectOnly, 
     NoResult, 
     LimitOne, 
     LimitTwo, 
@@ -92,8 +88,6 @@ pub use expression::{
     Expression,
     RcExpression,
     ExprValue,
-    ExpressionValue,
-    DefaultValue,
     RawExpr
 };
 

@@ -48,10 +48,10 @@ pub type RcExpression = Arc<BoxedExpression>;
 
 #[deriving(Clone)]
 pub enum ExprValue<T> {
-    ExpressionValue {
+    Value {
         expression: RcExpression
     },
-    DefaultValue
+    Default
 }
 
 pub trait ToExprValue<T> for Sized? {
@@ -60,7 +60,7 @@ pub trait ToExprValue<T> for Sized? {
 
 impl<T> ExprValue<T> {
     pub fn new(exp: &Expression<T>) -> ExprValue<T> {
-        ExpressionValue {
+        ExprValue::Value {
             expression: exp.upcast_expression()
         }
     }
@@ -144,11 +144,11 @@ impl_expression_for!(Option<Uuid>)
 impl_expression_for!(RawExpr)
 impl_expression_for!(Option<RawExpr>)
 
-pub trait ToExpression<T> for Sized?: UntypedExpression {
+pub trait ToExpression<T>: UntypedExpression {
     fn as_expr(&self) -> &Expression<T> { unsafe{ mem::transmute(self as &UntypedExpression) } }
 }
 
-pub trait ToListExpression<T> for Sized?: UntypedExpression {
+pub trait ToListExpression<T>: UntypedExpression {
     fn as_expr(&self) -> &ListExpression<T> { unsafe{ mem::transmute(self as &UntypedExpression) } }
 }
 

@@ -16,12 +16,12 @@ pub use self::in_::{
 
 pub use self::range::{
     InRangePredicate, ToInRangePredicate,
-    InRangeBounds, ExcludeBoth, IncludeBoth, ExcludeRight, ExcludeLeft
+    InRangeBounds
 };
 
 pub use self::inequality::{
     InequalityPredicate, ToInequalityPredicate,
-    Inequality, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual
+    Inequality
 };
 
 pub mod is;

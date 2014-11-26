@@ -1,7 +1,5 @@
 use expression::{
-    ExprValue,
-    ExpressionValue,
-    DefaultValue,
+    ExprValue
 };
 
 use sql::{SqlContext, ToSql};
@@ -9,10 +7,10 @@ use sql::{SqlContext, ToSql};
 impl<T> ToSql for ExprValue<T> {
     fn to_sql(&self, ctx: &mut SqlContext) -> String {
         match self {
-            &ExpressionValue(ref e) => {
-                e.expression_as_sql().to_sql(ctx)
+            &ExprValue::Value{ref expression} => {
+                expression.expression_as_sql().to_sql(ctx)
             },
-            &DefaultValue => "DEFAULT".to_string()
+            &ExprValue::Default => "DEFAULT".to_string()
         }
     } 
 }

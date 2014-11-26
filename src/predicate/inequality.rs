@@ -53,7 +53,7 @@ macro_rules! inequality_methods(
             InequalityPredicate {
                 field: self.clone(),
                 value: val,
-                inequality: LessThan
+                inequality: Inequality::LessThan
             }.upcast()
         }
 
@@ -61,7 +61,7 @@ macro_rules! inequality_methods(
             InequalityPredicate {
                 field: self.clone(),
                 value: val,
-                inequality: LessThanEqual
+                inequality: Inequality::LessThanEqual
             }.upcast()
         }
 
@@ -69,7 +69,7 @@ macro_rules! inequality_methods(
             InequalityPredicate {
                 field: self.clone(),
                 value: val,
-                inequality: GreaterThan
+                inequality: Inequality::GreaterThan
             }.upcast()
         }
 
@@ -77,7 +77,7 @@ macro_rules! inequality_methods(
             InequalityPredicate {
                 field: self.clone(),
                 value: val,
-                inequality: GreaterThanEqual
+                inequality: Inequality::GreaterThanEqual
             }.upcast()
         }
     )

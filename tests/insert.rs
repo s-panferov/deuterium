@@ -19,7 +19,7 @@ fn insert() {
 
     let mut query = jedi_table.insert_1_for_test(&name);
     query.push((ExprValue::new(&"Luke".to_string()), ));
-    query.push((DefaultValue, ));
+    query.push((ExprValue::Default, ));
 
     assert_sql!(query, "INSERT INTO jedi (name) VALUES\n    ($1),\n    (DEFAULT);");
 }

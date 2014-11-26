@@ -2,7 +2,7 @@ use std::mem;
 
 use std::sync::Arc;
 
-use select_query::{Queryable, Select, SelectOnly, SelectAll, LimitMany, NoResult};
+use select_query::{Queryable, Select, LimitMany, NoResult};
 use from::{From, Table, RcTable, RcFrom};
 use predicate::{RcPredicate};
 use expression::{Expression, UntypedExpression};
@@ -11,7 +11,6 @@ use expression::{
     RawExpr,
     ToExprValue,
     ExprValue, 
-    DefaultValue,
     ToExpression,
 };
 
@@ -65,7 +64,7 @@ impl<T> ToFieldUpdate<NamedField<T>, T> for NamedField<T> where T: Clone {
     fn set_default(&self) -> FieldUpdate<NamedField<T>, T> {
         FieldUpdate {
             field: self.clone(),
-            value: DefaultValue
+            value: ExprValue::Default
         }
     }
 }
@@ -81,7 +80,7 @@ impl ToFieldUpdate<RawExpr, RawExpr> for RawExpr {
     fn set_default(&self) -> FieldUpdate<RawExpr, RawExpr> {
         FieldUpdate {
             field: self.clone(),
-            value: DefaultValue
+            value: ExprValue::Default
         }
     }
 }
