@@ -3,6 +3,9 @@
 name = "deuterium"
 version = "0.0.1"
 authors = ["Stanislav Panferov <fnight.m@gmail.com>"]
+license = "MIT"
+description = "Deuterium is a fancy SQL builder for Rust. It's designed to provide a DSL to easily build SQL queries in safe and *typed* way."
+keywords = ["sql", "orm"]
 
 [[test]]
 name = "tests"
@@ -15,5 +18,5 @@ uuid = "*"
 time = "*"
 
 [dependencies.postgres]
-varsion = "*"
+version = "*"
 optional = true
