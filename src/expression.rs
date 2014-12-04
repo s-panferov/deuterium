@@ -111,7 +111,7 @@ macro_rules! impl_expression_for(
     )
 )
 
-impl<'a, 'b, T> ToExprValue<T> for &'a Expression<T> + 'b {
+impl<'a, 'b, T> ToExprValue<T> for &'a (Expression<T> + 'b) {
     fn to_expr_val(&self) -> ExprValue<T> {
         ExprValue::new(*self)
     }   
