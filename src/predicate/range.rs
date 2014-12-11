@@ -1,6 +1,6 @@
 use time::Timespec;
 
-use predicate::{Predicate, RcPredicate};
+use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
 use sql::{ToPredicateValue};
 use expression::{ToExpression};
 
@@ -32,7 +32,7 @@ pub enum InRangeBounds {
     ExcludeLeft
 }
 
-#[deriving(Send, Clone)]
+#[deriving(Clone)]
 pub struct InRangePredicate<F, T> {
     pub field: F,
     pub from: T,
@@ -89,9 +89,9 @@ macro_rules! in_range_methods(
 
 macro_rules! impl_for(
     ($field:ty, $v:ty) => (
-        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone> Predicate for InRangePredicate<$field, T> { }
+        impl<T: ToExpression<$v> + ToPredicateValue + Clone> Predicate for InRangePredicate<$field, T> { }
 
-        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone> ToInRangePredicate<$field, T> for $field {
+        impl<T: ToExpression<$v> + ToPredicateValue + Clone> ToInRangePredicate<$field, T> for $field {
             in_range_methods!(T)    
         }
     )

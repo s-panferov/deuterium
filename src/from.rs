@@ -1,5 +1,5 @@
 
-use std::sync::Arc;
+use std::rc::Rc;
 use sql::{FromToSql};
 use select_query::{SelectQuery, Selectable};
 use insert_query::{InsertQuery, Insertable};
@@ -14,17 +14,17 @@ pub trait From {
     fn upcast_from(&self) -> RcFrom;
 }
 
-pub type BoxedFrom = Box<From + Send + Sync>;
-pub type RcFrom = Arc<BoxedFrom>;
+pub type BoxedFrom = Box<From + 'static>;
+pub type RcFrom = Rc<BoxedFrom>;
 
-pub trait Table: Clone {
+pub trait Table {
     fn upcast_table(&self) -> RcTable;
     fn get_table_name(&self) -> &String;
     fn get_table_alias(&self) -> &Option<String>;
 }
 
-pub type BoxedTable = Box<Table + Send + Sync>;
-pub type RcTable = Arc<BoxedTable>;
+pub type BoxedTable = Box<Table + 'static>;
+pub type RcTable = Rc<BoxedTable>;
 
 #[deriving(Clone)]
 pub struct TableDef {
@@ -70,7 +70,7 @@ impl TableDef {
 
 impl Table for TableDef {
     fn upcast_table(&self) -> RcTable {
-        Arc::new(box self.clone() as BoxedTable)
+        Rc::new(box self.clone() as BoxedTable)
     }
 
     fn get_table_name(&self) -> &String {
@@ -88,7 +88,7 @@ impl From for TableDef {
     }
 
     fn upcast_from(&self) -> RcFrom {
-        Arc::new(box self.clone() as BoxedFrom)
+        Rc::new(box self.clone() as BoxedFrom)
     }
 }
 
@@ -109,7 +109,7 @@ impl<T: Clone, L: Clone, M: Clone> From for FromSelect<T, L, M> {
     }
 
     fn upcast_from(&self) -> RcFrom {
-        Arc::new(box self.clone() as BoxedFrom)
+        Rc::new(box self.clone() as BoxedFrom)
     }
 }
 

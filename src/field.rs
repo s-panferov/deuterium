@@ -1,7 +1,7 @@
 use serialize::json::Json;
 use time::Timespec;
 use uuid::Uuid;
-use std::sync::Arc;
+use std::rc::Rc;
 
 use from::{Table};
 use sql::{ToSql};
@@ -14,8 +14,8 @@ pub trait Field {
     fn upcast_field(&self) -> RcField;
 }
 
-pub type BoxedField = Box<Field + Send + Sync>;
-pub type RcField = Arc<BoxedField>;
+pub type BoxedField = Box<Field + 'static>;
+pub type RcField = Rc<BoxedField>;
 
 #[deriving(Clone)]
 pub struct NamedField<T> {
@@ -74,7 +74,7 @@ impl<T: Clone> UntypedExpression for NamedField<T> {
     }
 
     fn upcast_expression(&self) -> RcExpression {
-        Arc::new(box self.clone() as BoxedExpression)
+        Rc::new(box self.clone() as BoxedExpression)
     }
 }
 
@@ -94,7 +94,7 @@ impl<T: Clone> Field for NamedField<T> {
     }
 
     fn upcast_field(&self) -> RcField {
-        Arc::new(box self.clone() as BoxedField)
+        Rc::new(box self.clone() as BoxedField)
     }
 }
 

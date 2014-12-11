@@ -1,6 +1,6 @@
 
 use sql::{ToSql};
-use std::sync::Arc;
+use std::rc::Rc;
 
 use serialize::json::Json;
 use time::Timespec;
@@ -43,8 +43,8 @@ pub trait UntypedExpression for Sized? {
     fn upcast_expression(&self) -> RcExpression;
 }
 
-pub type BoxedExpression = Box<UntypedExpression + Send + Sync>;
-pub type RcExpression = Arc<BoxedExpression>;
+pub type BoxedExpression = Box<UntypedExpression + 'static>;
+pub type RcExpression = Rc<BoxedExpression>;
 
 #[deriving(Clone)]
 pub enum ExprValue<T> {
@@ -87,7 +87,7 @@ macro_rules! impl_expression_for(
             }
 
             fn upcast_expression(&self) -> RcExpression {
-                Arc::new(box self.clone() as BoxedExpression)
+                Rc::new(box self.clone() as BoxedExpression)
             }
         }
 
@@ -101,7 +101,7 @@ macro_rules! impl_expression_for(
             }
 
             fn upcast_expression(&self) -> RcExpression {
-                Arc::new(box self.clone() as BoxedExpression)
+                Rc::new(box self.clone() as BoxedExpression)
             }
         }
 

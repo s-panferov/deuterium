@@ -7,24 +7,24 @@ use sql::{ToPredicateValue};
 use expression::{ToExpression};
 
 use expression::{RawExpr};
-use predicate::{Predicate, RcPredicate};
+use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
 use field::{
     NamedField,
 };
 
-#[deriving(Send, Clone)]
+#[deriving(Clone)]
 pub struct IsPredicate<F, T> {
     pub field: F,
     pub value: T
 }
 
 pub trait ToIsPredicate<F, T> {
-    fn is<B: ToExpression<T> + ToPredicateValue + Send + Sync + Clone>(&self, val: B) -> RcPredicate;
+    fn is<B: ToExpression<T> + ToPredicateValue + Clone>(&self, val: B) -> RcPredicate;
 }
 
 macro_rules! is_methods(
     ($v:ty) => (
-        fn is<B: ToExpression<$v> + ToPredicateValue + Send + Sync + Clone>(&self, val: B) -> RcPredicate {
+        fn is<B: ToExpression<$v> + ToPredicateValue + Clone>(&self, val: B) -> RcPredicate {
             IsPredicate {
                 field: self.clone(),
                 value: val
@@ -35,8 +35,8 @@ macro_rules! is_methods(
 
 macro_rules! impl_for(
     ($field:ty, $v:ty) => (
-        impl<T, B: ToExpression<T> + ToPredicateValue + Send + Sync + Clone> Predicate for IsPredicate<$field, B> where T: Send + Sync + ToPredicateValue + Clone { }
-        impl<T> ToIsPredicate<$field, T> for $field where T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone {
+        impl<T, B: ToExpression<T> + ToPredicateValue + Clone> Predicate for IsPredicate<$field, B> where T: ToPredicateValue + Clone {}
+        impl<T> ToIsPredicate<$field, T> for $field where T: ToExpression<$v> + ToPredicateValue + Clone {
             is_methods!(T) 
         }
     )

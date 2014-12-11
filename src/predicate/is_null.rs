@@ -1,5 +1,5 @@
 
-use predicate::{Predicate, RcPredicate};
+use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
 
 use expression::{RawExpr};
 use field::{
@@ -17,7 +17,7 @@ use field::{
     OptionalUuidField,
 };
 
-#[deriving(Send, Clone)]
+#[deriving(Clone)]
 pub struct IsNullPredicate<F> {
     pub field: F,
     pub null: bool

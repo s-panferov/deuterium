@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::rc::Rc;
 use std::mem;
 
 use from::{From, RcFrom, FromSelect};
@@ -25,9 +25,17 @@ pub enum Select {
     All
 }
 
-pub trait ToSelectQuery: Clone + Send + Sync + ToSql {
+pub trait AbstractSelectQuery: ToSql {
+    
+}
+
+pub trait ToSelectQuery: ToSql {
+    fn upcast(&self) -> RcSelectQuery;
+}
+
+impl<T> ToSelectQuery for T where T: AbstractSelectQuery + Clone + 'static {
     fn upcast(&self) -> RcSelectQuery {
-        Arc::new(box self.clone() as BoxedSelectQuery)
+        Rc::new(box self.clone() as BoxedSelectQuery)
     }
 }
 
@@ -368,10 +376,10 @@ impl<T: Clone, L: Clone, M: Clone> Orderable for SelectQuery<T, L, M> {
     fn set_order_by(&mut self, order_by: Vec<OrderBy>) { self.order_by = order_by }
 }
 
-impl<T: Clone, L: Clone, M: Clone> ToSelectQuery for SelectQuery<T, L, M> { }
+impl<T: Clone, L: Clone, M: Clone> AbstractSelectQuery for SelectQuery<T, L, M> { }
 
-pub type BoxedSelectQuery = Box<ToSelectQuery + Send + Sync>;
-pub type RcSelectQuery = Arc<BoxedSelectQuery>;
+pub type BoxedSelectQuery = Box<AbstractSelectQuery + 'static>;
+pub type RcSelectQuery = Rc<BoxedSelectQuery>;
 
 impl<T: Clone, L: Clone, M: Clone> UntypedExpression for SelectQuery<T, L, M> {
     fn expression_as_sql(&self) -> &ToSql {
@@ -379,7 +387,7 @@ impl<T: Clone, L: Clone, M: Clone> UntypedExpression for SelectQuery<T, L, M> {
     }
 
     fn upcast_expression(&self) -> RcExpression {
-        Arc::new(box self.clone() as BoxedExpression)
+        Rc::new(box self.clone() as BoxedExpression)
     }
 }
 

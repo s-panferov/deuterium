@@ -1,7 +1,7 @@
 
-use predicate::{Predicate, RcPredicate};
+use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
 
-#[deriving(Send, Clone)]
+#[deriving(Clone)]
 pub struct ExcludePredicate {
     pub predicate: RcPredicate
 }

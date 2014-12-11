@@ -43,22 +43,22 @@ pub trait ToSql {
 }
 
 #[cfg(feature = "postgres")]
-pub type BoxedValue = Box<AsPostgresValue + Send + Sync>;
+pub type BoxedValue = Box<AsPostgresValue + 'static>;
 #[cfg(not(feature = "postgres"))]
-pub type BoxedValue = Box<ToPredicateValue + Send + Sync>;
-pub type BoxedAdapter = Box<SqlAdapter + Send + Sync>;
+pub type BoxedValue = Box<ToPredicateValue>;
+pub type BoxedAdapter = Box<SqlAdapter + 'static>;
 
 #[allow(dead_code)]
 pub struct SqlContext {
     impl_placeholders: uint,
     expl_placeholders: uint,
     placeholder_data: Vec<BoxedValue>,
-    adapter: Box<SqlAdapter + Send + Sync>,
+    adapter: Box<SqlAdapter + 'static>,
 }
 
 #[allow(dead_code)]
 impl SqlContext {
-    pub fn new(adapter: Box<SqlAdapter + Send + Sync>) -> SqlContext {
+    pub fn new(adapter: Box<SqlAdapter + 'static>) -> SqlContext {
         SqlContext {
             impl_placeholders: 0,
             expl_placeholders: 0,

@@ -1,7 +1,7 @@
 
 use predicate::{Predicate};
 
-#[deriving(Send, Clone)]
+#[deriving(Clone)]
 pub struct RawPredicate {
     pub content: String
 }

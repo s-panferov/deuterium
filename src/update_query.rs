@@ -1,6 +1,6 @@
 use std::mem;
 
-use std::sync::Arc;
+use std::rc::Rc;
 
 use select_query::{Queryable, Select, LimitMany, NoResult};
 use from::{From, Table, RcTable, RcFrom};
@@ -23,7 +23,7 @@ pub trait FieldUpd: ToSql {
     fn upcast_field_update(&self) -> RcFieldUpdate;
 }
 
-#[deriving(Send, Sync, Clone)]
+#[deriving(Clone)]
 pub struct FieldUpdate<F, T> {
     pub field: F,
     pub value: ExprValue<T>
@@ -39,12 +39,12 @@ impl<F, T> FieldUpdate<F, T> {
     }
 }
 
-pub type BoxedFieldUpdate = Box<FieldUpd + Send + Sync>;
-pub type RcFieldUpdate = Arc<BoxedFieldUpdate>;
+pub type BoxedFieldUpdate = Box<FieldUpd + 'static>;
+pub type RcFieldUpdate = Rc<BoxedFieldUpdate>;
 
-impl<F: Clone + Send + Sync + ToPredicateValue, T: Clone + Send + Sync + ToPredicateValue> FieldUpd for FieldUpdate<F, T> {
+impl<F: Clone + ToPredicateValue + 'static, T: Clone + ToPredicateValue + 'static> FieldUpd for FieldUpdate<F, T> {
     fn upcast_field_update(&self) -> RcFieldUpdate {
-        Arc::new(box self.clone() as BoxedFieldUpdate)
+        Rc::new(box self.clone() as BoxedFieldUpdate)
     }
 }
 

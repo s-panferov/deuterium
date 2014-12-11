@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::rc::Rc;
 
 use time::Timespec;
 use serialize::json::Json;
@@ -23,7 +23,7 @@ impl UntypedExpression for Placeholder {
     }
 
     fn upcast_expression(&self) -> RcExpression {
-        Arc::new(box self.clone() as BoxedExpression)
+        Rc::new(box self.clone() as BoxedExpression)
     }
 }
 

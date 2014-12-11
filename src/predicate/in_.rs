@@ -1,7 +1,7 @@
 use time::Timespec;
 use uuid::Uuid;
 
-use predicate::{Predicate, RcPredicate};
+use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
 use expression::{ToListExpression};
 
 
@@ -30,7 +30,7 @@ use field::{
     OptionalUuidField,
 };
 
-#[deriving(Send, Clone)]
+#[deriving(Clone)]
 pub struct InPredicate<F, T> {
     pub field: F,
     pub values: T
@@ -53,9 +53,9 @@ macro_rules! in_methods(
 
 macro_rules! impl_for(
     ($field:ty, $v:ty) => (
-        impl<T: ToListExpression<$v> + Send + Sync + ToPredicateValue + Clone> Predicate for InPredicate<$field, T> { }
+        impl<T: ToListExpression<$v> + ToPredicateValue + Clone> Predicate for InPredicate<$field, T> { }
 
-        impl<T: ToListExpression<$v> + Send + Sync + ToPredicateValue + Clone> ToInPredicate<$field, T> for $field {
+        impl<T: ToListExpression<$v> + ToPredicateValue + Clone> ToInPredicate<$field, T> for $field {
             in_methods!(T)   
         }
     )

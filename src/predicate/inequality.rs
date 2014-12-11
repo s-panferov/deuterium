@@ -1,7 +1,7 @@
 
 use time::Timespec;
 
-use predicate::{Predicate, RcPredicate};
+use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
 use expression::{ToExpression};
 
 use expression::{RawExpr};
@@ -33,7 +33,7 @@ pub enum Inequality {
     GreaterThanEqual
 }
 
-#[deriving(Send, Clone)]
+#[deriving(Clone)]
 pub struct InequalityPredicate<F, T> {
     pub field: F,
     pub value: T,
@@ -85,9 +85,9 @@ macro_rules! inequality_methods(
 
 macro_rules! impl_for(
     ($field:ty, $v:ty) => (
-        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone> Predicate for InequalityPredicate<$field, T> { }
+        impl<T: ToExpression<$v> + ToPredicateValue + Clone> Predicate for InequalityPredicate<$field, T> { }
 
-        impl<T: ToExpression<$v> + Send + Sync + ToPredicateValue + Clone> ToInequalityPredicate<$field, T> for $field {
+        impl<T: ToExpression<$v> + ToPredicateValue + Clone> ToInequalityPredicate<$field, T> for $field {
             inequality_methods!(T)    
         }
     )

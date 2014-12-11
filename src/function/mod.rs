@@ -1,5 +1,5 @@
 
-use std::sync::Arc;
+use std::rc::Rc;
 use time::Timespec;
 
 use expression::{Expression, BoxedExpression, RcExpression, UntypedExpression};
@@ -18,7 +18,7 @@ use field::{
 
 macro_rules! agg_func(
     ($foo:ident, $foo_arg:ident, $foo_low:ident) => (
-        pub trait $foo_arg<R: Clone, T: Clone>: Clone + Expression<T> + Send + Sync {
+        pub trait $foo_arg<R: Clone, T: Clone>: Clone + Expression<T> {
             fn $foo_low(&self) -> $foo<R, T, Self> {
                 $foo::new(self.clone())
             }
@@ -38,13 +38,13 @@ macro_rules! agg_func(
             }
         }
 
-        impl<R: Clone, T: Clone, E: $foo_arg<R, T>> UntypedExpression for $foo<R, T, E> {
+        impl<R: Clone, T: Clone, E: $foo_arg<R, T> + 'static> UntypedExpression for $foo<R, T, E> {
             fn expression_as_sql(&self) -> &ToSql {
                 self
             }
 
             fn upcast_expression(&self) -> RcExpression {
-                Arc::new(box self.clone() as BoxedExpression)
+                Rc::new(box self.clone() as BoxedExpression)
             }
         }
 
@@ -104,7 +104,7 @@ impl UntypedExpression for CountAll {
     }
 
     fn upcast_expression(&self) -> RcExpression {
-        Arc::new(box self.clone() as BoxedExpression)
+        Rc::new(box self.clone() as BoxedExpression)
     }
 }
 

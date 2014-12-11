@@ -1,5 +1,5 @@
 
-use std::sync::Arc;
+use std::rc::Rc;
 
 use sql::{PredicateToSql};
 
@@ -35,9 +35,17 @@ pub mod exclude;
 pub mod like;
 pub mod raw;
 
-pub trait Predicate: Clone + Sync + Send + PredicateToSql { 
+pub trait Predicate: PredicateToSql { 
+
+}
+
+pub trait ToAbstractPredicate { 
+    fn upcast(&self) -> RcPredicate;
+}
+
+impl<T> ToAbstractPredicate for T where T: Predicate + Clone + 'static {
     fn upcast(&self) -> RcPredicate {
-        Arc::new(box self.clone() as BoxedPredicate)
+        Rc::new(box self.clone() as BoxedPredicate)
     }
 }
 
@@ -53,5 +61,5 @@ impl ToAndPredicate for RcPredicate {
     }
 }
 
-pub type BoxedPredicate = Box<Predicate + Send + Sync>;
-pub type RcPredicate = Arc<BoxedPredicate>;
+pub type BoxedPredicate = Box<Predicate + 'static>;
+pub type RcPredicate = Rc<BoxedPredicate>;
