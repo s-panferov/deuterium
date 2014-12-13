@@ -24,7 +24,7 @@ use field::{
     OptionalTimespecField,
 };
 
-#[deriving(Clone)]
+#[deriving(Clone, Copy)]
 pub enum InRangeBounds {
     ExcludeBoth,
     IncludeBoth,

@@ -71,7 +71,7 @@ impl<T, L, M> ToSql for SelectQuery<T, L, M> {
         }
 
         if self.for_.is_some() {
-            sql = format!("{} {}", sql, self.for_.unwrap().to_sql(ctx))
+            sql = format!("{} {}", sql, self.for_.as_ref().unwrap().to_sql(ctx))
         }
 
         sql

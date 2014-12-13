@@ -95,7 +95,7 @@ impl AvgArg<f64, f64> for F64Field {}
 agg_func!(Count, CountArg, count)
 impl<T: Clone> CountArg<i64, T> for NamedField<T> {}
 
-#[deriving(Clone)]
+#[deriving(Clone, Copy)]
 pub struct CountAll;
 
 impl UntypedExpression for CountAll {

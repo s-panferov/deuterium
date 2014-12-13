@@ -25,7 +25,7 @@ use field::{
 
 use sql::{ToPredicateValue};
 
-#[deriving(Clone)]
+#[deriving(Clone, Copy)]
 pub enum Inequality {
     LessThan,
     LessThanEqual,

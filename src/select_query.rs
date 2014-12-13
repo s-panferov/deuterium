@@ -39,7 +39,7 @@ impl<T> ToSelectQuery for T where T: AbstractSelectQuery + Clone + 'static {
     }
 }
 
-#[deriving(Clone)]
+#[deriving(Clone, Copy)]
 pub enum SelectFor {
     Update,
     UpdateNoWait,
@@ -47,16 +47,16 @@ pub enum SelectFor {
     ShareNoWait
 }
 
-#[deriving(Clone)]
+#[deriving(Clone, Copy)]
 pub struct LimitOne;
 
-#[deriving(Clone)]
+#[deriving(Clone, Copy)]
 pub struct LimitTwo;
 
-#[deriving(Clone)]
+#[deriving(Clone, Copy)]
 pub struct LimitMany;
 
-#[deriving(Clone)]
+#[deriving(Clone, Copy)]
 pub struct NoResult;
 
 macro_rules! set_predicate(

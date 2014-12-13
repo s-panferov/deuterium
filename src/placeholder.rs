@@ -6,7 +6,7 @@ use serialize::json::Json;
 use expression::{UntypedExpression, RcExpression, RawExpr, BoxedExpression, ToExpression};
 use sql::{ToSql};
 
-#[deriving(Clone)]
+#[deriving(Clone, Copy)]
 pub struct Placeholder {
     pub idx: uint
 }
