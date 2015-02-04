@@ -1,8 +1,5 @@
 
-#![feature(macro_rules)]
 #![feature(concat_idents)]
-#![feature(default_type_params)]
-#![feature(globs)]
 #![deny(warnings)]
 #![deny(bad_style)]
 
@@ -107,20 +104,20 @@ pub use placeholder::{
     Placeholder
 };
 
-macro_rules! with_clone(
+macro_rules! with_clone{
     ($slf: ident, $v:ident, $ex:expr) => ({
         let mut $v = $slf.clone();
         $ex;
         $v
     })
-)
+}
 
 mod field;
 mod predicate;
 mod select_query;
 mod insert_query;
 
-#[macro_escape]
+#[macro_use]
 mod delete_query;
 mod update_query;
 pub mod sql;

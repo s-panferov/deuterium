@@ -1,14 +1,14 @@
 
 
 pub trait SqlAdapter {
-    fn placeholder(&self, idx: uint) -> String;
+    fn placeholder(&self, idx: usize) -> String;
 }
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct PostgreSqlAdapter;
 
 impl SqlAdapter for PostgreSqlAdapter {
-    fn placeholder(&self, idx: uint) -> String {
+    fn placeholder(&self, idx: usize) -> String {
         format!("${}", idx)
     }
 }

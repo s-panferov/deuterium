@@ -11,7 +11,7 @@ pub trait Deletable<M>: Table {
     }
 }
 
-macro_rules! returning_for(
+macro_rules! returning_for {
     ($query:ident) => (
         impl<T, L, M> $query<T, L, M> {
             pub fn returning_1<T: Clone>(mut self, field: &Expression<T>) -> $query<(T), LimitMany, M> {
@@ -40,9 +40,9 @@ macro_rules! returning_for(
             }
         }
     )
-)
+}
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct DeleteQuery<T, L, M> {
     pub only: bool,
     pub table: RcTable,
@@ -85,7 +85,7 @@ impl<T, L, M> DeleteQuery<T, L, M> {
     }
 }
 
-returning_for!(DeleteQuery)
+returning_for!(DeleteQuery);
 
 impl<T:Clone, L:Clone, M:Clone> Queryable for DeleteQuery<T, L, M> { 
     fn get_where(&self) -> &Option<RcPredicate> { &self.where_ }

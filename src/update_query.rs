@@ -23,7 +23,7 @@ pub trait FieldUpd: ToSql {
     fn upcast_field_update(&self) -> RcFieldUpdate;
 }
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct FieldUpdate<F, T> {
     pub field: F,
     pub value: ExprValue<T>
@@ -44,7 +44,7 @@ pub type RcFieldUpdate = Rc<BoxedFieldUpdate>;
 
 impl<F: Clone + ToPredicateValue + 'static, T: Clone + ToPredicateValue + 'static> FieldUpd for FieldUpdate<F, T> {
     fn upcast_field_update(&self) -> RcFieldUpdate {
-        Rc::new(box self.clone() as BoxedFieldUpdate)
+        Rc::new(Box::new(self.clone()) as BoxedFieldUpdate)
     }
 }
 
@@ -91,7 +91,7 @@ pub trait Updatable<M>: Table {
     }
 }
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct UpdateQuery<T, L, M> {
     pub only: bool,
     pub table: RcTable,
@@ -141,7 +141,7 @@ impl<T, L, M> UpdateQuery<T, L, M> {
     }
 }
 
-returning_for!(UpdateQuery)
+returning_for!(UpdateQuery);
 
 impl<T:Clone, L:Clone, M:Clone> Queryable for UpdateQuery<T, L, M> { 
     fn get_where(&self) -> &Option<RcPredicate> { &self.where_ }

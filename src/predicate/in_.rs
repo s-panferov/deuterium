@@ -30,7 +30,7 @@ use field::{
     OptionalUuidField,
 };
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct InPredicate<F, T> {
     pub field: F,
     pub values: T
@@ -40,7 +40,7 @@ pub trait ToInPredicate<F, T> {
     fn in_(&self, val: T) -> RcPredicate;
 }
 
-macro_rules! in_methods(
+macro_rules! in_methods{
     ($v:ty) => (
         fn in_(&self, values: $v) -> RcPredicate {
             InPredicate {
@@ -49,36 +49,36 @@ macro_rules! in_methods(
             }.upcast()
         }
     )
-)
+}
 
-macro_rules! impl_for(
+macro_rules! impl_for{
     ($field:ty, $v:ty) => (
         impl<T: ToListExpression<$v> + ToPredicateValue + Clone> Predicate for InPredicate<$field, T> { }
 
         impl<T: ToListExpression<$v> + ToPredicateValue + Clone> ToInPredicate<$field, T> for $field {
-            in_methods!(T)   
+            in_methods!(T);
         }
     )
-)
+}
 
-impl_for!(I8Field, i8)
-impl_for!(I16Field, i16)
-impl_for!(I32Field, i32)
-impl_for!(I64Field, i64)
-impl_for!(F32Field, f32)
-impl_for!(F64Field, f64)
-impl_for!(StringField, String)
-impl_for!(TimespecField, Timespec)
-impl_for!(UuidField, Uuid)
+impl_for!(I8Field, i8);
+impl_for!(I16Field, i16);
+impl_for!(I32Field, i32);
+impl_for!(I64Field, i64);
+impl_for!(F32Field, f32);
+impl_for!(F64Field, f64);
+impl_for!(StringField, String);
+impl_for!(TimespecField, Timespec);
+impl_for!(UuidField, Uuid);
 
-impl_for!(OptionalI8Field, Option<i8>)
-impl_for!(OptionalI16Field, Option<i16>)
-impl_for!(OptionalI32Field, Option<i32>)
-impl_for!(OptionalI64Field, Option<i64>)
-impl_for!(OptionalF32Field, Option<f32>)
-impl_for!(OptionalF64Field, Option<f64>)
-impl_for!(OptionalStringField, Option<String>)
-impl_for!(OptionalTimespecField, Option<Timespec>)
-impl_for!(OptionalUuidField, Option<Uuid>)
+impl_for!(OptionalI8Field, Option<i8>);
+impl_for!(OptionalI16Field, Option<i16>);
+impl_for!(OptionalI32Field, Option<i32>);
+impl_for!(OptionalI64Field, Option<i64>);
+impl_for!(OptionalF32Field, Option<f32>);
+impl_for!(OptionalF64Field, Option<f64>);
+impl_for!(OptionalStringField, Option<String>);
+impl_for!(OptionalTimespecField, Option<Timespec>);
+impl_for!(OptionalUuidField, Option<Uuid>);
 
-impl_for!(RawExpr, RawExpr)
+impl_for!(RawExpr, RawExpr);

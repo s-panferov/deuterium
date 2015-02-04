@@ -8,7 +8,7 @@ use expression::{
     ExprValue, ToExprValue};
 
 #[allow(dead_code)]
-#[deriving(Clone)]
+#[derive(Clone)]
 pub enum Insert<T, V, M> {
     DefaultValues,
     Values(Vec<V>),
@@ -17,7 +17,7 @@ pub enum Insert<T, V, M> {
 }
 
 #[allow(dead_code)]
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct InsertQuery<T, V, M, RT, RL> {
     into: RcTable,
     cols: Option<Vec<RcField>>,
@@ -25,7 +25,7 @@ pub struct InsertQuery<T, V, M, RT, RL> {
     returning: Option<Select>
 }
 
-macro_rules! insert(
+macro_rules! insert {
     ($name:ident, $(($t:ident, $arg:ident)),+) => (
         // FIXME: Make this public after https://github.com/rust-lang/rust/issues/17635
         fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(ExprValue<$t>,)+), M, (), ()> {
@@ -36,9 +36,9 @@ macro_rules! insert(
             query
         }
     )
-)
+}
 
-macro_rules! insertable(
+macro_rules! insertable {
     () => (
         pub trait Insertable<M: Clone>: Table {   
             // FIXME: It doesn't work for now because of :
@@ -72,10 +72,10 @@ macro_rules! insertable(
             }
         }
     )
-)
+}
 
 
-insertable!()
+insertable!();
 
 #[allow(dead_code)]
 impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT, RL> {

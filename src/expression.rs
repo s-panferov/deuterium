@@ -35,10 +35,10 @@ use field::{
     OptionalUuidField,
 };
 
-pub trait Expression<T> for Sized?: UntypedExpression {}
-pub trait ListExpression<T> for Sized?: UntypedExpression {}
+pub trait Expression<T>: UntypedExpression {}
+pub trait ListExpression<T>: UntypedExpression {}
 
-pub trait UntypedExpression for Sized? {
+pub trait UntypedExpression {
     fn expression_as_sql(&self) -> &ToSql;
     fn upcast_expression(&self) -> RcExpression;
 }
@@ -46,7 +46,7 @@ pub trait UntypedExpression for Sized? {
 pub type BoxedExpression = Box<UntypedExpression + 'static>;
 pub type RcExpression = Rc<BoxedExpression>;
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub enum ExprValue<T> {
     Value {
         expression: RcExpression
@@ -54,7 +54,7 @@ pub enum ExprValue<T> {
     Default
 }
 
-pub trait ToExprValue<T> for Sized? {
+pub trait ToExprValue<T> {
     fn to_expr_val(&self) -> ExprValue<T>;
 }
 
@@ -66,7 +66,7 @@ impl<T> ExprValue<T> {
     }
 }
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct RawExpr {
     pub content: String
 }
@@ -79,7 +79,7 @@ impl RawExpr {
     }
 }
 
-macro_rules! impl_expression_for(
+macro_rules! impl_expression_for {
     ($t:ty) => (
         impl UntypedExpression for $t {
             fn expression_as_sql(&self) -> &ToSql {
@@ -87,7 +87,7 @@ macro_rules! impl_expression_for(
             }
 
             fn upcast_expression(&self) -> RcExpression {
-                Rc::new(box self.clone() as BoxedExpression)
+                Rc::new(Box::new(self.clone()) as BoxedExpression)
             }
         }
 
@@ -101,7 +101,7 @@ macro_rules! impl_expression_for(
             }
 
             fn upcast_expression(&self) -> RcExpression {
-                Rc::new(box self.clone() as BoxedExpression)
+                Rc::new(Box::new(self.clone()) as BoxedExpression)
             }
         }
 
@@ -109,7 +109,7 @@ macro_rules! impl_expression_for(
             
         }
     )
-)
+}
 
 impl<'a, 'b, T> ToExprValue<T> for &'a (Expression<T> + 'b) {
     fn to_expr_val(&self) -> ExprValue<T> {
@@ -117,32 +117,32 @@ impl<'a, 'b, T> ToExprValue<T> for &'a (Expression<T> + 'b) {
     }   
 }
 
-impl_expression_for!(bool)
-impl_expression_for!(Option<bool>)
-impl_expression_for!(i8)
-impl_expression_for!(Option<i8>)
-impl_expression_for!(i16)
-impl_expression_for!(Option<i16>)
-impl_expression_for!(i32)
-impl_expression_for!(Option<i32>)
-impl_expression_for!(i64)
-impl_expression_for!(Option<i64>)
-impl_expression_for!(f32)
-impl_expression_for!(Option<f32>)
-impl_expression_for!(f64)
-impl_expression_for!(Option<f64>)
-impl_expression_for!(String)
-impl_expression_for!(Option<String>)
-impl_expression_for!(Vec<u8>)
-impl_expression_for!(Option<Vec<u8>>)
-impl_expression_for!(Json)
-impl_expression_for!(Option<Json>)
-impl_expression_for!(Timespec)
-impl_expression_for!(Option<Timespec>)
-impl_expression_for!(Uuid)
-impl_expression_for!(Option<Uuid>)
-impl_expression_for!(RawExpr)
-impl_expression_for!(Option<RawExpr>)
+impl_expression_for!(bool);
+impl_expression_for!(Option<bool>);
+impl_expression_for!(i8);
+impl_expression_for!(Option<i8>);
+impl_expression_for!(i16);
+impl_expression_for!(Option<i16>);
+impl_expression_for!(i32);
+impl_expression_for!(Option<i32>);
+impl_expression_for!(i64);
+impl_expression_for!(Option<i64>);
+impl_expression_for!(f32);
+impl_expression_for!(Option<f32>);
+impl_expression_for!(f64);
+impl_expression_for!(Option<f64>);
+impl_expression_for!(String);
+impl_expression_for!(Option<String>);
+impl_expression_for!(Vec<u8>);
+impl_expression_for!(Option<Vec<u8>>);
+impl_expression_for!(Json);
+impl_expression_for!(Option<Json>);
+impl_expression_for!(Timespec);
+impl_expression_for!(Option<Timespec>);
+impl_expression_for!(Uuid);
+impl_expression_for!(Option<Uuid>);
+impl_expression_for!(RawExpr);
+impl_expression_for!(Option<RawExpr>);
 
 pub trait ToExpression<T>: UntypedExpression {
     fn as_expr(&self) -> &Expression<T> { unsafe{ mem::transmute(self as &UntypedExpression) } }
@@ -183,7 +183,7 @@ impl ToExpression<Option<String>> for RawExpr {}
 // Numbers
 //
 
-macro_rules! cast_numbers(
+macro_rules! cast_numbers {
     ($comp:ty) => (
         impl $comp for i8 {}
         impl $comp for i16 {}
@@ -199,9 +199,9 @@ macro_rules! cast_numbers(
         impl $comp for F64Field {}         
         impl $comp for RawExpr {}
     )
-)
+}
 
-macro_rules! cast_numbers_optional(
+macro_rules! cast_numbers_optional {
     ($comp:ty) => (
         impl $comp for i8 {}
         impl $comp for i16 {}
@@ -223,21 +223,21 @@ macro_rules! cast_numbers_optional(
         impl $comp for OptionalF64Field {} 
         impl $comp for RawExpr {}
     )
-)
+}
 
-cast_numbers!(ToExpression<i8>)
-cast_numbers!(ToExpression<i16>)
-cast_numbers!(ToExpression<i32>)
-cast_numbers!(ToExpression<i64>)
-cast_numbers!(ToExpression<f32>)
-cast_numbers!(ToExpression<f64>)
+cast_numbers!(ToExpression<i8>);
+cast_numbers!(ToExpression<i16>);
+cast_numbers!(ToExpression<i32>);
+cast_numbers!(ToExpression<i64>);
+cast_numbers!(ToExpression<f32>);
+cast_numbers!(ToExpression<f64>);
 
-cast_numbers_optional!(ToExpression<Option<i8>>)
-cast_numbers_optional!(ToExpression<Option<i16>>)
-cast_numbers_optional!(ToExpression<Option<i32>>)
-cast_numbers_optional!(ToExpression<Option<i64>>)
-cast_numbers_optional!(ToExpression<Option<f32>>)
-cast_numbers_optional!(ToExpression<Option<f64>>)
+cast_numbers_optional!(ToExpression<Option<i8>>);
+cast_numbers_optional!(ToExpression<Option<i16>>);
+cast_numbers_optional!(ToExpression<Option<i32>>);
+cast_numbers_optional!(ToExpression<Option<i64>>);
+cast_numbers_optional!(ToExpression<Option<f32>>);
+cast_numbers_optional!(ToExpression<Option<f64>>);
 
 //
 // Boolean

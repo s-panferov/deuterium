@@ -25,7 +25,7 @@ use field::{
 
 use sql::{ToPredicateValue};
 
-#[deriving(Clone, Copy)]
+#[derive(Clone, Copy)]
 pub enum Inequality {
     LessThan,
     LessThanEqual,
@@ -33,7 +33,7 @@ pub enum Inequality {
     GreaterThanEqual
 }
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct InequalityPredicate<F, T> {
     pub field: F,
     pub value: T,
@@ -47,7 +47,7 @@ pub trait ToInequalityPredicate<F, T> {
     fn gte(&self, val: T) -> RcPredicate;
 }
 
-macro_rules! inequality_methods(
+macro_rules! inequality_methods {
     ($v:ty) => (
         fn lt(&self, val: $v) -> RcPredicate {
             InequalityPredicate {
@@ -81,32 +81,32 @@ macro_rules! inequality_methods(
             }.upcast()
         }
     )
-)
+}
 
-macro_rules! impl_for(
+macro_rules! impl_for {
     ($field:ty, $v:ty) => (
         impl<T: ToExpression<$v> + ToPredicateValue + Clone> Predicate for InequalityPredicate<$field, T> { }
 
         impl<T: ToExpression<$v> + ToPredicateValue + Clone> ToInequalityPredicate<$field, T> for $field {
-            inequality_methods!(T)    
+            inequality_methods!(T);   
         }
     )
-)
+}
 
-impl_for!(I8Field, i8)
-impl_for!(I16Field, i16)
-impl_for!(I32Field, i32)
-impl_for!(I64Field, i64)
-impl_for!(F32Field, f32)
-impl_for!(F64Field, f64)
-impl_for!(TimespecField, Timespec)
+impl_for!(I8Field, i8);
+impl_for!(I16Field, i16);
+impl_for!(I32Field, i32);
+impl_for!(I64Field, i64);
+impl_for!(F32Field, f32);
+impl_for!(F64Field, f64);
+impl_for!(TimespecField, Timespec);
 
-impl_for!(OptionalI8Field, Option<i8>)
-impl_for!(OptionalI16Field, Option<i16>)
-impl_for!(OptionalI32Field, Option<i32>)
-impl_for!(OptionalI64Field, Option<i64>)
-impl_for!(OptionalF32Field, Option<f32>)
-impl_for!(OptionalF64Field, Option<f64>)
-impl_for!(OptionalTimespecField, Option<Timespec>)
+impl_for!(OptionalI8Field, Option<i8>);
+impl_for!(OptionalI16Field, Option<i16>);
+impl_for!(OptionalI32Field, Option<i32>);
+impl_for!(OptionalI64Field, Option<i64>);
+impl_for!(OptionalF32Field, Option<f32>);
+impl_for!(OptionalF64Field, Option<f64>);
+impl_for!(OptionalTimespecField, Option<Timespec>);
 
-impl_for!(RawExpr, RawExpr)
+impl_for!(RawExpr, RawExpr);

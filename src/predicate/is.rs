@@ -12,7 +12,7 @@ use field::{
     NamedField,
 };
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct IsPredicate<F, T> {
     pub field: F,
     pub value: T
@@ -22,7 +22,7 @@ pub trait ToIsPredicate<F, T> {
     fn is<B: ToExpression<T> + ToPredicateValue + Clone>(&self, val: B) -> RcPredicate;
 }
 
-macro_rules! is_methods(
+macro_rules! is_methods{
     ($v:ty) => (
         fn is<B: ToExpression<$v> + ToPredicateValue + Clone>(&self, val: B) -> RcPredicate {
             IsPredicate {
@@ -31,17 +31,17 @@ macro_rules! is_methods(
             }.upcast()
         }
     )
-)
+}
 
-macro_rules! impl_for(
+macro_rules! impl_for{
     ($field:ty, $v:ty) => (
         impl<T, B: ToExpression<T> + ToPredicateValue + Clone> Predicate for IsPredicate<$field, B> where T: ToPredicateValue + Clone {}
         impl<T> ToIsPredicate<$field, T> for $field where T: ToExpression<$v> + ToPredicateValue + Clone {
-            is_methods!(T) 
+            is_methods!(T);
         }
     )
-)
+}
 
 
-impl_for!(NamedField<T>, T)
-impl_for!(RawExpr, RawExpr)
+impl_for!(NamedField<T>, T);
+impl_for!(RawExpr, RawExpr);

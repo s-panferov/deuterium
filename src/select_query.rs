@@ -19,7 +19,7 @@ use join::{Join};
 use distinct::{Distinct};
 use group_by::{GroupBy};
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub enum Select {
     Only(Vec<RcExpression>),
     All
@@ -35,11 +35,11 @@ pub trait ToSelectQuery: ToSql {
 
 impl<T> ToSelectQuery for T where T: AbstractSelectQuery + Clone + 'static {
     fn upcast(&self) -> RcSelectQuery {
-        Rc::new(box self.clone() as BoxedSelectQuery)
+        Rc::new(Box::new(self.clone()) as BoxedSelectQuery)
     }
 }
 
-#[deriving(Clone, Copy)]
+#[derive(Clone, Copy)]
 pub enum SelectFor {
     Update,
     UpdateNoWait,
@@ -47,19 +47,19 @@ pub enum SelectFor {
     ShareNoWait
 }
 
-#[deriving(Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct LimitOne;
 
-#[deriving(Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct LimitTwo;
 
-#[deriving(Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct LimitMany;
 
-#[deriving(Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct NoResult;
 
-macro_rules! set_predicate(
+macro_rules! set_predicate {
     ($s:ident, $getter:ident, $setter:ident, $pr:expr, $w:ident, $new_pr:expr) => ({
         let mut query = $s.clone();
         match $s.$getter() {
@@ -72,9 +72,9 @@ macro_rules! set_predicate(
         }
         query
     })
-)
+}
 
-macro_rules! predicate_trait(
+macro_rules! predicate_trait {
     (
         $name:ident, 
         $getter:ident, 
@@ -119,7 +119,7 @@ macro_rules! predicate_trait(
         }
 
     )
-)
+}
 
 predicate_trait!(
     Queryable,
@@ -132,7 +132,7 @@ predicate_trait!(
     exclude,
     and_exclude,
     or_exclude
-)
+);
 
 predicate_trait!(
     HasHaving,
@@ -145,7 +145,7 @@ predicate_trait!(
     exclude_having,
     and_exclude_having,
     or_exclude_having
-)
+);
 
 pub trait Orderable: Clone {
     fn get_order_by_mut(&mut self) -> &mut Vec<OrderBy>;
@@ -197,7 +197,7 @@ pub trait Orderable: Clone {
 
 }
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct SelectQuery<T, L, M> {
     pub distinct: Option<Distinct>,
     pub select: Select,
@@ -206,8 +206,8 @@ pub struct SelectQuery<T, L, M> {
     pub where_: Option<RcPredicate>,
     pub group_by: Option<GroupBy>,
     pub having: Option<RcPredicate>,
-    pub limit: Option<uint>,
-    pub offset: Option<uint>,
+    pub limit: Option<usize>,
+    pub offset: Option<usize>,
     pub order_by: Vec<OrderBy>,
     pub for_: Option<SelectFor>,
 }
@@ -242,7 +242,7 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
         with_clone!(self, query, query.group_by = Some(GroupBy::new(fields)))
     }
 
-    pub fn limit(&self, limit: uint) -> SelectQuery<T, LimitOne, M> {
+    pub fn limit(&self, limit: usize) -> SelectQuery<T, LimitOne, M> {
         let mut query = self.clone();
         query.limit = Some(limit);
         unsafe{ mem::transmute(query) }
@@ -254,7 +254,7 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
         unsafe{ mem::transmute(query) }
     }
 
-    pub fn offset(&self, offset: uint) -> SelectQuery<T, L, M> {
+    pub fn offset(&self, offset: usize) -> SelectQuery<T, L, M> {
         with_clone!(self, query, query.offset = Some(offset))
     }
 
@@ -387,7 +387,7 @@ impl<T: Clone, L: Clone, M: Clone> UntypedExpression for SelectQuery<T, L, M> {
     }
 
     fn upcast_expression(&self) -> RcExpression {
-        Rc::new(box self.clone() as BoxedExpression)
+        Rc::new(Box::new(self.clone()) as BoxedExpression)
     }
 }
 

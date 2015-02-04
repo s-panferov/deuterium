@@ -1,7 +1,7 @@
 
 use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct ExcludePredicate {
     pub predicate: RcPredicate
 }

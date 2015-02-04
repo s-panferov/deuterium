@@ -6,13 +6,13 @@ use serialize::json::Json;
 use expression::{UntypedExpression, RcExpression, RawExpr, BoxedExpression, ToExpression};
 use sql::{ToSql};
 
-#[deriving(Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct Placeholder {
-    pub idx: uint
+    pub idx: usize
 }
 
 impl Placeholder {
-    pub fn new(idx: uint) -> Placeholder {
+    pub fn new(idx: usize) -> Placeholder {
         Placeholder { idx: idx }
     }
 }
@@ -23,7 +23,7 @@ impl UntypedExpression for Placeholder {
     }
 
     fn upcast_expression(&self) -> RcExpression {
-        Rc::new(box self.clone() as BoxedExpression)
+        Rc::new(Box::new(self.clone()) as BoxedExpression)
     }
 }
 

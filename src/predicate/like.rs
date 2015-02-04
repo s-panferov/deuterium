@@ -6,7 +6,7 @@ use expression::{RawExpr};
 use field::{StringField, OptionalStringField};
 use sql::{ToPredicateValue};
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct LikePredicate<F, T> {
     pub field: F,
     pub value: T,
@@ -18,7 +18,7 @@ pub trait ToLikePredicate<F, T> {
     fn ilike(&self, val: T) -> RcPredicate;
 }
 
-macro_rules! is_methods(
+macro_rules! like_methods {
     ($v:ty) => (
         fn like(&self, val: $v) -> RcPredicate {
             LikePredicate {
@@ -36,18 +36,18 @@ macro_rules! is_methods(
             }.upcast()
         }
     )
-)
+}
 
-macro_rules! impl_for(
+macro_rules! impl_for {
     ($field:ty, $v:ident) => (
         impl<T: ToExpression<$v> + ToPredicateValue + Clone> Predicate for LikePredicate<$field, T> { }
         impl<T: ToExpression<$v> + ToPredicateValue + Clone> ToLikePredicate<$field, T> for $field {
-            is_methods!(T) 
+            like_methods!(T); 
         }
     )
-)
+}
 
-impl_for!(StringField, String)
-impl_for!(OptionalStringField, String)
+impl_for!(StringField, String);
+impl_for!(OptionalStringField, String);
 
-impl_for!(RawExpr, String)
+impl_for!(RawExpr, String);

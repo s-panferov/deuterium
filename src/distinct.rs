@@ -1,7 +1,7 @@
 
 use expression::{UntypedExpression, RcExpression};
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct Distinct {
     pub on: Option<Vec<RcExpression>>
 }
