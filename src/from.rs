@@ -3,8 +3,8 @@ use std::rc::Rc;
 use sql::{FromToSql};
 use select_query::{SelectQuery, Selectable};
 // use insert_query::{InsertQuery, Insertable};
-// use update_query::{Updatable};
-// use delete_query::{Deletable};
+use update_query::{Updatable};
+use delete_query::{Deletable};
 
 use field::{NamedField, Field};
 use expression::{ExpressionValue};
@@ -95,8 +95,8 @@ impl From for TableDef {
 
 impl Selectable<()> for TableDef {}
 // impl Insertable<()> for TableDef {}
-// impl Updatable<()> for TableDef {}
-// impl Deletable<()> for TableDef {}
+impl Updatable<()> for TableDef {}
+impl Deletable<()> for TableDef {}
 
 #[derive(Clone)]
 pub struct FromSelect<T, L, M> {

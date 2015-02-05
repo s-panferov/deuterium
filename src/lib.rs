@@ -56,23 +56,23 @@ pub use select_query::{
     LimitMany
 };
 
-// pub use update_query::{
-//     UpdateQuery,
-//     FieldUpdate,
-//     FieldUpd,
-//     Updatable,
-//     ToFieldUpdate,
-// };
+pub use update_query::{
+    UpdateQuery,
+    FieldUpdate,
+    FieldUpd,
+    Updatable,
+    ToFieldUpdate,
+};
 
 // pub use insert_query::{
 //     InsertQuery,
 //     Insertable,
 // };
 
-// pub use delete_query::{
-//     DeleteQuery,
-//     Deletable,
-// };
+pub use delete_query::{
+    DeleteQuery,
+    Deletable,
+};
 
 pub use expression::{
     ToExpressionValue,
@@ -117,9 +117,9 @@ mod predicate;
 mod select_query;
 // mod insert_query;
 
-// #[macro_use]
-// mod delete_query;
-// mod update_query;
+#[macro_use]
+mod delete_query;
+mod update_query;
 pub mod sql;
 mod expression;
 mod order_by;

@@ -8,7 +8,7 @@ pub use self::adapter::{
     PostgreSqlAdapter,
 };
 
-// pub mod delete;
+pub mod delete;
 pub mod distinct;
 pub mod expr_value;
 pub mod field;
@@ -21,7 +21,7 @@ pub mod placeholder;
 pub mod predicate;
 pub mod select;
 pub mod from;
-// pub mod update;
+pub mod update;
 pub mod value;
 pub mod adapter;
 

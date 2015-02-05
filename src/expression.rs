@@ -119,8 +119,13 @@ to_expression!(Option<Timespec>);
 to_expression!(Option<Uuid>);
 to_expression!(Option<RawExpr>);
 
-pub trait ToExpression<T>: UntypedExpression { }
-pub trait ToListExpression<T>: UntypedExpression { }
+pub trait ToExpression<T>: UntypedExpression + Sized {
+    fn as_expr(&self) -> &Expression<T> { unsafe{ mem::transmute(self as &UntypedExpression) } }
+}
+
+pub trait ToListExpression<T>: UntypedExpression + Sized {
+    fn as_expr(&self) -> &ListExpression<T> { unsafe{ mem::transmute(self as &UntypedExpression) } }
+}
 
 impl<T> Expression<T>         for field::NamedField<T>         where T: PrimitiveType + Clone { }
 impl<T> Expression<Option<T>> for field::NamedField<Option<T>> where T: PrimitiveType + Clone { }

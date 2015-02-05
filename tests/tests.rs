@@ -18,8 +18,8 @@ mod order;
 mod join;
 mod group_by;
 // mod insert;
-// mod update;
-// mod delete;
+mod update;
+mod delete;
 // mod placeholder;
 
 #[test]

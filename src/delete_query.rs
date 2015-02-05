@@ -5,7 +5,7 @@ use from::{From, Table, RcTable, RcFrom};
 use predicate::{RcPredicate};
 use expression::{Expression, UntypedExpression};
 
-pub trait Deletable<M>: Table { 
+pub trait Deletable<M>: Table + Sized { 
     fn delete(&self) -> DeleteQuery<(), NoResult, M> {
         DeleteQuery::new(self)
     }

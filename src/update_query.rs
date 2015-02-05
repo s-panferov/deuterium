@@ -69,23 +69,23 @@ impl<T> ToFieldUpdate<NamedField<T>, T> for NamedField<T> where T: Clone {
     }
 }
 
-impl ToFieldUpdate<RawExpr, RawExpr> for RawExpr {
-    fn set<B: ToExpression<RawExpr>>(&self, val: &B) -> FieldUpdate<RawExpr, RawExpr> {
-        FieldUpdate {
-            field: self.clone(),
-            value: val.as_expr().to_expr_val()
-        }
-    }
+// impl ToFieldUpdate<RawExpr, RawExpr> for RawExpr {
+//     fn set<B: ToExpression<RawExpr>>(&self, val: &B) -> FieldUpdate<RawExpr, RawExpr> {
+//         FieldUpdate {
+//             field: self.clone(),
+//             value: val.as_expr().to_expr_val()
+//         }
+//     }
 
-    fn set_default(&self) -> FieldUpdate<RawExpr, RawExpr> {
-        FieldUpdate {
-            field: self.clone(),
-            value: ExpressionValue::Default
-        }
-    }
-}
+//     fn set_default(&self) -> FieldUpdate<RawExpr, RawExpr> {
+//         FieldUpdate {
+//             field: self.clone(),
+//             value: ExpressionValue::Default
+//         }
+//     }
+// }
 
-pub trait Updatable<M>: Table { 
+pub trait Updatable<M>: Table + Sized { 
     fn update(&self) -> UpdateQuery<(), NoResult, M> {
         UpdateQuery::new(self)
     }

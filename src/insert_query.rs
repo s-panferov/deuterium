@@ -40,7 +40,7 @@ macro_rules! insert {
 
 macro_rules! insertable {
     () => (
-        pub trait Insertable<M: Clone>: Table {   
+        pub trait Insertable<M: Clone>: Table + Sized {   
             // FIXME: It doesn't work for now because of :
             //        [Cannot use Macros in Trait Bodies](https://github.com/rust-lang/rust/issues/11403)
             //        [Impossible to have a macro expand to `pub` method](https://github.com/rust-lang/rust/issues/17436)
@@ -125,7 +125,7 @@ impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT
         }
     }
 
-    pub fn push_untyped(&mut self, values: &[&ToExpression<()>]) {
+    pub fn push_untyped(&mut self, values: &[&UntypedExpression]) {
         let mut reassign = false;
         match &self.values {
             &Insert::DefaultValues | &Insert::FromSelect(_) => {
