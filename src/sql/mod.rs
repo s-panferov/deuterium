@@ -12,7 +12,7 @@ pub use self::adapter::{
 pub mod distinct;
 pub mod expr_value;
 pub mod field;
-// pub mod function;
+pub mod function;
 pub mod group_by;
 // pub mod insert;
 pub mod join;

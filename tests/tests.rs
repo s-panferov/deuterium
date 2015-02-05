@@ -16,7 +16,7 @@ mod select;
 mod where_;
 mod order;
 mod join;
-// mod group_by;
+mod group_by;
 // mod insert;
 // mod update;
 // mod delete;

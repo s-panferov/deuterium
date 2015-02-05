@@ -88,14 +88,14 @@ pub use sql::{SqlContext, ToSql, QueryToSql, FromToSql, ToPredicateValue};
 #[cfg(feature = "postgres")] pub use sql::{AsPostgresValue};
 pub use from::{TableDef, Table, BoxedTable, RcTable, From, BoxedFrom, RcFrom};
 
-// pub use function::{
-//     Sum, SumArg,
-//     Min, MinArg,
-//     Max, MaxArg,
-//     Avg, AvgArg,
-//     Count, CountArg,
-//     CountAll
-// };
+pub use function::{
+    Sum, SumArg,
+    Min, MinArg,
+    Max, MaxArg,
+    Avg, AvgArg,
+    Count, CountArg,
+    CountAll
+};
 
 pub use placeholder::{
     Placeholder
@@ -124,6 +124,6 @@ mod from;
 mod join;
 mod distinct;
 mod group_by;
-// mod function;
+mod function;
 mod placeholder;
 
