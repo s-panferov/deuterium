@@ -160,25 +160,25 @@ fn predicate_in_subquery() {
 
 }
 
-// #[test]
-// fn predicate_in_range() {
+#[test]
+fn predicate_in_range() {
 
-//     let jedi_table = TableDef::new("jedi");
-//     let force_level = NamedField::<i8>::field_of("force_level", &jedi_table);
+    let jedi_table = TableDef::new("jedi");
+    let force_level = NamedField::<i8>::field_of("force_level", &jedi_table);
     
-//     let query = jedi_table.select_all().where_(force_level.in_range(100i8, 120i8));
-//     assert_sql!(query, "SELECT * FROM jedi WHERE force_level >= $1 AND force_level <= $2;");     
+    let query = jedi_table.select_all().where_(force_level.in_range(100i8, 120i8));
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level >= $1 AND force_level <= $2;");     
     
-//     let query = jedi_table.select_all().where_(force_level.in_range_exclude(100i8, 120i8));
-//     assert_sql!(query, "SELECT * FROM jedi WHERE force_level > $1 AND force_level < $2;");     
+    let query = jedi_table.select_all().where_(force_level.in_range_exclude(100i8, 120i8));
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level > $1 AND force_level < $2;");     
     
-//     let query = jedi_table.select_all().where_(force_level.in_range_exclude_right(100i8, 120i8));
-//     assert_sql!(query, "SELECT * FROM jedi WHERE force_level >= $1 AND force_level < $2;");  
+    let query = jedi_table.select_all().where_(force_level.in_range_exclude_right(100i8, 120i8));
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level >= $1 AND force_level < $2;");  
 
-//     let query = jedi_table.select_all().where_(force_level.in_range_exclude_left(100i8, 120i8));
-//     assert_sql!(query, "SELECT * FROM jedi WHERE force_level > $1 AND force_level <= $2;");     
+    let query = jedi_table.select_all().where_(force_level.in_range_exclude_left(100i8, 120i8));
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level > $1 AND force_level <= $2;");     
 
-// }
+}
 
 // #[test]
 // fn predicate_like() {

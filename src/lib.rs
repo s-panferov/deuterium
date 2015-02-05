@@ -34,7 +34,7 @@ pub use predicate::{
     // OrPredicate, ToOrPredicate,
     // AndPredicate, ToAndPredicate,
     InPredicate, ToInPredicate,
-    // InRangePredicate, ToInRangePredicate, 
+    InRangePredicate, ToInRangePredicate, 
     // InRangeBounds,
     // InequalityPredicate, ToInequalityPredicate, 
     // Inequality,

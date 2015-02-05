@@ -14,10 +14,10 @@ pub use self::in_::{
     InPredicate, ToInPredicate
 };
 
-// pub use self::range::{
-//     InRangePredicate, ToInRangePredicate,
-//     InRangeBounds
-// };
+pub use self::range::{
+    InRangePredicate, ToInRangePredicate,
+    InRangeBounds
+};
 
 // pub use self::inequality::{
 //     InequalityPredicate, ToInequalityPredicate,
@@ -28,7 +28,7 @@ pub mod is;
 pub mod is_null;
 pub mod or;
 pub mod in_;
-// pub mod range;
+pub mod range;
 pub mod and;
 // pub mod inequality;
 pub mod exclude;

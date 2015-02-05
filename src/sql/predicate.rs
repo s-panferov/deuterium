@@ -7,7 +7,7 @@ use predicate::{
     OrPredicate, 
     AndPredicate,
     InPredicate,
-    // InRangePredicate, InRangeBounds,
+    InRangePredicate, InRangeBounds,
     // InequalityPredicate, Inequality,
     ExcludePredicate,
     // LikePredicate,
@@ -90,43 +90,43 @@ impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InPredicate<F,
 //     }
 // }
 
-// impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InRangePredicate<F, T> {
-//     fn to_sql(&self, negation: bool, ctx: &mut SqlContext) -> String {
-//         let ref name = self.field.to_predicate_value(ctx);
-//         let from = self.from.to_predicate_value(ctx); 
-//         let to = self.to.to_predicate_value(ctx);
-//         match self.bounds {
-//             InRangeBounds::IncludeBoth => {
-//                 if !negation {
-//                     format!("{} >= {} AND {} <= {}", name, from, name, to)
-//                 } else {
-//                     format!("{} < {} OR {} > {}", name, from, name, to)
-//                 }
-//             },
-//             InRangeBounds::ExcludeBoth => {
-//                 if !negation {
-//                     format!("{} > {} AND {} < {}", name, from, name, to)
-//                 } else {
-//                     format!("{} <= {} OR {} >= {}", name, from, name, to)
-//                 }
-//             },
-//             InRangeBounds::ExcludeLeft => {
-//                 if !negation {
-//                     format!("{} > {} AND {} <= {}", name, from, name, to)
-//                 } else {
-//                     format!("{} <= {} OR {} > {}", name, from, name, to)
-//                 }
-//             },
-//             InRangeBounds::ExcludeRight => {
-//                 if !negation {
-//                     format!("{} >= {} AND {} < {}", name, from, name, to)
-//                 } else {
-//                     format!("{} < {} OR {} >= {}", name, from, name, to)
-//                 }
-//             }
-//         }
-//     }
-// }
+impl<F: ToPredicateValue, T1: ToPredicateValue, T2: ToPredicateValue> PredicateToSql for InRangePredicate<F, T1, T2> {
+    fn to_sql(&self, negation: bool, ctx: &mut SqlContext) -> String {
+        let ref name = self.field.to_predicate_value(ctx);
+        let from = self.from.to_predicate_value(ctx); 
+        let to = self.to.to_predicate_value(ctx);
+        match self.bounds {
+            InRangeBounds::IncludeBoth => {
+                if !negation {
+                    format!("{} >= {} AND {} <= {}", name, from, name, to)
+                } else {
+                    format!("{} < {} OR {} > {}", name, from, name, to)
+                }
+            },
+            InRangeBounds::ExcludeBoth => {
+                if !negation {
+                    format!("{} > {} AND {} < {}", name, from, name, to)
+                } else {
+                    format!("{} <= {} OR {} >= {}", name, from, name, to)
+                }
+            },
+            InRangeBounds::ExcludeLeft => {
+                if !negation {
+                    format!("{} > {} AND {} <= {}", name, from, name, to)
+                } else {
+                    format!("{} <= {} OR {} > {}", name, from, name, to)
+                }
+            },
+            InRangeBounds::ExcludeRight => {
+                if !negation {
+                    format!("{} >= {} AND {} < {}", name, from, name, to)
+                } else {
+                    format!("{} < {} OR {} >= {}", name, from, name, to)
+                }
+            }
+        }
+    }
+}
 
 // impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InequalityPredicate<F, T> {
 //     fn to_sql(&self, negation: bool, ctx: &mut SqlContext) -> String {

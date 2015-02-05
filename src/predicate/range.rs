@@ -2,7 +2,8 @@ use time::Timespec;
 
 use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
 use sql::{ToPredicateValue};
-use expression::{ToExpression};
+use expression::{Expression, RawExpr};
+use field;
 
 #[derive(Clone, Copy)]
 pub enum InRangeBounds {
@@ -13,133 +14,84 @@ pub enum InRangeBounds {
 }
 
 #[derive(Clone)]
-pub struct InRangePredicate<F, T> {
+pub struct InRangePredicate<F, T1, T2> {
     pub field: F,
-    pub from: T,
-    pub to: T,
+    pub from: T1,
+    pub to: T2,
     pub bounds: InRangeBounds
 }
 
-pub trait ToInRangePredicate<F, T> {
-    fn in_range<F, T>(&self, from: B, to: B) -> RcPredicate 
-        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
-    fn in_range_exclude_left<F, T>(&self, from: B, to: B) -> RcPredicate 
-        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
-    fn in_range_exclude_right<F, T>(&self, from: B, to: B) -> RcPredicate 
-        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
-    fn in_range_exclude<F, T>(&self, from: B, to: B) -> RcPredicate 
-        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
+pub trait ToInRangePredicate<T> {
+    fn in_range<B1, B2>(&self, from: B1, to: B2) -> RcPredicate 
+        where B1: Expression<T> + ToPredicateValue + Clone + 'static,
+              B2: Expression<T> + ToPredicateValue + Clone + 'static;
+
+    fn in_range_exclude_left<B1, B2>(&self, from: B1, to: B2) -> RcPredicate 
+        where B1: Expression<T> + ToPredicateValue + Clone + 'static,
+              B2: Expression<T> + ToPredicateValue + Clone + 'static;
+
+    fn in_range_exclude_right<B1, B2>(&self, from: B1, to: B2) -> RcPredicate 
+        where B1: Expression<T> + ToPredicateValue + Clone + 'static,
+              B2: Expression<T> + ToPredicateValue + Clone + 'static;
+
+    fn in_range_exclude<B1, B2>(&self, from: B1, to: B2) -> RcPredicate 
+        where B1: Expression<T> + ToPredicateValue + Clone + 'static,
+              B2: Expression<T> + ToPredicateValue + Clone + 'static;
 }
 
-macro_rules! in_range_methods {
-    ($v:ty) => (
-        fn in_range(&self, from: $v, to: $v) -> RcPredicate {
-            InRangePredicate {
-                field: self.clone(),
-                from: from,
-                to: to,
-                bounds: InRangeBounds::IncludeBoth
-            }.upcast()
-        }
-
-        fn in_range_exclude_left(&self, from: $v, to: $v) -> RcPredicate {
-            InRangePredicate {
-                field: self.clone(),
-                from: from,
-                to: to,
-                bounds: InRangeBounds::ExcludeLeft
-            }.upcast()
-        }
-
-        fn in_range_exclude_right(&self, from: $v, to: $v) -> RcPredicate {
-            InRangePredicate {
-                field: self.clone(),
-                from: from,
-                to: to,
-                bounds: InRangeBounds::ExcludeRight
-            }.upcast()
-        }
-
-        fn in_range_exclude(&self, from: $v, to: $v) -> RcPredicate {
-            InRangePredicate {
-                field: self.clone(),
-                from: from,
-                to: to,
-                bounds: InRangeBounds::ExcludeBoth
-            }.upcast()
-        }
-    )
-}
+impl<F, T1, T2> Predicate for InRangePredicate<F, T1, T2> 
+    where F: ToPredicateValue,
+          T1: ToPredicateValue,
+          T2: ToPredicateValue 
+    { }
 
 macro_rules! impl_for {
-    ($field:ty, $v:ty) => (
-        impl<T: ToExpression<$v> + ToPredicateValue + Clone> Predicate for InRangePredicate<$field, T> { }
+    ($field:ty, $expr:ty) => (
 
-        impl<T: ToExpression<$v> + ToPredicateValue + Clone> ToInRangePredicate<$field, T> for $field {
-            in_range_methods!(T);  
+        impl ToInRangePredicate<$expr> for $field {
+            fn in_range<B1, B2>(&self, from: B1, to: B2) -> RcPredicate 
+                where B1: Expression<$expr> + ToPredicateValue + Clone + 'static,
+                      B2: Expression<$expr> + ToPredicateValue + Clone + 'static {
+                InRangePredicate { field: self.clone(), from: from, to: to, bounds: InRangeBounds::IncludeBoth }.upcast()
+            }
+
+            fn in_range_exclude_left<B1, B2>(&self, from: B1, to: B2) -> RcPredicate 
+                where B1: Expression<$expr> + ToPredicateValue + Clone + 'static,
+                      B2: Expression<$expr> + ToPredicateValue + Clone + 'static {
+                InRangePredicate { field: self.clone(), from: from, to: to, bounds: InRangeBounds::ExcludeLeft }.upcast()
+            }
+
+            fn in_range_exclude_right<B1, B2>(&self, from: B1, to: B2) -> RcPredicate 
+                where B1: Expression<$expr> + ToPredicateValue + Clone + 'static,
+                      B2: Expression<$expr> + ToPredicateValue + Clone + 'static {
+                InRangePredicate { field: self.clone(), from: from, to: to, bounds: InRangeBounds::ExcludeRight }.upcast()
+            }
+
+            fn in_range_exclude<B1, B2>(&self, from: B1, to: B2) -> RcPredicate 
+                where B1: Expression<$expr> + ToPredicateValue + Clone + 'static,
+                      B2: Expression<$expr> + ToPredicateValue + Clone + 'static {
+                InRangePredicate { field: self.clone(), from: from, to: to, bounds: InRangeBounds::ExcludeBoth }.upcast()
+            }
         }
+
     )
 }
 
-impl<F, T> Predicate for InRangePredicate<F, T> 
-    where F: ToPredicateValue,
-          T: ToPredicateValue { }
 
-impl<F, T> ToInRangePredicate<F, T> for F 
-    where F: ToPredicateValue + ToExpression<T> + Clone + 'static,
-          T: ToPredicateValue + Clone {
-    
-    fn in_range<B>(&self, from: B, to: B) -> RcPredicate {
-        InRangePredicate {
-            field: self.clone(),
-            from: from,
-            to: to,
-            bounds: InRangeBounds::IncludeBoth
-        }.upcast()
-    }
+impl_for!(field::I8Field, i8);
+impl_for!(field::I16Field, i16);
+impl_for!(field::I32Field, i32);
+impl_for!(field::I64Field, i64);
+impl_for!(field::F32Field, f32);
+impl_for!(field::F64Field, f64);
+impl_for!(field::TimespecField, Timespec);
 
-    fn in_range_exclude_left(&self, from: $v, to: $v) -> RcPredicate {
-        InRangePredicate {
-            field: self.clone(),
-            from: from,
-            to: to,
-            bounds: InRangeBounds::ExcludeLeft
-        }.upcast()
-    }
-
-    fn in_range_exclude_right(&self, from: $v, to: $v) -> RcPredicate {
-        InRangePredicate {
-            field: self.clone(),
-            from: from,
-            to: to,
-            bounds: InRangeBounds::ExcludeRight
-        }.upcast()
-    }
-
-    fn in_range_exclude(&self, from: $v, to: $v) -> RcPredicate {
-        InRangePredicate {
-            field: self.clone(),
-            from: from,
-            to: to,
-            bounds: InRangeBounds::ExcludeBoth
-        }.upcast()
-    }
-}
-
-impl_for!(I8Field, i8);
-impl_for!(I16Field, i16);
-impl_for!(I32Field, i32);
-impl_for!(I64Field, i64);
-impl_for!(F32Field, f32);
-impl_for!(F64Field, f64);
-impl_for!(TimespecField, Timespec);
-
-impl_for!(OptionalI8Field, Option<i8>);
-impl_for!(OptionalI16Field, Option<i16>);
-impl_for!(OptionalI32Field, Option<i32>);
-impl_for!(OptionalI64Field, Option<i64>);
-impl_for!(OptionalF32Field, Option<f32>);
-impl_for!(OptionalF64Field, Option<f64>);
-impl_for!(OptionalTimespecField, Option<Timespec>);
+impl_for!(field::OptionalI8Field, Option<i8>);
+impl_for!(field::OptionalI16Field, Option<i16>);
+impl_for!(field::OptionalI32Field, Option<i32>);
+impl_for!(field::OptionalI64Field, Option<i64>);
+impl_for!(field::OptionalF32Field, Option<f32>);
+impl_for!(field::OptionalF64Field, Option<f64>);
+impl_for!(field::OptionalTimespecField, Option<Timespec>);
 
 impl_for!(RawExpr, RawExpr);
