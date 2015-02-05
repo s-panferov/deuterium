@@ -14,8 +14,8 @@ macro_rules! assert_sql {
 
 mod select;
 mod where_;
-// mod order;
-// mod join;
+mod order;
+mod join;
 // mod group_by;
 // mod insert;
 // mod update;
