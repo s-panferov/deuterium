@@ -9,17 +9,6 @@ use std::mem;
 
 use field;
 
-pub trait Expression<T>: UntypedExpression {}
-pub trait ListExpression<T>: UntypedExpression {}
-
-pub trait UntypedExpression {
-    fn expression_as_sql(&self) -> &ToSql;
-    fn upcast_expression(&self) -> RcExpression;
-}
-
-pub type BoxedExpression = Box<UntypedExpression + 'static>;
-pub type RcExpression = Rc<BoxedExpression>;
-
 #[derive(Clone)]
 pub enum ExpressionValue<T> {
     Value {
@@ -53,7 +42,18 @@ impl RawExpr {
     }
 }
 
-macro_rules! impl_expression_for {
+pub trait UntypedExpression {
+    fn expression_as_sql(&self) -> &ToSql;
+    fn upcast_expression(&self) -> RcExpression;
+}
+
+pub trait Expression<T>: UntypedExpression {}
+pub trait ListExpression<T>: UntypedExpression {}
+
+pub type BoxedExpression = Box<UntypedExpression + 'static>;
+pub type RcExpression = Rc<BoxedExpression>;
+
+macro_rules! to_expression {
     ($t:ty) => (
         impl UntypedExpression for $t {
             fn expression_as_sql(&self) -> &ToSql {
@@ -73,225 +73,51 @@ impl<'a, 'b, T> ToExpressionValue<T> for &'a (Expression<T> + 'b) {
     }   
 }
 
-impl_expression_for!(bool);
-impl_expression_for!(Option<bool>);
-impl_expression_for!(i8);
-impl_expression_for!(Option<i8>);
-impl_expression_for!(i16);
-impl_expression_for!(Option<i16>);
-impl_expression_for!(i32);
-impl_expression_for!(Option<i32>);
-impl_expression_for!(i64);
-impl_expression_for!(Option<i64>);
-impl_expression_for!(f32);
-impl_expression_for!(Option<f32>);
-impl_expression_for!(f64);
-impl_expression_for!(Option<f64>);
-impl_expression_for!(String);
-impl_expression_for!(Option<String>);
-impl_expression_for!(Vec<u8>);
-impl_expression_for!(Option<Vec<u8>>);
-impl_expression_for!(Json);
-impl_expression_for!(Option<Json>);
-impl_expression_for!(Timespec);
-impl_expression_for!(Option<Timespec>);
-impl_expression_for!(Uuid);
-impl_expression_for!(Option<Uuid>);
-impl_expression_for!(RawExpr);
-impl_expression_for!(Option<RawExpr>);
+to_expression!(bool);
+to_expression!(i8);
+to_expression!(i16);
+to_expression!(i32);
+to_expression!(i64);
+to_expression!(f32);
+to_expression!(f64);
+to_expression!(String);
+to_expression!(Vec<u8>);
+to_expression!(Json);
+to_expression!(Timespec);
+to_expression!(Uuid);
+to_expression!(RawExpr);
 
-//
-// Strings
-//
+impl<T> Expression<T> for T where T: UntypedExpression { }
+impl<T> Expression<T> for field::NamedField<T> where T: UntypedExpression + Clone { }
+impl<T> Expression<Option<T>> for field::NamedField<T> where T: UntypedExpression + Clone { }
 
-impl Expression<String> for String {}
-impl Expression<String> for field::StringField {}
-impl Expression<String> for RawExpr {}
-
-impl Expression<Option<String>> for String {}
-impl Expression<Option<String>> for Option<String> {}
-impl Expression<Option<String>> for field::StringField {}
-impl Expression<Option<String>> for field::OptionalStringField {}
-impl Expression<Option<String>> for RawExpr {}
-
-//
-// Numbers
-//
-
-macro_rules! cast_numbers {
-    ($comp:ty) => (
-        impl $comp for i8 {}
-        impl $comp for i16 {}
-        impl $comp for i32 {}
-        impl $comp for i64 {}
-        impl $comp for f32 {}
-        impl $comp for f64 {}
-        impl $comp for field::I8Field {} 
-        impl $comp for field::I16Field {} 
-        impl $comp for field::I32Field {} 
-        impl $comp for field::I64Field {} 
-        impl $comp for field::F32Field {} 
-        impl $comp for field::F64Field {}         
-        impl $comp for RawExpr {}
+macro_rules! allow_cast {
+    ($expr:ty, $($ty:ty),+) => (
+        $(
+            impl<T> $expr for T where T: Expression<$ty> { }
+        )+
     )
 }
 
-macro_rules! cast_numbers_optional {
-    ($comp:ty) => (
-        impl $comp for i8 {}
-        impl $comp for i16 {}
-        impl $comp for i32 {}
-        impl $comp for i64 {}
-        impl $comp for f32 {}
-        impl $comp for f64 {}
-        impl $comp for field::I8Field {} 
-        impl $comp for field::I16Field {} 
-        impl $comp for field::I32Field {} 
-        impl $comp for field::I64Field {} 
-        impl $comp for field::F32Field {} 
-        impl $comp for field::F64Field {} 
-        impl $comp for field::OptionalI8Field {} 
-        impl $comp for field::OptionalI16Field {} 
-        impl $comp for field::OptionalI32Field {} 
-        impl $comp for field::OptionalI64Field {} 
-        impl $comp for field::OptionalF32Field {} 
-        impl $comp for field::OptionalF64Field {} 
-        impl $comp for RawExpr {}
+macro_rules! allow_cast_for_optional {
+    ($expr:ty, $($ty:ty),+) => (
+        $(
+            impl<T> $expr for T where T: Expression<Option<$ty>> { }
+        )+
     )
 }
 
-cast_numbers!(Expression<i8>);
-cast_numbers!(Expression<i16>);
-cast_numbers!(Expression<i32>);
-cast_numbers!(Expression<i64>);
-cast_numbers!(Expression<f32>);
-cast_numbers!(Expression<f64>);
+allow_cast!(Expression<i8>, i16);
+allow_cast!(Expression<i16>, i32);
+allow_cast!(Expression<i32>, i64);
+allow_cast!(Expression<i64>, f32);
+allow_cast!(Expression<f32>, f64);
 
-cast_numbers_optional!(Expression<Option<i8>>);
-cast_numbers_optional!(Expression<Option<i16>>);
-cast_numbers_optional!(Expression<Option<i32>>);
-cast_numbers_optional!(Expression<Option<i64>>);
-cast_numbers_optional!(Expression<Option<f32>>);
-cast_numbers_optional!(Expression<Option<f64>>);
-
-//
-// Boolean
-//
-
-impl Expression<bool> for bool {}
-impl Expression<bool> for field::BoolField {} 
-impl Expression<bool> for RawExpr {} 
-
-impl Expression<Option<bool>> for bool {}
-impl Expression<Option<bool>> for Option<bool> {}
-impl Expression<Option<bool>> for field::BoolField {} 
-impl Expression<Option<bool>> for field::OptionalBoolField {} 
-impl Expression<Option<bool>> for RawExpr {} 
-
-//
-// Vec<u8>
-//
-
-impl Expression<Vec<u8>> for Vec<u8> {}
-impl Expression<Vec<u8>> for field::ByteListField {}
-impl Expression<Vec<u8>> for RawExpr {}
-
-impl Expression<Option<Vec<u8>>> for Vec<u8> {}
-impl Expression<Option<Vec<u8>>> for Option<Vec<u8>> {}
-impl Expression<Option<Vec<u8>>> for field::ByteListField {}
-impl Expression<Option<Vec<u8>>> for field::OptionalByteListField {}
-impl Expression<Option<Vec<u8>>> for RawExpr {}
-
-//
-// Json
-//
-
-impl Expression<Json> for Json {}
-impl Expression<Json> for field::JsonField {}
-impl Expression<Json> for RawExpr {}
-
-impl Expression<Option<Json>> for Json {}
-impl Expression<Option<Json>> for Option<Json> {}
-impl Expression<Option<Json>> for field::JsonField {}
-impl Expression<Option<Json>> for field::OptionalJsonField {}
-impl Expression<Option<Json>> for RawExpr {}
-
-//
-// Timespec
-//
-
-impl Expression<Timespec> for Timespec {}
-impl Expression<Timespec> for field::TimespecField {}
-impl Expression<Timespec> for RawExpr {}
-
-impl Expression<Option<Timespec>> for Timespec {}
-impl Expression<Option<Timespec>> for Option<Timespec> {}
-impl Expression<Option<Timespec>> for field::TimespecField {}
-impl Expression<Option<Timespec>> for field::OptionalTimespecField {}
-impl Expression<Option<Timespec>> for RawExpr {}
-
-//
-// Uuid
-//
-
-impl Expression<Uuid> for Uuid {}
-impl Expression<Uuid> for field::UuidField {}
-impl Expression<Uuid> for RawExpr {}
-
-impl Expression<Option<Uuid>> for Uuid {}
-impl Expression<Option<Uuid>> for Option<Uuid> {}
-impl Expression<Option<Uuid>> for field::UuidField {}
-impl Expression<Option<Uuid>> for field::OptionalUuidField {}
-impl Expression<Option<Uuid>> for RawExpr {}
-
-impl Expression<RawExpr> for bool {}
-impl Expression<RawExpr> for i8 {}
-impl Expression<RawExpr> for i16 {}
-impl Expression<RawExpr> for i32 {}
-impl Expression<RawExpr> for i64 {}
-impl Expression<RawExpr> for f32 {}
-impl Expression<RawExpr> for f64 {}
-impl Expression<RawExpr> for Vec<u8> {}
-impl Expression<RawExpr> for String {}
-impl Expression<RawExpr> for Json {}
-impl Expression<RawExpr> for Timespec {}
-impl Expression<RawExpr> for Uuid {}
-impl Expression<RawExpr> for Option<bool> {}
-impl Expression<RawExpr> for Option<i8> {}
-impl Expression<RawExpr> for Option<i16> {}
-impl Expression<RawExpr> for Option<i32> {}
-impl Expression<RawExpr> for Option<i64> {}
-impl Expression<RawExpr> for Option<f32> {}
-impl Expression<RawExpr> for Option<f64> {}
-impl Expression<RawExpr> for Option<Vec<u8>> {}
-impl Expression<RawExpr> for Option<String> {}
-impl Expression<RawExpr> for Option<Json> {}
-impl Expression<RawExpr> for Option<Timespec> {}
-impl Expression<RawExpr> for Option<Uuid> {}
-impl Expression<RawExpr> for field::BoolField {} 
-impl Expression<RawExpr> for field::I8Field {} 
-impl Expression<RawExpr> for field::I16Field {} 
-impl Expression<RawExpr> for field::I32Field {} 
-impl Expression<RawExpr> for field::I64Field {} 
-impl Expression<RawExpr> for field::F32Field {} 
-impl Expression<RawExpr> for field::F64Field {} 
-impl Expression<RawExpr> for field::StringField {} 
-impl Expression<RawExpr> for field::JsonField {} 
-impl Expression<RawExpr> for field::ByteListField {} 
-impl Expression<RawExpr> for field::TimespecField {}
-impl Expression<RawExpr> for field::UuidField {}
-impl Expression<RawExpr> for field::OptionalBoolField {} 
-impl Expression<RawExpr> for field::OptionalI8Field {} 
-impl Expression<RawExpr> for field::OptionalI16Field {} 
-impl Expression<RawExpr> for field::OptionalI32Field {} 
-impl Expression<RawExpr> for field::OptionalI64Field {} 
-impl Expression<RawExpr> for field::OptionalF32Field {} 
-impl Expression<RawExpr> for field::OptionalF64Field {} 
-impl Expression<RawExpr> for field::OptionalStringField {} 
-impl Expression<RawExpr> for field::OptionalJsonField {} 
-impl Expression<RawExpr> for field::OptionalByteListField {} 
-impl Expression<RawExpr> for field::OptionalTimespecField {}
-impl Expression<RawExpr> for field::OptionalUuidField {}
+allow_cast_for_optional!(Expression<Option<i8>>, i16);
+allow_cast_for_optional!(Expression<Option<i16>>, i32);
+allow_cast_for_optional!(Expression<Option<i32>>, i64);
+allow_cast_for_optional!(Expression<Option<i64>>, f32);
+allow_cast_for_optional!(Expression<Option<f32>>, f64);
 
 impl<T> UntypedExpression for Vec<T> where T: UntypedExpression + ToPredicateValue + Clone + 'static {
     fn expression_as_sql(&self) -> &ToSql {

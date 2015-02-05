@@ -28,11 +28,6 @@ impl UntypedExpression for Placeholder {
 }
 
 impl Expression<bool> for Placeholder {}
-impl Expression<i8> for Placeholder {}
-impl Expression<i16> for Placeholder {}
-impl Expression<i32> for Placeholder {}
-impl Expression<i64> for Placeholder {}
-impl Expression<f32> for Placeholder {}
 impl Expression<f64> for Placeholder {}
 impl Expression<String> for Placeholder {}
 impl Expression<Vec<u8>> for Placeholder {}

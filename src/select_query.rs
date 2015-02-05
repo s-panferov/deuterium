@@ -338,7 +338,7 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
 pub trait Selectable<M: Clone>: From {
     // FIXME: Unify select_N after [generics](https://github.com/rust-lang/rfcs/issues/376)
 
-    fn select_1<T: Clone>(&self, field: &Expression<T>) -> SelectQuery<(T), LimitMany, M> {
+    fn select_1<T: Clone>(&self, field: &Expression<T>) -> SelectQuery<(T,), LimitMany, M> {
         SelectQuery::new(Select::Only(vec![field.upcast_expression()]), self.upcast_from())
     }
 
@@ -391,5 +391,5 @@ impl<T: Clone, L: Clone, M: Clone> UntypedExpression for SelectQuery<T, L, M> {
     }
 }
 
-impl<M: Clone, T: Clone> Expression<T> for SelectQuery<(T), LimitOne, M> { }
-impl<M: Clone, T: Clone> ListExpression<T> for SelectQuery<(T), LimitMany, M> { }
+impl<M: Clone, T: Clone> Expression<T> for SelectQuery<(T,), LimitOne, M> { }
+impl<M: Clone, T: Clone> ListExpression<T> for SelectQuery<(T,), LimitMany, M> { }

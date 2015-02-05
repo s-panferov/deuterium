@@ -28,7 +28,7 @@ fn select_order() {
     let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
     
-    let query: SelectQuery<(String), LimitOne, ()> = jedi_table.select_1(&name)
+    let query: SelectQuery<(String,), LimitOne, ()> = jedi_table.select_1(&name)
         .first().order_by(&name);
 
     assert_sql!(query, "SELECT name FROM jedi ORDER BY name ASC LIMIT 1;");

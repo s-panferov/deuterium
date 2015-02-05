@@ -12,10 +12,10 @@ fn select() {
     let query: SelectQuery<(), LimitMany, ()> = jedi_table.select_all();
     assert_sql!(query, "SELECT * FROM jedi;");
 
-    let query: SelectQuery<(String), LimitMany, ()> = jedi_table.select_1(&name);
+    let query: SelectQuery<(String,), LimitMany, ()> = jedi_table.select_1(&name);
     assert_sql!(query, "SELECT name FROM jedi;");
 
-    let query: SelectQuery<(String), LimitMany, ()> = jedi_table.alias("j").select_1(&name);
+    let query: SelectQuery<(String,), LimitMany, ()> = jedi_table.alias("j").select_1(&name);
     assert_sql!(query, "SELECT name FROM jedi AS j;");
 
     let query: SelectQuery<(String, bool), LimitMany, ()> = jedi_table.select_2(&name, &side);
