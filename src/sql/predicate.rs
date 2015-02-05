@@ -11,7 +11,7 @@ use predicate::{
     // InequalityPredicate, Inequality,
     ExcludePredicate,
     // LikePredicate,
-    // IsNullPredicate
+    IsNullPredicate
 };
 
 use sql::value::{ToPredicateValue};
@@ -27,12 +27,12 @@ impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for IsPredicate<F,
     }
 }
 
-// impl<F: ToPredicateValue> PredicateToSql for IsNullPredicate<F> {
-//     fn to_sql(&self, negation: bool, ctx: &mut SqlContext) -> String {
-//         let op = if !negation && self.null { "IS NULL" } else { "IS NOT NULL" };
-//         format!("{} {}", self.field.to_predicate_value(ctx), op)
-//     }
-// }
+impl<F: ToPredicateValue> PredicateToSql for IsNullPredicate<F> {
+    fn to_sql(&self, negation: bool, ctx: &mut SqlContext) -> String {
+        let op = if !negation && self.null { "IS NULL" } else { "IS NOT NULL" };
+        format!("{} {}", self.field.to_predicate_value(ctx), op)
+    }
+}
 
 impl PredicateToSql for RcPredicate {
     fn to_sql(&self, negation: bool, ctx: &mut SqlContext) -> String {

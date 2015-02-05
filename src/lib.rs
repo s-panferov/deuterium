@@ -40,7 +40,7 @@ pub use predicate::{
     // Inequality,
     // ExcludePredicate, ToExcludePredicate,
     // LikePredicate, ToLikePredicate,
-    // IsNullPredicate, ToIsNullPredicate,
+    IsNullPredicate, ToIsNullPredicate,
     // RawPredicate
 };
 

@@ -117,19 +117,19 @@ fn simple_where() {
 //     assert_sql!(query, "SELECT * FROM jedi WHERE force_level < $1;"); 
 // }
 
-// #[test]
-// fn predicate_is_null() {
+#[test]
+fn predicate_is_null() {
 
-//     let jedi_table = TableDef::new("jedi");
-//     let force_level = NamedField::<Option<i8>>::field_of("force_level", &jedi_table);
+    let jedi_table = TableDef::new("jedi");
+    let force_level = NamedField::<Option<i8>>::field_of("force_level", &jedi_table);
     
-//     let query = jedi_table.select_all().where_(force_level.is_null());
-//     assert_sql!(query, "SELECT * FROM jedi WHERE force_level IS NULL;"); 
+    let query = jedi_table.select_all().where_(force_level.is_null());
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level IS NULL;"); 
 
-//     let query = jedi_table.select_all().exclude(force_level.is_null());
-//     assert_sql!(query, "SELECT * FROM jedi WHERE force_level IS NOT NULL;");     
+    let query = jedi_table.select_all().exclude(force_level.is_null());
+    assert_sql!(query, "SELECT * FROM jedi WHERE force_level IS NOT NULL;");     
 
-// }
+}
 
 #[test]
 fn predicate_in() {
