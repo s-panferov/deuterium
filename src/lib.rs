@@ -81,7 +81,10 @@ pub use expression::{
     Expression,
     RcExpression,
     ExpressionValue,
-    RawExpr
+    RawExpr,
+    ListExpression,
+    ToExpression,
+    ToListExpression
 };
 
 pub use sql::{SqlContext, ToSql, QueryToSql, FromToSql, ToPredicateValue};

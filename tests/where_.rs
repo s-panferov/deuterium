@@ -12,6 +12,16 @@ fn simple_where() {
 }
 
 #[test]
+fn number_cast() {
+
+    let jedi_table = TableDef::new("jedi");
+    let count_i8 = NamedField::<i8>::field_of("count_i8", &jedi_table);
+    
+    let query = jedi_table.select_all().where_(count_i8.lt(40f64));
+    assert_sql!(query, "SELECT * FROM jedi WHERE count_i8 < $1;");
+}
+
+#[test]
 fn query_level_and() {
 
     let jedi_table = TableDef::new("jedi");

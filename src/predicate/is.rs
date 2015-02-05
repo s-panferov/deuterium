@@ -4,7 +4,7 @@
 // use uuid::Uuid;
 
 use sql::{ToPredicateValue};
-use expression::{Expression};
+use expression::{ToExpression};
 
 use expression::{RawExpr};
 use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
@@ -19,7 +19,7 @@ pub struct IsPredicate<F, T> {
 }
 
 pub trait ToIsPredicate<T> {
-    fn is<B: Expression<T> + ToPredicateValue + Clone + 'static>(&self, val: B) -> RcPredicate;
+    fn is<B: ToExpression<T> + ToPredicateValue + Clone + 'static>(&self, val: B) -> RcPredicate;
 }
 
 impl<F, T> Predicate for IsPredicate<F, T> 
@@ -27,13 +27,13 @@ impl<F, T> Predicate for IsPredicate<F, T>
           T: ToPredicateValue { }
 
 impl<T> ToIsPredicate<T> for NamedField<T> where T: ToPredicateValue + Clone {
-    fn is<B: Expression<T> + ToPredicateValue + Clone + 'static>(&self, val: B) -> RcPredicate {
+    fn is<B: ToExpression<T> + ToPredicateValue + Clone + 'static>(&self, val: B) -> RcPredicate {
         IsPredicate { field: self.clone(), value: val }.upcast()
     }
 }
 
 impl<T> ToIsPredicate<T> for RawExpr where T: ToPredicateValue + Clone {
-    fn is<B: Expression<T> + ToPredicateValue + Clone + 'static>(&self, val: B) -> RcPredicate {
+    fn is<B: ToExpression<T> + ToPredicateValue + Clone + 'static>(&self, val: B) -> RcPredicate {
         IsPredicate { field: self.clone(), value: val }.upcast()
     }
 }

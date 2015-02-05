@@ -2,7 +2,7 @@
 use std::rc::Rc;
 use time::Timespec;
 
-use expression::{Expression, BoxedExpression, RcExpression, UntypedExpression};
+use expression::{Expression, BoxedExpression, RcExpression, UntypedExpression, PrimitiveType};
 use sql::{ToSql};
 use field;
 
@@ -84,7 +84,7 @@ impl AvgArg<f64, f64> for field::F64Field {}
 
 agg_func!(Count, CountArg, count);
 
-impl<T: UntypedExpression + Clone> CountArg<i64, T> for field::NamedField<T> {}
+impl<T: PrimitiveType + Clone> CountArg<i64, T> for field::NamedField<T> {}
 
 #[derive(Clone, Copy)]
 pub struct CountAll;

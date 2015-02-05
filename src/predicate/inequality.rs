@@ -2,7 +2,7 @@
 use time::Timespec;
 
 use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
-use expression::{self, Expression};
+use expression::{self, ToExpression};
 use field;
 
 use sql::{ToPredicateValue};
@@ -24,16 +24,16 @@ pub struct InequalityPredicate<F, T> {
 
 pub trait ToInequalityPredicate<T> {
     fn lt<B>(&self, val: B) -> RcPredicate
-        where B: Expression<T> + ToPredicateValue + Clone + 'static;
+        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
 
     fn lte<B>(&self, val: B) -> RcPredicate
-        where B: Expression<T> + ToPredicateValue + Clone + 'static;
+        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
 
     fn gt<B>(&self, val: B) -> RcPredicate
-        where B: Expression<T> + ToPredicateValue + Clone + 'static;
+        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
 
     fn gte<B>(&self, val: B) -> RcPredicate
-        where B: Expression<T> + ToPredicateValue + Clone + 'static;
+        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
 }
 
 impl<F, T> Predicate for InequalityPredicate<F, T> 
@@ -45,22 +45,22 @@ macro_rules! impl_for {
 
         impl ToInequalityPredicate<$expr> for $field {
             fn lt<B>(&self, val: B) -> RcPredicate
-                where B: Expression<$expr> + ToPredicateValue + Clone + 'static {
+                where B: ToExpression<$expr> + ToPredicateValue + Clone + 'static {
                 InequalityPredicate { field: self.clone(), value: val, inequality: Inequality::LessThan }.upcast()
             }
 
             fn lte<B>(&self, val: B) -> RcPredicate
-                where B: Expression<$expr> + ToPredicateValue + Clone + 'static {
+                where B: ToExpression<$expr> + ToPredicateValue + Clone + 'static {
                 InequalityPredicate { field: self.clone(), value: val, inequality: Inequality::LessThanEqual }.upcast()
             }
 
             fn gt<B>(&self, val: B) -> RcPredicate
-                where B: Expression<$expr> + ToPredicateValue + Clone + 'static {
+                where B: ToExpression<$expr> + ToPredicateValue + Clone + 'static {
                 InequalityPredicate { field: self.clone(), value: val, inequality: Inequality::GreaterThan }.upcast()
             }
 
             fn gte<B>(&self, val: B) -> RcPredicate
-                where B: Expression<$expr> + ToPredicateValue + Clone + 'static {
+                where B: ToExpression<$expr> + ToPredicateValue + Clone + 'static {
                 InequalityPredicate { field: self.clone(), value: val, inequality: Inequality::GreaterThanEqual }.upcast()
             }
         }
