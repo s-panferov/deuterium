@@ -31,17 +31,15 @@ pub use predicate::{
     Predicate, 
     RcPredicate, 
     IsPredicate, ToIsPredicate, 
-    // OrPredicate, ToOrPredicate,
-    // AndPredicate, ToAndPredicate,
+    OrPredicate, ToOrPredicate,
+    AndPredicate, ToAndPredicate,
     InPredicate, ToInPredicate,
-    InRangePredicate, ToInRangePredicate, 
-    // InRangeBounds,
-    // InequalityPredicate, ToInequalityPredicate, 
-    // Inequality,
-    // ExcludePredicate, ToExcludePredicate,
-    // LikePredicate, ToLikePredicate,
+    InRangePredicate, ToInRangePredicate, InRangeBounds,
+    InequalityPredicate, ToInequalityPredicate, Inequality,
+    ExcludePredicate, ToExcludePredicate,
+    LikePredicate, ToLikePredicate,
     IsNullPredicate, ToIsNullPredicate,
-    // RawPredicate
+    RawPredicate
 };
 
 pub use select_query::{
