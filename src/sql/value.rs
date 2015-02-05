@@ -19,7 +19,7 @@ pub trait ToPredicateValue {
 
 // Trait to connect Deuterium and rust-postgres
 #[cfg(feature = "postgres")]
-pub trait AsPostgresValue: postgres::types::ToSql {
+pub trait AsPostgresValue: postgres::types::ToSql + Sized {
     fn as_postgres_value(&self) -> &postgres::types::ToSql {
         self
     }

@@ -3,7 +3,7 @@ use std::mem;
 
 use from::{From, RcFrom, FromSelect};
 use expression::{
-    Expression, ToExpression, ToListExpression, 
+    Expression, ListExpression,
     UntypedExpression, BoxedExpression, RcExpression, RawExpr
 };
 use predicate::{
@@ -391,5 +391,5 @@ impl<T: Clone, L: Clone, M: Clone> UntypedExpression for SelectQuery<T, L, M> {
     }
 }
 
-impl<M: Clone, T: Clone> ToExpression<T> for SelectQuery<(T), LimitOne, M> { }
-impl<M: Clone, T: Clone> ToListExpression<T> for SelectQuery<(T), LimitMany, M> { }
+impl<M: Clone, T: Clone> Expression<T> for SelectQuery<(T), LimitOne, M> { }
+impl<M: Clone, T: Clone> ListExpression<T> for SelectQuery<(T), LimitMany, M> { }

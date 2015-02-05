@@ -1,9 +1,9 @@
-
+#![feature(core)]
 #![feature(concat_idents)]
-#![deny(warnings)]
-#![deny(bad_style)]
+// #![deny(warnings)]
+// #![deny(bad_style)]
 
-extern crate serialize;
+extern crate "rustc-serialize" as serialize;
 extern crate time;
 
 #[cfg(feature = "postgres")]
@@ -31,17 +31,17 @@ pub use predicate::{
     Predicate, 
     RcPredicate, 
     IsPredicate, ToIsPredicate, 
-    OrPredicate, ToOrPredicate,
-    AndPredicate, ToAndPredicate,
+    // OrPredicate, ToOrPredicate,
+    // AndPredicate, ToAndPredicate,
     InPredicate, ToInPredicate,
-    InRangePredicate, ToInRangePredicate, 
-    InRangeBounds,
-    InequalityPredicate, ToInequalityPredicate, 
-    Inequality,
-    ExcludePredicate, ToExcludePredicate,
-    LikePredicate, ToLikePredicate,
-    IsNullPredicate, ToIsNullPredicate,
-    RawPredicate
+    // InRangePredicate, ToInRangePredicate, 
+    // InRangeBounds,
+    // InequalityPredicate, ToInequalityPredicate, 
+    // Inequality,
+    // ExcludePredicate, ToExcludePredicate,
+    // LikePredicate, ToLikePredicate,
+    // IsNullPredicate, ToIsNullPredicate,
+    // RawPredicate
 };
 
 pub use select_query::{
@@ -58,32 +58,31 @@ pub use select_query::{
     LimitMany
 };
 
-pub use update_query::{
-    UpdateQuery,
-    FieldUpdate,
-    FieldUpd,
-    Updatable,
-    ToFieldUpdate,
-};
+// pub use update_query::{
+//     UpdateQuery,
+//     FieldUpdate,
+//     FieldUpd,
+//     Updatable,
+//     ToFieldUpdate,
+// };
 
-pub use insert_query::{
-    InsertQuery,
-    Insertable,
-};
+// pub use insert_query::{
+//     InsertQuery,
+//     Insertable,
+// };
 
-pub use delete_query::{
-    DeleteQuery,
-    Deletable,
-};
+// pub use delete_query::{
+//     DeleteQuery,
+//     Deletable,
+// };
 
 pub use expression::{
-    ToExpression,
-    ToExprValue,
+    ToExpressionValue,
     BoxedExpression, 
     UntypedExpression, 
     Expression,
     RcExpression,
-    ExprValue,
+    ExpressionValue,
     RawExpr
 };
 
@@ -91,14 +90,14 @@ pub use sql::{SqlContext, ToSql, QueryToSql, FromToSql, ToPredicateValue};
 #[cfg(feature = "postgres")] pub use sql::{AsPostgresValue};
 pub use from::{TableDef, Table, BoxedTable, RcTable, From, BoxedFrom, RcFrom};
 
-pub use function::{
-    Sum, SumArg,
-    Min, MinArg,
-    Max, MaxArg,
-    Avg, AvgArg,
-    Count, CountArg,
-    CountAll
-};
+// pub use function::{
+//     Sum, SumArg,
+//     Min, MinArg,
+//     Max, MaxArg,
+//     Avg, AvgArg,
+//     Count, CountArg,
+//     CountAll
+// };
 
 pub use placeholder::{
     Placeholder
@@ -115,11 +114,11 @@ macro_rules! with_clone{
 mod field;
 mod predicate;
 mod select_query;
-mod insert_query;
+// mod insert_query;
 
-#[macro_use]
-mod delete_query;
-mod update_query;
+// #[macro_use]
+// mod delete_query;
+// mod update_query;
 pub mod sql;
 mod expression;
 mod order_by;
@@ -127,6 +126,6 @@ mod from;
 mod join;
 mod distinct;
 mod group_by;
-mod function;
+// mod function;
 mod placeholder;
 

@@ -30,7 +30,7 @@ macro_rules! agg_func {
         }
 
         #[allow(dead_code)]
-        impl<R: Clone, T: Clone, E: $foo_arg<R, T>> $foo<R, T, E> {
+        impl<R: Clone, T: Clone, E: $foo_arg<R, T> + 'static> $foo<R, T, E> {
             pub fn new(expr: E) -> $foo<R, T, E> {
                 $foo {
                     expression: expr.clone()
@@ -48,7 +48,7 @@ macro_rules! agg_func {
             }
         }
 
-        impl<R: Clone, T: Clone, E: $foo_arg<R, T>> Expression<R> for $foo<R, T, E> { }
+        impl<R: Clone, T: Clone, E: $foo_arg<R, T>  + 'static> Expression<R> for $foo<R, T, E> { }
     )
 }
 

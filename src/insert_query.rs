@@ -5,14 +5,14 @@ use field::{Field, RcField};
 use select_query::{SelectQuery, LimitMany, Select, NoResult};
 use expression::{
     Expression, ToExpression, UntypedExpression,     
-    ExprValue, ToExprValue};
+    ExpressionValue, ToExpressionValue};
 
 #[allow(dead_code)]
 #[derive(Clone)]
 pub enum Insert<T, V, M> {
     DefaultValues,
     Values(Vec<V>),
-    UntypedValues(Vec<Vec<ExprValue<()>>>),
+    UntypedValues(Vec<Vec<ExpressionValue<()>>>),
     FromSelect(SelectQuery<T, LimitMany, M>)
 }
 
@@ -28,7 +28,7 @@ pub struct InsertQuery<T, V, M, RT, RL> {
 macro_rules! insert {
     ($name:ident, $(($t:ident, $arg:ident)),+) => (
         // FIXME: Make this public after https://github.com/rust-lang/rust/issues/17635
-        fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(ExprValue<$t>,)+), M, (), ()> {
+        fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(ExpressionValue<$t>,)+), M, (), ()> {
             let mut cols = vec![];
             $(cols.push((*$arg).upcast_field());)+
             let mut query = InsertQuery::new(self);

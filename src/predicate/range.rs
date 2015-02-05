@@ -4,26 +4,6 @@ use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
 use sql::{ToPredicateValue};
 use expression::{ToExpression};
 
-use expression::{RawExpr};
-
-use field::{
-    I8Field,
-    I16Field,
-    I32Field,
-    I64Field,
-    F32Field,
-    F64Field,
-    TimespecField,
-
-    OptionalI8Field,
-    OptionalI16Field,
-    OptionalI32Field,
-    OptionalI64Field,
-    OptionalF32Field,
-    OptionalF64Field,
-    OptionalTimespecField,
-};
-
 #[derive(Clone, Copy)]
 pub enum InRangeBounds {
     ExcludeBoth,
@@ -41,10 +21,14 @@ pub struct InRangePredicate<F, T> {
 }
 
 pub trait ToInRangePredicate<F, T> {
-    fn in_range(&self, from: T, to: T) -> RcPredicate;
-    fn in_range_exclude_left(&self, from: T, to: T) -> RcPredicate;
-    fn in_range_exclude_right(&self, from: T, to: T) -> RcPredicate;
-    fn in_range_exclude(&self, from: T, to: T) -> RcPredicate;
+    fn in_range<F, T>(&self, from: B, to: B) -> RcPredicate 
+        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
+    fn in_range_exclude_left<F, T>(&self, from: B, to: B) -> RcPredicate 
+        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
+    fn in_range_exclude_right<F, T>(&self, from: B, to: B) -> RcPredicate 
+        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
+    fn in_range_exclude<F, T>(&self, from: B, to: B) -> RcPredicate 
+        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
 }
 
 macro_rules! in_range_methods {
@@ -95,6 +79,51 @@ macro_rules! impl_for {
             in_range_methods!(T);  
         }
     )
+}
+
+impl<F, T> Predicate for InRangePredicate<F, T> 
+    where F: ToPredicateValue,
+          T: ToPredicateValue { }
+
+impl<F, T> ToInRangePredicate<F, T> for F 
+    where F: ToPredicateValue + ToExpression<T> + Clone + 'static,
+          T: ToPredicateValue + Clone {
+    
+    fn in_range<B>(&self, from: B, to: B) -> RcPredicate {
+        InRangePredicate {
+            field: self.clone(),
+            from: from,
+            to: to,
+            bounds: InRangeBounds::IncludeBoth
+        }.upcast()
+    }
+
+    fn in_range_exclude_left(&self, from: $v, to: $v) -> RcPredicate {
+        InRangePredicate {
+            field: self.clone(),
+            from: from,
+            to: to,
+            bounds: InRangeBounds::ExcludeLeft
+        }.upcast()
+    }
+
+    fn in_range_exclude_right(&self, from: $v, to: $v) -> RcPredicate {
+        InRangePredicate {
+            field: self.clone(),
+            from: from,
+            to: to,
+            bounds: InRangeBounds::ExcludeRight
+        }.upcast()
+    }
+
+    fn in_range_exclude(&self, from: $v, to: $v) -> RcPredicate {
+        InRangePredicate {
+            field: self.clone(),
+            from: from,
+            to: to,
+            bounds: InRangeBounds::ExcludeBoth
+        }.upcast()
+    }
 }
 
 impl_for!(I8Field, i8);

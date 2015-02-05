@@ -8,7 +8,7 @@ fn update() {
 
     let update: FieldUpdate<NamedField<String>, String> = name.set(&"Luke".to_string());
     let query = jedi_table.update().all().field(update);
-    assert_sql!(query, "UPDATE jedi SET name = $1;")
+    assert_sql!(query, "UPDATE jedi SET name = $1;");
 
     let query = jedi_table.update().field(name.set(&"Luke".to_string()));
     assert_sql!(query, "UPDATE jedi SET name = $1 WHERE true = false;");
@@ -45,7 +45,7 @@ fn update_returning() {
     let name = NamedField::<String>::field_of("name", &jedi_table);
 
     let query = jedi_table.update().all().field(name.set(&"Luke".to_string())).returning_all();
-    assert_sql!(query, "UPDATE jedi SET name = $1 RETURNING *;")
+    assert_sql!(query, "UPDATE jedi SET name = $1 RETURNING *;");
 
     let query = jedi_table.update().all().field(name.set(&"Luke".to_string())).returning_1(&name.qual());
     assert_sql!(query, "UPDATE jedi SET name = $1 RETURNING jedi.name;")

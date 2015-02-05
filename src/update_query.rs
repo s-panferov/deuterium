@@ -9,8 +9,8 @@ use expression::{Expression, UntypedExpression};
 
 use expression::{
     RawExpr,
-    ToExprValue,
-    ExprValue, 
+    ToExpressionValue,
+    ExpressionValue, 
     ToExpression,
 };
 
@@ -26,7 +26,7 @@ pub trait FieldUpd: ToSql {
 #[derive(Clone)]
 pub struct FieldUpdate<F, T> {
     pub field: F,
-    pub value: ExprValue<T>
+    pub value: ExpressionValue<T>
 }
 
 impl<F, T> FieldUpdate<F, T> {
@@ -34,7 +34,7 @@ impl<F, T> FieldUpdate<F, T> {
         &self.field
     }    
 
-    pub fn get_value(&self) -> &ExprValue<T> {
+    pub fn get_value(&self) -> &ExpressionValue<T> {
         &self.value
     }
 }
@@ -64,7 +64,7 @@ impl<T> ToFieldUpdate<NamedField<T>, T> for NamedField<T> where T: Clone {
     fn set_default(&self) -> FieldUpdate<NamedField<T>, T> {
         FieldUpdate {
             field: self.clone(),
-            value: ExprValue::Default
+            value: ExpressionValue::Default
         }
     }
 }
@@ -80,7 +80,7 @@ impl ToFieldUpdate<RawExpr, RawExpr> for RawExpr {
     fn set_default(&self) -> FieldUpdate<RawExpr, RawExpr> {
         FieldUpdate {
             field: self.clone(),
-            value: ExprValue::Default
+            value: ExpressionValue::Default
         }
     }
 }

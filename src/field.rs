@@ -78,8 +78,6 @@ impl<T: Clone> UntypedExpression for NamedField<T> {
     }
 }
 
-impl<T: Clone> Expression<T> for NamedField<T> {}
-
 impl<T: Clone> Field for NamedField<T> {
     fn name(&self) -> &str {
         self.name.as_slice()

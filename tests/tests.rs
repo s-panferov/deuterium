@@ -1,5 +1,4 @@
-#![feature(globs)]
-#![feature(macro_rules)]
+#![feature(core)]
 
 extern crate deuterium;
 extern crate time;
@@ -7,21 +6,21 @@ extern crate time;
 use deuterium::*;
 
 #[macro_export]
-macro_rules! assert_sql(
+macro_rules! assert_sql {
     ($query:expr, $s:expr) => (
         assert_eq!($query.to_final_sql(&mut SqlContext::new(box sql::PostgreSqlAdapter)).as_slice(), $s)
     )
-)
+}
 
 mod select;
 mod where_;
-mod order;
-mod join;
-mod group_by;
-mod insert;
-mod update;
-mod delete;
-mod placeholder;
+// mod order;
+// mod join;
+// mod group_by;
+// mod insert;
+// mod update;
+// mod delete;
+// mod placeholder;
 
 #[test]
 fn select_order() {

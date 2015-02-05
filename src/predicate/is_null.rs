@@ -2,20 +2,7 @@
 use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
 
 use expression::{RawExpr};
-use field::{
-    OptionalBoolField,
-    OptionalI8Field,
-    OptionalI16Field,
-    OptionalI32Field,
-    OptionalI64Field,
-    OptionalF32Field,
-    OptionalF64Field,
-    OptionalStringField,
-    OptionalByteListField,
-    OptionalJsonField,
-    OptionalTimespecField,
-    OptionalUuidField,
-};
+use field;
 
 #[derive(Clone)]
 pub struct IsNullPredicate<F> {
@@ -27,6 +14,10 @@ pub trait ToIsNullPredicate {
     fn is_null(&self) -> RcPredicate;
     fn not_null(&self) -> RcPredicate;
 }
+
+impl<F, T> Predicate for InPredicate<F, T> 
+    where F: ToPredicateValue,
+          T: ToPredicateValue { }
 
 macro_rules! impl_for{
     ($f:ty) => (

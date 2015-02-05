@@ -8,20 +8,20 @@ pub use self::adapter::{
     PostgreSqlAdapter,
 };
 
-pub mod delete;
+// pub mod delete;
 pub mod distinct;
 pub mod expr_value;
 pub mod field;
-pub mod function;
+// pub mod function;
 pub mod group_by;
-pub mod insert;
+// pub mod insert;
 pub mod join;
 pub mod order_by;
 pub mod placeholder;
 pub mod predicate;
 pub mod select;
 pub mod from;
-pub mod update;
+// pub mod update;
 pub mod value;
 pub mod adapter;
 
@@ -43,7 +43,7 @@ pub trait ToSql {
 }
 
 #[cfg(feature = "postgres")]
-pub type BoxedValue = Box<AsPostgresValue + 'static>;
+pub type BoxedValue = Box<::postgres::types::ToSql + 'static>;
 #[cfg(not(feature = "postgres"))]
 pub type BoxedValue = Box<ToPredicateValue>;
 pub type BoxedAdapter = Box<SqlAdapter + 'static>;
