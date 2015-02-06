@@ -3,16 +3,40 @@ use std::mem;
 use from::{Table, RcTable};
 use field::{Field, RcField};
 use select_query::{SelectQuery, LimitMany, Select, NoResult};
-use expression::{
-    Expression, ToExpression, UntypedExpression,     
-    ExpressionValue, ToExpressionValue};
+use expression::{RcExpression, Expression, ToExpression, UntypedExpression};
+
+#[derive(Clone)]
+pub enum InsertValue<T> {
+    Value {
+        expression: RcExpression
+    },
+    Default
+}
+
+pub trait ToInsertValue<T> {
+    fn to_expr_val(&self) -> InsertValue<T>;
+}
+
+impl<T> InsertValue<T> {
+    pub fn new(exp: &Expression<T>) -> InsertValue<T> {
+        InsertValue::Value {
+            expression: exp.upcast_expression()
+        }
+    }
+}
+
+impl<'a, 'b, T> ToInsertValue<T> for &'a (Expression<T> + 'b) {
+    fn to_expr_val(&self) -> InsertValue<T> {
+        InsertValue::new(*self)
+    }   
+}
 
 #[allow(dead_code)]
 #[derive(Clone)]
 pub enum Insert<T, V, M> {
     DefaultValues,
     Values(Vec<V>),
-    UntypedValues(Vec<Vec<ExpressionValue<()>>>),
+    UntypedValues(Vec<Vec<InsertValue<()>>>),
     FromSelect(SelectQuery<T, LimitMany, M>)
 }
 
@@ -28,7 +52,7 @@ pub struct InsertQuery<T, V, M, RT, RL> {
 macro_rules! insert {
     ($name:ident, $(($t:ident, $arg:ident)),+) => (
         // FIXME: Make this public after https://github.com/rust-lang/rust/issues/17635
-        fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(ExpressionValue<$t>,)+), M, (), ()> {
+        pub fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(InsertValue<$t>,)+), M, (), ()> {
             let mut cols = vec![];
             $(cols.push((*$arg).upcast_field());)+
             let mut query = InsertQuery::new(self);
@@ -41,23 +65,20 @@ macro_rules! insert {
 macro_rules! insertable {
     () => (
         pub trait Insertable<M: Clone>: Table + Sized {   
-            // FIXME: It doesn't work for now because of :
-            //        [Cannot use Macros in Trait Bodies](https://github.com/rust-lang/rust/issues/11403)
-            //        [Impossible to have a macro expand to `pub` method](https://github.com/rust-lang/rust/issues/17436)
             // FIXME: Rewrite after https://github.com/rust-lang/rfcs/issues/376:
             //        Draft RFC: variadic generics
-            // insert!(insert_1, (T0, _t0))
-            // insert!(insert_2, (T0, _t0), (T1, _t1))
-            // insert!(insert_3, (T0, _t0), (T1, _t1), (T2, _t2))
-            // insert!(insert_4, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3))
-            // insert!(insert_5, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4))
-            // insert!(insert_6, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5))
-            // insert!(insert_7, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6))
-            // insert!(insert_8, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7))
-            // insert!(insert_9, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8))
-            // insert!(insert_10, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8), (T9, _t9))
-            // insert!(insert_11, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8), (T9, _t9), (T10, _t10))
-            // insert!(insert_12, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8), (T9, _t9), (T10, _t10), (T11, _t11))
+            // insert!(insert_1, (T0, _t0));
+            // insert!(insert_2, (T0, _t0), (T1, _t1));
+            // insert!(insert_3, (T0, _t0), (T1, _t1), (T2, _t2));
+            // insert!(insert_4, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3));
+            // insert!(insert_5, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4));
+            // insert!(insert_6, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5));
+            // insert!(insert_7, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6));
+            // insert!(insert_8, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7));
+            // insert!(insert_9, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8));
+            // insert!(insert_10, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8), (T9, _t9));
+            // insert!(insert_11, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8), (T9, _t9), (T10, _t10));
+            // insert!(insert_12, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8), (T9, _t9), (T10, _t10), (T11, _t11));
         
             fn insert_all(&self) -> InsertQuery<(), (), M, (), ()> {
                  InsertQuery::new(self)
@@ -117,7 +138,7 @@ impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT
             self.values = Insert::Values(vec![value])
         } else {
             match &mut self.values {
-                &Insert::Values(ref mut values) => {
+                &mut Insert::Values(ref mut values) => {
                     values.push(value)
                 },
                 _ => ()
@@ -125,7 +146,7 @@ impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT
         }
     }
 
-    pub fn push_untyped(&mut self, values: &[&UntypedExpression]) {
+    pub fn push_untyped(&mut self, values: &[&Expression<()>]) {
         let mut reassign = false;
         match &self.values {
             &Insert::DefaultValues | &Insert::FromSelect(_) => {
@@ -134,13 +155,13 @@ impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT
             _ => ()
         }
 
-        let values_vec = values.iter().map(|v| v.as_expr().to_expr_val()).collect();
+        let values_vec = values.iter().map(|v| v.to_expr_val()).collect();
 
         if reassign {
             self.values = Insert::UntypedValues(vec![values_vec])
         } else {
             match &mut self.values {
-                &Insert::UntypedValues(ref mut values) => {
+                &mut Insert::UntypedValues(ref mut values) => {
                     values.push(values_vec)
                 },
                 _ => ()

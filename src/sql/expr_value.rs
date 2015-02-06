@@ -1,16 +1,16 @@
-use expression::{
-    ExpressionValue
+use insert_query::{
+    InsertValue
 };
 
 use sql::{SqlContext, ToSql};
 
-impl<T> ToSql for ExpressionValue<T> {
+impl<T> ToSql for InsertValue<T> {
     fn to_sql(&self, ctx: &mut SqlContext) -> String {
         match self {
-            &ExpressionValue::Value{ref expression} => {
+            &InsertValue::Value{ref expression} => {
                 expression.expression_as_sql().to_sql(ctx)
             },
-            &ExpressionValue::Default => "DEFAULT".to_string()
+            &InsertValue::Default => "DEFAULT".to_string()
         }
     } 
 }
@@ -23,7 +23,7 @@ impl ToSql for ()  {
 
 macro_rules! to_sql_for_insert_tuple {
     ($fmt:expr, $($t:ident, $var:ident),+) => (
-        impl<$($t,)+> ToSql for ($(ExpressionValue<$t>),+,)  {
+        impl<$($t,)+> ToSql for ($(InsertValue<$t>),+,)  {
             fn to_sql(&self, ctx: &mut SqlContext) -> String {
                 let &($(ref $var,)+) = self;
                 format!($fmt, $($var.to_sql(ctx),)+)

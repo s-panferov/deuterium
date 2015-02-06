@@ -14,7 +14,7 @@ pub mod expr_value;
 pub mod field;
 pub mod function;
 pub mod group_by;
-// pub mod insert;
+pub mod insert;
 pub mod join;
 pub mod order_by;
 pub mod placeholder;

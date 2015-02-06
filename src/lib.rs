@@ -64,10 +64,12 @@ pub use update_query::{
     ToFieldUpdate,
 };
 
-// pub use insert_query::{
-//     InsertQuery,
-//     Insertable,
-// };
+pub use insert_query::{
+    InsertQuery,
+    Insertable,        
+    ToInsertValue,
+    InsertValue,
+};
 
 pub use delete_query::{
     DeleteQuery,
@@ -75,12 +77,10 @@ pub use delete_query::{
 };
 
 pub use expression::{
-    ToExpressionValue,
     BoxedExpression, 
     UntypedExpression, 
     Expression,
     RcExpression,
-    ExpressionValue,
     RawExpr,
     ListExpression,
     ToExpression,
@@ -115,7 +115,7 @@ macro_rules! with_clone{
 mod field;
 mod predicate;
 mod select_query;
-// mod insert_query;
+mod insert_query;
 
 #[macro_use]
 mod delete_query;

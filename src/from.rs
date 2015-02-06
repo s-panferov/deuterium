@@ -2,12 +2,11 @@
 use std::rc::Rc;
 use sql::{FromToSql};
 use select_query::{SelectQuery, Selectable};
-// use insert_query::{InsertQuery, Insertable};
+use insert_query::{InsertQuery, Insertable, InsertValue};
 use update_query::{Updatable};
 use delete_query::{Deletable};
 
 use field::{NamedField, Field};
-use expression::{ExpressionValue};
 
 pub trait From { 
     fn as_sql(&self) -> &FromToSql;
@@ -36,7 +35,7 @@ pub struct TableDef {
 macro_rules! insert {
     ($name:ident, $(($t:ident, $arg:ident)),+) => (
         #[doc(hidden)]
-        fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(ExpressionValue<$t>,)+), (), (), ()> {
+        fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(InsertValue<$t>,)+), (), (), ()> {
             let mut cols = vec![];
             $(cols.push((*$arg).upcast_field());)+
             InsertQuery::new_with_cols(self, cols)
@@ -60,13 +59,13 @@ impl TableDef {
         table_def
     }
 
-    // // FIXME: Remove after all stuff in InsertQuery will be fixed
-    // insert!(insert_1, (T0, _t0));
+    // FIXME: Remove after all stuff in InsertQuery will be fixed
+    insert!(insert_1, (T0, _t0));
 
-    // #[doc(hidden)]
-    // pub fn insert_1_for_test(&self, name: &NamedField<String>) -> InsertQuery<(String,), (ExpressionValue<String>,), (), (), ()> {
-    //     self.insert_1(name)
-    // }
+    #[doc(hidden)]
+    pub fn insert_1_for_test(&self, name: &NamedField<String>) -> InsertQuery<(String,), (InsertValue<String>,), (), (), ()> {
+        self.insert_1(name)
+    }
 }
 
 impl Table for TableDef {
@@ -94,7 +93,7 @@ impl From for TableDef {
 }
 
 impl Selectable<()> for TableDef {}
-// impl Insertable<()> for TableDef {}
+impl Insertable<()> for TableDef {}
 impl Updatable<()> for TableDef {}
 impl Deletable<()> for TableDef {}
 

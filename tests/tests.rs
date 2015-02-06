@@ -17,10 +17,10 @@ mod where_;
 mod order;
 mod join;
 mod group_by;
-// mod insert;
+mod insert;
 mod update;
 mod delete;
-// mod placeholder;
+mod placeholder;
 
 #[test]
 fn select_order() {

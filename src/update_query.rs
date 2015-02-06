@@ -3,17 +3,10 @@ use std::mem;
 use std::rc::Rc;
 
 use select_query::{Queryable, Select, LimitMany, NoResult};
+use insert_query::{ToInsertValue, InsertValue};
 use from::{From, Table, RcTable, RcFrom};
 use predicate::{RcPredicate};
-use expression::{Expression, UntypedExpression};
-
-use expression::{
-    RawExpr,
-    ToExpressionValue,
-    ExpressionValue, 
-    ToExpression,
-};
-
+use expression::{Expression, UntypedExpression, RawExpr, ToExpression};
 use sql::{ToSql, ToPredicateValue};
 use field::{
     NamedField,
@@ -26,7 +19,7 @@ pub trait FieldUpd: ToSql {
 #[derive(Clone)]
 pub struct FieldUpdate<F, T> {
     pub field: F,
-    pub value: ExpressionValue<T>
+    pub value: InsertValue<T>
 }
 
 impl<F, T> FieldUpdate<F, T> {
@@ -34,7 +27,7 @@ impl<F, T> FieldUpdate<F, T> {
         &self.field
     }    
 
-    pub fn get_value(&self) -> &ExpressionValue<T> {
+    pub fn get_value(&self) -> &InsertValue<T> {
         &self.value
     }
 }
@@ -64,26 +57,26 @@ impl<T> ToFieldUpdate<NamedField<T>, T> for NamedField<T> where T: Clone {
     fn set_default(&self) -> FieldUpdate<NamedField<T>, T> {
         FieldUpdate {
             field: self.clone(),
-            value: ExpressionValue::Default
+            value: InsertValue::Default
         }
     }
 }
 
-// impl ToFieldUpdate<RawExpr, RawExpr> for RawExpr {
-//     fn set<B: ToExpression<RawExpr>>(&self, val: &B) -> FieldUpdate<RawExpr, RawExpr> {
-//         FieldUpdate {
-//             field: self.clone(),
-//             value: val.as_expr().to_expr_val()
-//         }
-//     }
+impl ToFieldUpdate<RawExpr, RawExpr> for RawExpr {
+    fn set<B: ToExpression<RawExpr>>(&self, val: &B) -> FieldUpdate<RawExpr, RawExpr> {
+        FieldUpdate {
+            field: self.clone(),
+            value: val.as_expr().to_expr_val()
+        }
+    }
 
-//     fn set_default(&self) -> FieldUpdate<RawExpr, RawExpr> {
-//         FieldUpdate {
-//             field: self.clone(),
-//             value: ExpressionValue::Default
-//         }
-//     }
-// }
+    fn set_default(&self) -> FieldUpdate<RawExpr, RawExpr> {
+        FieldUpdate {
+            field: self.clone(),
+            value: InsertValue::Default
+        }
+    }
+}
 
 pub trait Updatable<M>: Table + Sized { 
     fn update(&self) -> UpdateQuery<(), NoResult, M> {

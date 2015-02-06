@@ -3,7 +3,7 @@ use std::rc::Rc;
 use time::Timespec;
 use serialize::json::Json;
 
-use expression::{Expression, UntypedExpression, RcExpression, RawExpr, BoxedExpression};
+use expression::{ToExpression, UntypedExpression, RcExpression, RawExpr, BoxedExpression};
 use sql::{ToSql};
 
 #[derive(Clone, Copy)]
@@ -27,10 +27,10 @@ impl UntypedExpression for Placeholder {
     }
 }
 
-impl Expression<bool> for Placeholder {}
-impl Expression<f64> for Placeholder {}
-impl Expression<String> for Placeholder {}
-impl Expression<Vec<u8>> for Placeholder {}
-impl Expression<Timespec> for Placeholder {}
-impl Expression<Json> for Placeholder {}
-impl Expression<RawExpr> for Placeholder {}
+impl ToExpression<bool> for Placeholder {}
+impl ToExpression<f64> for Placeholder {}
+impl ToExpression<String> for Placeholder {}
+impl ToExpression<Vec<u8>> for Placeholder {}
+impl ToExpression<Timespec> for Placeholder {}
+impl ToExpression<Json> for Placeholder {}
+impl ToExpression<RawExpr> for Placeholder {}
