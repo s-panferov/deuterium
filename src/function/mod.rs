@@ -1,14 +1,14 @@
 
-use std::rc::Rc;
-use time::Timespec;
+use std::rc;
+use time;
 
-use expression::{Expression, BoxedExpression, RcExpression, UntypedExpression, PrimitiveType};
-use sql::{ToSql};
+use expression;
 use field;
+use sql;
 
 macro_rules! agg_func {
     ($foo:ident, $foo_arg:ident, $foo_low:ident) => (
-        pub trait $foo_arg<R: Clone, T: Clone>: Clone + Expression<T> + 'static {
+        pub trait $foo_arg<R: Clone, T: Clone>: Clone + expression::Expression<T> + 'static {
             fn $foo_low(&self) -> $foo<R, T, Self> {
                 $foo::new(self.clone())
             }
@@ -28,17 +28,17 @@ macro_rules! agg_func {
             }
         }
 
-        impl<R: Clone, T: Clone, E: $foo_arg<R, T> + 'static> UntypedExpression for $foo<R, T, E> {
-            fn expression_as_sql(&self) -> &ToSql {
+        impl<R: Clone, T: Clone, E: $foo_arg<R, T> + 'static> expression::UntypedExpression for $foo<R, T, E> {
+            fn expression_as_sql(&self) -> &sql::ToSql {
                 self
             }
 
-            fn upcast_expression(&self) -> RcExpression {
-                Rc::new(Box::new(self.clone()) as BoxedExpression)
+            fn upcast_expression(&self) -> expression::RcExpression {
+                rc::Rc::new(Box::new(self.clone()) as expression::BoxedExpression)
             }
         }
 
-        impl<R: Clone, T: Clone, E: $foo_arg<R, T>  + 'static> Expression<R> for $foo<R, T, E> { }
+        impl<R: Clone, T: Clone, E: $foo_arg<R, T>  + 'static> expression::Expression<R> for $foo<R, T, E> { }
     )
 }
 
@@ -51,7 +51,7 @@ impl MinArg<i64, i64> for field::I64Field {}
 impl MinArg<f32, f32> for field::F32Field {}
 impl MinArg<f64, f64> for field::F64Field {}
 impl MinArg<String, String> for field::StringField {}
-impl MinArg<Timespec, Timespec> for field::TimespecField {}
+impl MinArg<time::Timespec, time::Timespec> for field::TimespecField {}
 
 agg_func!(Max, MaxArg, max);
 
@@ -62,7 +62,7 @@ impl MaxArg<i64, i64> for field::I64Field {}
 impl MaxArg<f32, f32> for field::F32Field {}
 impl MaxArg<f64, f64> for field::F64Field {}
 impl MaxArg<String, String> for field::StringField {}
-impl MaxArg<Timespec, Timespec> for field::TimespecField {}
+impl MaxArg<time::Timespec, time::Timespec> for field::TimespecField {}
 
 agg_func!(Sum, SumArg, sum);
 
@@ -84,19 +84,19 @@ impl AvgArg<f64, f64> for field::F64Field {}
 
 agg_func!(Count, CountArg, count);
 
-impl<T: PrimitiveType + Clone> CountArg<i64, T> for field::NamedField<T> {}
+impl<T: expression::PrimitiveType + Clone> CountArg<i64, T> for field::NamedField<T> {}
 
 #[derive(Clone, Copy)]
 pub struct CountAll;
 
-impl UntypedExpression for CountAll {
-    fn expression_as_sql(&self) -> &ToSql {
+impl expression::UntypedExpression for CountAll {
+    fn expression_as_sql(&self) -> &sql::ToSql {
         self
     }
 
-    fn upcast_expression(&self) -> RcExpression {
-        Rc::new(Box::new(self.clone()) as BoxedExpression)
+    fn upcast_expression(&self) -> expression::RcExpression {
+        rc::Rc::new(Box::new(self.clone()) as expression::BoxedExpression)
     }
 }
 
-impl Expression<i64> for CountAll { }
+impl expression::Expression<i64> for CountAll { }

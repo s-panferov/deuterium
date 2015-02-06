@@ -1,10 +1,5 @@
-
-use from::{RcFrom};
-use predicate::{RcPredicate};
-
-use self::Join::*;
-use self::ConditionedJoinType::*;
-use self::UnconditionedJoinType::*;
+use super::from;
+use super::predicate;
 
 #[allow(dead_code)]
 #[derive(Clone)]
@@ -33,63 +28,63 @@ pub enum UnconditionedJoinType {
 pub enum Join {
     ConditionedJoin {
         join_type: ConditionedJoinType,
-        from: RcFrom,
-        on: RcPredicate
+        from: from::RcFrom,
+        on: predicate::RcPredicate
     },
 
     UnconditionedJoin {
         join_type: UnconditionedJoinType,
-        from: RcFrom
+        from: from::RcFrom
     }
 }
 
 impl Join {
-    pub fn inner_join(from: RcFrom, predicate: RcPredicate) -> Join { 
-        ConditionedJoin{ join_type: InnerJoin, from: from, on: predicate } 
+    pub fn inner_join(from: from::RcFrom, predicate: predicate::RcPredicate) -> Join { 
+        Join::ConditionedJoin{ join_type: ConditionedJoinType::InnerJoin, from: from, on: predicate } 
     }
 
-    pub fn full_outer_join(from: RcFrom, predicate: RcPredicate) -> Join { 
-        ConditionedJoin{ join_type: FullOuterJoin, from: from, on: predicate } 
+    pub fn full_outer_join(from: from::RcFrom, predicate: predicate::RcPredicate) -> Join { 
+        Join::ConditionedJoin{ join_type: ConditionedJoinType::FullOuterJoin, from: from, on: predicate } 
     }
 
-    pub fn right_outer_join(from: RcFrom, predicate: RcPredicate) -> Join { 
-        ConditionedJoin{ join_type: RightOuterJoin, from: from, on: predicate } 
+    pub fn right_outer_join(from: from::RcFrom, predicate: predicate::RcPredicate) -> Join { 
+        Join::ConditionedJoin{ join_type: ConditionedJoinType::RightOuterJoin, from: from, on: predicate } 
     }
 
-    pub fn left_outer_join(from: RcFrom, predicate: RcPredicate) -> Join { 
-        ConditionedJoin{ join_type: LeftOuterJoin, from: from, on: predicate } 
+    pub fn left_outer_join(from: from::RcFrom, predicate: predicate::RcPredicate) -> Join { 
+        Join::ConditionedJoin{ join_type: ConditionedJoinType::LeftOuterJoin, from: from, on: predicate } 
     }
 
-    pub fn full_join(from: RcFrom, predicate: RcPredicate) -> Join { 
-        ConditionedJoin{ join_type: FullJoin, from: from, on: predicate } 
+    pub fn full_join(from: from::RcFrom, predicate: predicate::RcPredicate) -> Join { 
+        Join::ConditionedJoin{ join_type: ConditionedJoinType::FullJoin, from: from, on: predicate } 
     }
 
-    pub fn left_join(from: RcFrom, predicate: RcPredicate) -> Join { 
-        ConditionedJoin{ join_type: LeftJoin, from: from, on: predicate } 
+    pub fn left_join(from: from::RcFrom, predicate: predicate::RcPredicate) -> Join { 
+        Join::ConditionedJoin{ join_type: ConditionedJoinType::LeftJoin, from: from, on: predicate } 
     }
 
-    pub fn right_join(from: RcFrom, predicate: RcPredicate) -> Join { 
-        ConditionedJoin{ join_type: RightJoin, from: from, on: predicate } 
+    pub fn right_join(from: from::RcFrom, predicate: predicate::RcPredicate) -> Join { 
+        Join::ConditionedJoin{ join_type: ConditionedJoinType::RightJoin, from: from, on: predicate } 
     }
 
-    pub fn natural_join(from: RcFrom) -> Join { 
-        UnconditionedJoin{ join_type: NaturalJoin, from: from } 
+    pub fn natural_join(from: from::RcFrom) -> Join { 
+        Join::UnconditionedJoin{ join_type: UnconditionedJoinType::NaturalJoin, from: from } 
     }
 
-    pub fn natural_left_join(from: RcFrom) -> Join { 
-        UnconditionedJoin{ join_type: NaturalLeftJoin, from: from } 
+    pub fn natural_left_join(from: from::RcFrom) -> Join { 
+        Join::UnconditionedJoin{ join_type: UnconditionedJoinType::NaturalLeftJoin, from: from } 
     }
 
-    pub fn natural_right_join(from: RcFrom) -> Join { 
-        UnconditionedJoin{ join_type: NaturalRightJoin, from: from } 
+    pub fn natural_right_join(from: from::RcFrom) -> Join { 
+        Join::UnconditionedJoin{ join_type: UnconditionedJoinType::NaturalRightJoin, from: from } 
     }
 
-    pub fn natural_full_join(from: RcFrom) -> Join { 
-        UnconditionedJoin{ join_type: NaturalFullJoin, from: from } 
+    pub fn natural_full_join(from: from::RcFrom) -> Join { 
+        Join::UnconditionedJoin{ join_type: UnconditionedJoinType::NaturalFullJoin, from: from } 
     }
 
-    pub fn cross_join(from: RcFrom) -> Join { 
-        UnconditionedJoin{ join_type: CrossJoin, from: from } 
+    pub fn cross_join(from: from::RcFrom) -> Join { 
+        Join::UnconditionedJoin{ join_type: UnconditionedJoinType::CrossJoin, from: from } 
     }
 
 }

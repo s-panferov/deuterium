@@ -1,13 +1,8 @@
+use super::super::delete_query;
+use super::from::{FromToSql};
 
-use delete_query::{
-    DeleteQuery,
-};
-
-use sql::from::{FromToSql};
-use sql::{SqlContext, ToSql, QueryToSql};
-
-impl<T, L, M> ToSql for DeleteQuery<T, L, M> {
-    fn to_sql(&self, ctx: &mut SqlContext) -> String {
+impl<T, L, M> super::ToSql for delete_query::DeleteQuery<T, L, M> {
+    fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         let mut sql = "DELETE FROM".to_string();
 
         if self.only {
@@ -44,4 +39,4 @@ impl<T, L, M> ToSql for DeleteQuery<T, L, M> {
     }
 }
 
-impl<T, L, M> QueryToSql for DeleteQuery<T, L, M> {}
+impl<T, L, M> super::QueryToSql for delete_query::DeleteQuery<T, L, M> {}

@@ -1,5 +1,3 @@
-
-
 pub trait SqlAdapter {
     fn placeholder(&self, idx: usize) -> String;
 }

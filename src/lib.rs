@@ -10,6 +10,30 @@ extern crate time;
 extern crate postgres;
 extern crate uuid;
 
+mod prelude {
+    pub use {
+        ToIsPredicate,
+        ToOrPredicate,
+        ToAndPredicate,
+        ToInPredicate,
+        ToInRangePredicate,
+        ToInequalityPredicate,
+        ToExcludePredicate,
+        ToLikePredicate,
+        ToIsNullPredicate,
+        Selectable,
+        Queryable,
+        Orderable,
+        ToSelectQuery,
+        Updatable,
+        ToFieldUpdate,
+        ToInsertValue,
+        Deletable,
+        ToExpression,
+        ToListExpression
+    };
+}
+
 pub use field::{
     Field,
     NamedField,

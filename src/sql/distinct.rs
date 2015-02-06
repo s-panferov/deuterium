@@ -1,9 +1,7 @@
+use super::super::distinct;
 
-use distinct::{Distinct};
-use sql::{SqlContext, ToSql};
-
-impl ToSql for Distinct {
-    fn to_sql(&self, ctx: &mut SqlContext) -> String {
+impl super::ToSql for distinct::Distinct {
+    fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         match &self.on {
             &None => "DISTINCT".to_string(),
             &Some(ref on) if on.is_empty() => "DISTINCT".to_string(),

@@ -1,8 +1,8 @@
+use super::super::expression;
+use super::super::field;
+use super::super::sql;
 
-use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
-use expression::{self, ToExpression};
-use field;
-use sql::{ToPredicateValue};
+use super::{ToAbstractPredicate};
 
 #[derive(Clone)]
 pub struct LikePredicate<F, T> {
@@ -12,27 +12,27 @@ pub struct LikePredicate<F, T> {
 }
 
 pub trait ToLikePredicate<T> {
-    fn like<B>(&self, val: B) -> RcPredicate 
-        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
+    fn like<B>(&self, val: B) -> super::RcPredicate 
+        where B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 
-    fn ilike<B>(&self, val: B) -> RcPredicate
-        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
+    fn ilike<B>(&self, val: B) -> super::RcPredicate
+        where B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 }
 
-impl<F, T> Predicate for LikePredicate<F, T> 
-    where F: ToPredicateValue,
-          T: ToPredicateValue { }
+impl<F, T> super::Predicate for LikePredicate<F, T> 
+    where F: sql::ToPredicateValue,
+          T: sql::ToPredicateValue { }
 
 macro_rules! impl_for {
     ($field:ty, $expr:ty) => (
         impl ToLikePredicate<$expr> for $field {
-            fn like<B>(&self, val: B) -> RcPredicate 
-                where B: ToExpression<$expr> + ToPredicateValue + Clone + 'static {
+            fn like<B>(&self, val: B) -> super::RcPredicate 
+                where B: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static {
                 LikePredicate { field: self.clone(), value: val, case_sensitive: true }.upcast()
             }
 
-            fn ilike<B>(&self, val: B) -> RcPredicate 
-                where B: ToExpression<$expr> + ToPredicateValue + Clone + 'static {
+            fn ilike<B>(&self, val: B) -> super::RcPredicate 
+                where B: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static {
                 LikePredicate { field: self.clone(), value: val, case_sensitive: false }.upcast()
             } 
         }

@@ -1,21 +1,15 @@
+use super::super::update_query;
+use super::from::{FromToSql};
+use super::value;
 
-use update_query::{
-    UpdateQuery,
-    FieldUpdate,
-};
-
-use sql::from::{FromToSql};
-use sql::value::{ToPredicateValue};
-use sql::{SqlContext, ToSql, QueryToSql};
-
-impl<F: ToPredicateValue, T: ToPredicateValue> ToSql for FieldUpdate<F, T> {
-    fn to_sql(&self, ctx: &mut SqlContext) -> String {
+impl<F: value::ToPredicateValue, T: value::ToPredicateValue> super::ToSql for update_query::FieldUpdate<F, T> {
+    fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         format!("{} = {}", self.get_field().to_predicate_value(ctx), self.get_value().to_sql(ctx))
     }
 }
 
-impl<T, L, M> ToSql for UpdateQuery<T, L, M> {
-    fn to_sql(&self, ctx: &mut SqlContext) -> String {
+impl<T, L, M> super::ToSql for update_query::UpdateQuery<T, L, M> {
+    fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         let mut sql = "UPDATE".to_string();
 
         if self.only {
@@ -55,4 +49,4 @@ impl<T, L, M> ToSql for UpdateQuery<T, L, M> {
     }
 }
 
-impl<T, L, M> QueryToSql for UpdateQuery<T, L, M> {}
+impl<T, L, M> super::QueryToSql for update_query::UpdateQuery<T, L, M> {}

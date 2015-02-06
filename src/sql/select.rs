@@ -1,33 +1,26 @@
-use from::{FromSelect};
-use select_query::{
-    Select,
-    SelectQuery, RcSelectQuery,
-    SelectFor
-};
+use super::super::from;
+use super::super::select_query;
+use super::{ToSql};
 
-use sql::{SqlContext, ToSql, QueryToSql};
-use sql::value::{ToPredicateValue};
-use sql::from::{FromToSql};
-
-impl<T, L, M> FromToSql for FromSelect<T, L, M> {
-    fn to_from_sql(&self, ctx: &mut SqlContext) -> String {
+impl<T, L, M> super::from::FromToSql for from::FromSelect<T, L, M> {
+    fn to_from_sql(&self, ctx: &mut super::SqlContext) -> String {
         format!("({}) as {}", self.select.to_sql(ctx), self.alias.to_string())
     }
 }
 
-impl ToSql for SelectFor {
-    fn to_sql(&self, _ctx: &mut SqlContext) -> String {
+impl super::ToSql for select_query::SelectFor {
+    fn to_sql(&self, _ctx: &mut super::SqlContext) -> String {
         match self {
-            &SelectFor::Update => "FOR UPDATE",
-            &SelectFor::UpdateNoWait => "FOR UPDATE NOWAIT",
-            &SelectFor::Share => "FOR SHARE",
-            &SelectFor::ShareNoWait => "FOR SHARE NOWAIT",
+            &select_query::SelectFor::Update => "FOR UPDATE",
+            &select_query::SelectFor::UpdateNoWait => "FOR UPDATE NOWAIT",
+            &select_query::SelectFor::Share => "FOR SHARE",
+            &select_query::SelectFor::ShareNoWait => "FOR SHARE NOWAIT",
         }.to_string()
     }
 }
 
-impl<T, L, M> ToSql for SelectQuery<T, L, M> {
-    fn to_sql(&self, ctx: &mut SqlContext) -> String {
+impl<T, L, M> super::ToSql for select_query::SelectQuery<T, L, M> {
+    fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         let mut sql = "SELECT".to_string();
 
         if self.distinct.is_some() {
@@ -78,26 +71,26 @@ impl<T, L, M> ToSql for SelectQuery<T, L, M> {
     }
 }
 
-impl<T, L, M> QueryToSql for SelectQuery<T, L, M> {}
+impl<T, L, M> super::QueryToSql for select_query::SelectQuery<T, L, M> {}
 
-impl ToSql for RcSelectQuery {
-    fn to_sql(&self, ctx: &mut SqlContext) -> String {
+impl super::ToSql for select_query::RcSelectQuery {
+    fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         (**self).to_sql(ctx)
     }
 }
 
-impl ToSql for Select {
-    fn to_sql(&self, ctx: &mut SqlContext) -> String {
+impl super::ToSql for select_query::Select {
+    fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         match self {
-            &Select::Only(ref fields) => {
+            &select_query::Select::Only(ref fields) => {
                 let defs: Vec<String> = fields.iter().map(|f| f.expression_as_sql().to_sql(ctx)).collect();
                 defs.connect(", ")
             },
-            &Select::All => "*".to_string()
+            &select_query::Select::All => "*".to_string()
         }
     }
 }
 
-impl<T, L, M> ToPredicateValue for SelectQuery<T, L, M> {
-    fn to_predicate_value(&self, ctx: &mut SqlContext) -> String { self.to_sql(ctx) }   
+impl<T, L, M> super::ToPredicateValue for select_query::SelectQuery<T, L, M> {
+    fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String { self.to_sql(ctx) }   
 }

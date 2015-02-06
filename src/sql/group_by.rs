@@ -1,8 +1,7 @@
-use group_by::{GroupBy};
-use sql::{SqlContext, ToSql};
+use super::super::group_by;
 
-impl ToSql for GroupBy {
-    fn to_sql(&self, ctx: &mut SqlContext) -> String {
+impl super::ToSql for group_by::GroupBy {
+    fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         if !self.by.is_empty() {
             let defs: Vec<String> = self.by.iter().map(|f| f.expression_as_sql().to_sql(ctx)).collect();
             format!(" GROUP BY {}", defs.connect(", "))
