@@ -90,7 +90,7 @@ impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for LikePredicate<
     }
 }
 
-impl<F: ToPredicateValue, T: ToPredicateValue> PredicateToSql for InRangePredicate<F, T> {
+impl<F: ToPredicateValue, T1: ToPredicateValue, T2: ToPredicateValue> PredicateToSql for InRangePredicate<F, T1, T2> {
     fn to_sql(&self, negation: bool, ctx: &mut SqlContext) -> String {
         let ref name = self.field.to_predicate_value(ctx);
         let from = self.from.to_predicate_value(ctx); 

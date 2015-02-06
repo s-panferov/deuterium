@@ -5,21 +5,21 @@ use from::{From, Table, RcTable, RcFrom};
 use predicate::{RcPredicate};
 use expression::{Expression, UntypedExpression};
 
-pub trait Deletable<M>: Table { 
+pub trait Deletable<M>: Table + Sized { 
     fn delete(&self) -> DeleteQuery<(), NoResult, M> {
         DeleteQuery::new(self)
     }
 }
 
-macro_rules! returning_for(
+macro_rules! returning_for {
     ($query:ident) => (
         impl<T, L, M> $query<T, L, M> {
-            pub fn returning_1<T: Clone>(mut self, field: &Expression<T>) -> $query<(T), LimitMany, M> {
+            pub fn returning_1<R: Clone>(mut self, field: &Expression<R>) -> $query<(R), LimitMany, M> {
                 self.returning = Some(Select::Only(vec![field.upcast_expression()]));
                 unsafe{ mem::transmute(self) }
             }
 
-            pub fn returning_2<T1: Clone, T2: Clone>(mut self, field1: &Expression<T1>, field2: &Expression<T2>) -> $query<(T1, T2), LimitMany, M> {
+            pub fn returning_2<R1: Clone, R2: Clone>(mut self, field1: &Expression<R1>, field2: &Expression<R2>) -> $query<(R1, R2), LimitMany, M> {
                 self.returning = Some(Select::Only(vec![field1.upcast_expression(), field2.upcast_expression()]));
                 unsafe{ mem::transmute(self) }
             }
@@ -40,9 +40,9 @@ macro_rules! returning_for(
             }
         }
     )
-)
+}
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct DeleteQuery<T, L, M> {
     pub only: bool,
     pub table: RcTable,
@@ -85,7 +85,7 @@ impl<T, L, M> DeleteQuery<T, L, M> {
     }
 }
 
-returning_for!(DeleteQuery)
+returning_for!(DeleteQuery);
 
 impl<T:Clone, L:Clone, M:Clone> Queryable for DeleteQuery<T, L, M> { 
     fn get_where(&self) -> &Option<RcPredicate> { &self.where_ }

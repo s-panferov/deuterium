@@ -7,10 +7,10 @@ fn delete() {
     let name = NamedField::<String>::field_of("name", &jedi_table);
 
     let query = jedi_table.delete().all();
-    assert_sql!(query, "DELETE FROM jedi;")
+    assert_sql!(query, "DELETE FROM jedi;");
 
     let query = jedi_table.delete();
-    assert_sql!(query, "DELETE FROM jedi WHERE true = false;")
+    assert_sql!(query, "DELETE FROM jedi WHERE true = false;");
 
     let query = jedi_table.delete().where_(name.is("Anakin Skywalker".to_string()));
     assert_sql!(query, "DELETE FROM jedi WHERE name = $1;");
@@ -36,7 +36,7 @@ fn delete_returning() {
     let name = NamedField::<String>::field_of("name", &jedi_table);
 
     let query: DeleteQuery<(), LimitMany, ()> = jedi_table.delete().all().returning_all();
-    assert_sql!(query, "DELETE FROM jedi RETURNING *;")
+    assert_sql!(query, "DELETE FROM jedi RETURNING *;");
 
     let query: DeleteQuery<(String), LimitMany, ()> = jedi_table.delete().all().returning_1(&name);
     assert_sql!(query, "DELETE FROM jedi RETURNING name;")

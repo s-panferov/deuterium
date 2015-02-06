@@ -1,23 +1,11 @@
 
+use sql::{ToPredicateValue};
 use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
 
 use expression::{RawExpr};
-use field::{
-    OptionalBoolField,
-    OptionalI8Field,
-    OptionalI16Field,
-    OptionalI32Field,
-    OptionalI64Field,
-    OptionalF32Field,
-    OptionalF64Field,
-    OptionalStringField,
-    OptionalByteListField,
-    OptionalJsonField,
-    OptionalTimespecField,
-    OptionalUuidField,
-};
+use field;
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct IsNullPredicate<F> {
     pub field: F,
     pub null: bool
@@ -28,40 +16,24 @@ pub trait ToIsNullPredicate {
     fn not_null(&self) -> RcPredicate;
 }
 
-macro_rules! impl_for(
-    ($f:ty) => (
+impl<F> Predicate for IsNullPredicate<F> where F: ToPredicateValue {}
 
-        impl Predicate for IsNullPredicate<$f> { }
-        impl ToIsNullPredicate for $f {
-            fn is_null(&self) -> RcPredicate {
-                IsNullPredicate {
-                    field: self.clone(),
-                    null: true
-                }.upcast()
-            }
+impl<T> ToIsNullPredicate for field::NamedField<Option<T>> where T: ToPredicateValue + Clone {
+    fn is_null(&self) -> RcPredicate {
+        IsNullPredicate { field: self.clone(), null: true }.upcast()
+    }
 
-            fn not_null(&self) -> RcPredicate {
-                IsNullPredicate {
-                    field: self.clone(),
-                    null: false
-                }.upcast()
-            }
-        }
+    fn not_null(&self) -> RcPredicate {
+        IsNullPredicate { field: self.clone(), null: false }.upcast()
+    }
+}
 
-    )
-)
+impl ToIsNullPredicate for RawExpr {
+    fn is_null(&self) -> RcPredicate {
+        IsNullPredicate { field: self.clone(), null: true }.upcast()
+    }
 
-impl_for!(OptionalBoolField)
-impl_for!(OptionalI8Field)
-impl_for!(OptionalI16Field)
-impl_for!(OptionalI32Field)
-impl_for!(OptionalI64Field)
-impl_for!(OptionalF32Field)
-impl_for!(OptionalF64Field)
-impl_for!(OptionalStringField)
-impl_for!(OptionalByteListField)
-impl_for!(OptionalJsonField)
-impl_for!(OptionalTimespecField)
-impl_for!(OptionalUuidField)
-impl_for!(RawExpr)
-
+    fn not_null(&self) -> RcPredicate {
+        IsNullPredicate { field: self.clone(), null: false }.upcast()
+    }
+}

@@ -1,12 +1,9 @@
-
-#![feature(macro_rules)]
+#![feature(core)]
 #![feature(concat_idents)]
-#![feature(default_type_params)]
-#![feature(globs)]
-#![deny(warnings)]
-#![deny(bad_style)]
+// #![deny(warnings)]
+// #![deny(bad_style)]
 
-extern crate serialize;
+extern crate "rustc-serialize" as serialize;
 extern crate time;
 
 #[cfg(feature = "postgres")]
@@ -37,10 +34,8 @@ pub use predicate::{
     OrPredicate, ToOrPredicate,
     AndPredicate, ToAndPredicate,
     InPredicate, ToInPredicate,
-    InRangePredicate, ToInRangePredicate, 
-    InRangeBounds,
-    InequalityPredicate, ToInequalityPredicate, 
-    Inequality,
+    InRangePredicate, ToInRangePredicate, InRangeBounds,
+    InequalityPredicate, ToInequalityPredicate, Inequality,
     ExcludePredicate, ToExcludePredicate,
     LikePredicate, ToLikePredicate,
     IsNullPredicate, ToIsNullPredicate,
@@ -71,7 +66,9 @@ pub use update_query::{
 
 pub use insert_query::{
     InsertQuery,
-    Insertable,
+    Insertable,        
+    ToInsertValue,
+    InsertValue,
 };
 
 pub use delete_query::{
@@ -80,14 +77,14 @@ pub use delete_query::{
 };
 
 pub use expression::{
-    ToExpression,
-    ToExprValue,
     BoxedExpression, 
     UntypedExpression, 
     Expression,
     RcExpression,
-    ExprValue,
-    RawExpr
+    RawExpr,
+    ListExpression,
+    ToExpression,
+    ToListExpression
 };
 
 pub use sql::{SqlContext, ToSql, QueryToSql, FromToSql, ToPredicateValue};
@@ -107,20 +104,20 @@ pub use placeholder::{
     Placeholder
 };
 
-macro_rules! with_clone(
+macro_rules! with_clone{
     ($slf: ident, $v:ident, $ex:expr) => ({
         let mut $v = $slf.clone();
         $ex;
         $v
     })
-)
+}
 
 mod field;
 mod predicate;
 mod select_query;
 mod insert_query;
 
-#[macro_escape]
+#[macro_use]
 mod delete_query;
 mod update_query;
 pub mod sql;

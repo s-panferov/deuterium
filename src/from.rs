@@ -2,12 +2,11 @@
 use std::rc::Rc;
 use sql::{FromToSql};
 use select_query::{SelectQuery, Selectable};
-use insert_query::{InsertQuery, Insertable};
+use insert_query::{InsertQuery, Insertable, InsertValue};
 use update_query::{Updatable};
 use delete_query::{Deletable};
 
 use field::{NamedField, Field};
-use expression::{ExprValue};
 
 pub trait From { 
     fn as_sql(&self) -> &FromToSql;
@@ -26,23 +25,23 @@ pub trait Table {
 pub type BoxedTable = Box<Table + 'static>;
 pub type RcTable = Rc<BoxedTable>;
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct TableDef {
     name: String,
     alias: Option<String>
 }
 
 // FIXME: Remove after all stuff in InsertQuery will be fixed
-macro_rules! insert(
+macro_rules! insert {
     ($name:ident, $(($t:ident, $arg:ident)),+) => (
         #[doc(hidden)]
-        fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(ExprValue<$t>,)+), (), (), ()> {
+        fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(InsertValue<$t>,)+), (), (), ()> {
             let mut cols = vec![];
             $(cols.push((*$arg).upcast_field());)+
             InsertQuery::new_with_cols(self, cols)
         }
     )
-)
+}
 
 #[allow(dead_code)]
 impl TableDef {
@@ -61,16 +60,17 @@ impl TableDef {
     }
 
     // FIXME: Remove after all stuff in InsertQuery will be fixed
-    insert!(insert_1, (T0, _t0))
+    insert!(insert_1, (T0, _t0));
+
     #[doc(hidden)]
-    pub fn insert_1_for_test(&self, name: &NamedField<String>) -> InsertQuery<(String,), (ExprValue<String>,), (), (), ()> {
+    pub fn insert_1_for_test(&self, name: &NamedField<String>) -> InsertQuery<(String,), (InsertValue<String>,), (), (), ()> {
         self.insert_1(name)
     }
 }
 
 impl Table for TableDef {
     fn upcast_table(&self) -> RcTable {
-        Rc::new(box self.clone() as BoxedTable)
+        Rc::new(Box::new(self.clone()) as BoxedTable)
     }
 
     fn get_table_name(&self) -> &String {
@@ -88,7 +88,7 @@ impl From for TableDef {
     }
 
     fn upcast_from(&self) -> RcFrom {
-        Rc::new(box self.clone() as BoxedFrom)
+        Rc::new(Box::new(self.clone()) as BoxedFrom)
     }
 }
 
@@ -97,7 +97,7 @@ impl Insertable<()> for TableDef {}
 impl Updatable<()> for TableDef {}
 impl Deletable<()> for TableDef {}
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct FromSelect<T, L, M> {
     pub select: SelectQuery<T, L, M>,
     pub alias: String 
@@ -109,7 +109,7 @@ impl<T: Clone, L: Clone, M: Clone> From for FromSelect<T, L, M> {
     }
 
     fn upcast_from(&self) -> RcFrom {
-        Rc::new(box self.clone() as BoxedFrom)
+        Rc::new(Box::new(self.clone()) as BoxedFrom)
     }
 }
 

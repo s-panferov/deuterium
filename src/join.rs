@@ -7,7 +7,7 @@ use self::ConditionedJoinType::*;
 use self::UnconditionedJoinType::*;
 
 #[allow(dead_code)]
-#[deriving(Clone)]
+#[derive(Clone)]
 pub enum ConditionedJoinType {
     InnerJoin,
     FullOuterJoin,
@@ -19,7 +19,7 @@ pub enum ConditionedJoinType {
 }
 
 #[allow(dead_code)]
-#[deriving(Clone)]
+#[derive(Clone)]
 pub enum UnconditionedJoinType {
     NaturalJoin,
     NaturalLeftJoin,
@@ -29,7 +29,7 @@ pub enum UnconditionedJoinType {
 }
 
 #[allow(dead_code)]
-#[deriving(Clone)]
+#[derive(Clone)]
 pub enum Join {
     ConditionedJoin {
         join_type: ConditionedJoinType,

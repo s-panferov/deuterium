@@ -1,7 +1,7 @@
 
 use predicate::{Predicate, RcPredicate};
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct OrPredicate {
     pub left: RcPredicate,
     pub right: RcPredicate

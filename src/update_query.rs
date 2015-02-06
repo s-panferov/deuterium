@@ -3,17 +3,10 @@ use std::mem;
 use std::rc::Rc;
 
 use select_query::{Queryable, Select, LimitMany, NoResult};
+use insert_query::{ToInsertValue, InsertValue};
 use from::{From, Table, RcTable, RcFrom};
 use predicate::{RcPredicate};
-use expression::{Expression, UntypedExpression};
-
-use expression::{
-    RawExpr,
-    ToExprValue,
-    ExprValue, 
-    ToExpression,
-};
-
+use expression::{Expression, UntypedExpression, RawExpr, ToExpression};
 use sql::{ToSql, ToPredicateValue};
 use field::{
     NamedField,
@@ -23,10 +16,10 @@ pub trait FieldUpd: ToSql {
     fn upcast_field_update(&self) -> RcFieldUpdate;
 }
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct FieldUpdate<F, T> {
     pub field: F,
-    pub value: ExprValue<T>
+    pub value: InsertValue<T>
 }
 
 impl<F, T> FieldUpdate<F, T> {
@@ -34,7 +27,7 @@ impl<F, T> FieldUpdate<F, T> {
         &self.field
     }    
 
-    pub fn get_value(&self) -> &ExprValue<T> {
+    pub fn get_value(&self) -> &InsertValue<T> {
         &self.value
     }
 }
@@ -44,7 +37,7 @@ pub type RcFieldUpdate = Rc<BoxedFieldUpdate>;
 
 impl<F: Clone + ToPredicateValue + 'static, T: Clone + ToPredicateValue + 'static> FieldUpd for FieldUpdate<F, T> {
     fn upcast_field_update(&self) -> RcFieldUpdate {
-        Rc::new(box self.clone() as BoxedFieldUpdate)
+        Rc::new(Box::new(self.clone()) as BoxedFieldUpdate)
     }
 }
 
@@ -64,7 +57,7 @@ impl<T> ToFieldUpdate<NamedField<T>, T> for NamedField<T> where T: Clone {
     fn set_default(&self) -> FieldUpdate<NamedField<T>, T> {
         FieldUpdate {
             field: self.clone(),
-            value: ExprValue::Default
+            value: InsertValue::Default
         }
     }
 }
@@ -80,18 +73,18 @@ impl ToFieldUpdate<RawExpr, RawExpr> for RawExpr {
     fn set_default(&self) -> FieldUpdate<RawExpr, RawExpr> {
         FieldUpdate {
             field: self.clone(),
-            value: ExprValue::Default
+            value: InsertValue::Default
         }
     }
 }
 
-pub trait Updatable<M>: Table { 
+pub trait Updatable<M>: Table + Sized { 
     fn update(&self) -> UpdateQuery<(), NoResult, M> {
         UpdateQuery::new(self)
     }
 }
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct UpdateQuery<T, L, M> {
     pub only: bool,
     pub table: RcTable,
@@ -141,7 +134,7 @@ impl<T, L, M> UpdateQuery<T, L, M> {
     }
 }
 
-returning_for!(UpdateQuery)
+returning_for!(UpdateQuery);
 
 impl<T:Clone, L:Clone, M:Clone> Queryable for UpdateQuery<T, L, M> { 
     fn get_where(&self) -> &Option<RcPredicate> { &self.where_ }

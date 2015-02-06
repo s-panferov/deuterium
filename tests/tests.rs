@@ -1,5 +1,4 @@
-#![feature(globs)]
-#![feature(macro_rules)]
+#![feature(core)]
 
 extern crate deuterium;
 extern crate time;
@@ -7,11 +6,11 @@ extern crate time;
 use deuterium::*;
 
 #[macro_export]
-macro_rules! assert_sql(
+macro_rules! assert_sql {
     ($query:expr, $s:expr) => (
         assert_eq!($query.to_final_sql(&mut SqlContext::new(box sql::PostgreSqlAdapter)).as_slice(), $s)
     )
-)
+}
 
 mod select;
 mod where_;
@@ -29,7 +28,7 @@ fn select_order() {
     let jedi_table = TableDef::new("jedi");
     let name = NamedField::<String>::field_of("name", &jedi_table);
     
-    let query: SelectQuery<(String), LimitOne, ()> = jedi_table.select_1(&name)
+    let query: SelectQuery<(String,), LimitOne, ()> = jedi_table.select_1(&name)
         .first().order_by(&name);
 
     assert_sql!(query, "SELECT name FROM jedi ORDER BY name ASC LIMIT 1;");

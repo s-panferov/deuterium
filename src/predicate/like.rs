@@ -1,53 +1,44 @@
 
 use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
-use expression::{ToExpression};
-
-use expression::{RawExpr};
-use field::{StringField, OptionalStringField};
+use expression::{self, ToExpression};
+use field;
 use sql::{ToPredicateValue};
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct LikePredicate<F, T> {
     pub field: F,
     pub value: T,
     pub case_sensitive: bool
 }
 
-pub trait ToLikePredicate<F, T> {
-    fn like(&self, val: T) -> RcPredicate;
-    fn ilike(&self, val: T) -> RcPredicate;
+pub trait ToLikePredicate<T> {
+    fn like<B>(&self, val: B) -> RcPredicate 
+        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
+
+    fn ilike<B>(&self, val: B) -> RcPredicate
+        where B: ToExpression<T> + ToPredicateValue + Clone + 'static;
 }
 
-macro_rules! is_methods(
-    ($v:ty) => (
-        fn like(&self, val: $v) -> RcPredicate {
-            LikePredicate {
-                field: self.clone(),
-                value: val,
-                case_sensitive: true
-            }.upcast()
-        }
+impl<F, T> Predicate for LikePredicate<F, T> 
+    where F: ToPredicateValue,
+          T: ToPredicateValue { }
 
-        fn ilike(&self, val: $v) -> RcPredicate {
-            LikePredicate {
-                field: self.clone(),
-                value: val,
-                case_sensitive: false
-            }.upcast()
-        }
-    )
-)
+macro_rules! impl_for {
+    ($field:ty, $expr:ty) => (
+        impl ToLikePredicate<$expr> for $field {
+            fn like<B>(&self, val: B) -> RcPredicate 
+                where B: ToExpression<$expr> + ToPredicateValue + Clone + 'static {
+                LikePredicate { field: self.clone(), value: val, case_sensitive: true }.upcast()
+            }
 
-macro_rules! impl_for(
-    ($field:ty, $v:ident) => (
-        impl<T: ToExpression<$v> + ToPredicateValue + Clone> Predicate for LikePredicate<$field, T> { }
-        impl<T: ToExpression<$v> + ToPredicateValue + Clone> ToLikePredicate<$field, T> for $field {
-            is_methods!(T) 
+            fn ilike<B>(&self, val: B) -> RcPredicate 
+                where B: ToExpression<$expr> + ToPredicateValue + Clone + 'static {
+                LikePredicate { field: self.clone(), value: val, case_sensitive: false }.upcast()
+            } 
         }
     )
-)
+}
 
-impl_for!(StringField, String)
-impl_for!(OptionalStringField, String)
-
-impl_for!(RawExpr, String)
+impl_for!(field::StringField, String);
+impl_for!(field::OptionalStringField, Option<String>);
+impl_for!(expression::RawExpr, String);

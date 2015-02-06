@@ -17,7 +17,7 @@ pub trait Field {
 pub type BoxedField = Box<Field + 'static>;
 pub type RcField = Rc<BoxedField>;
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct NamedField<T> {
     pub name: String,
     pub table_name: String,
@@ -74,11 +74,9 @@ impl<T: Clone> UntypedExpression for NamedField<T> {
     }
 
     fn upcast_expression(&self) -> RcExpression {
-        Rc::new(box self.clone() as BoxedExpression)
+        Rc::new(Box::new(self.clone()) as BoxedExpression)
     }
 }
-
-impl<T: Clone> Expression<T> for NamedField<T> {}
 
 impl<T: Clone> Field for NamedField<T> {
     fn name(&self) -> &str {
@@ -94,7 +92,7 @@ impl<T: Clone> Field for NamedField<T> {
     }
 
     fn upcast_field(&self) -> RcField {
-        Rc::new(box self.clone() as BoxedField)
+        Rc::new(Box::new(self.clone()) as BoxedField)
     }
 }
 

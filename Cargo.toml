@@ -16,6 +16,7 @@ default = ["postgres"]
 [dependencies]
 uuid = "*"
 time = "*"
+rustc-serialize = "*"
 
 [dependencies.postgres]
 version = "*"

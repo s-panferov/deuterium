@@ -1,13 +1,13 @@
 
 use expression::{RcExpression, UntypedExpression};
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub enum Order {
     Asc,
     Desc
 }
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct OrderBy {
     by: RcExpression,
     order: Order
