@@ -1,19 +1,18 @@
-
-use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
+use super::{ToAbstractPredicate};
 
 #[derive(Clone)]
 pub struct ExcludePredicate {
-    pub predicate: RcPredicate
+    pub predicate: super::RcPredicate
 }
 
 pub trait ToExcludePredicate {
-    fn exclude(&self) -> RcPredicate;
+    fn exclude(&self) -> super::RcPredicate;
 }
 
-impl Predicate for ExcludePredicate {}
+impl super::Predicate for ExcludePredicate {}
 
-impl ToExcludePredicate for RcPredicate { 
-    fn exclude(&self) -> RcPredicate {
+impl ToExcludePredicate for super::RcPredicate { 
+    fn exclude(&self) -> super::RcPredicate {
         ExcludePredicate{predicate: self.clone()}.upcast()
     }
 }

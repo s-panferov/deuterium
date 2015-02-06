@@ -1,7 +1,6 @@
+use std::rc;
 
-use std::rc::Rc;
-
-use sql::{PredicateToSql};
+use super::sql;
 
 pub use self::raw::{RawPredicate};
 pub use self::is::{IsPredicate, ToIsPredicate};
@@ -35,7 +34,7 @@ pub mod exclude;
 pub mod like;
 pub mod raw;
 
-pub trait Predicate: PredicateToSql { 
+pub trait Predicate: sql::PredicateToSql { 
 
 }
 
@@ -45,7 +44,7 @@ pub trait ToAbstractPredicate {
 
 impl<T> ToAbstractPredicate for T where T: Predicate + Clone + 'static {
     fn upcast(&self) -> RcPredicate {
-        Rc::new(Box::new(self.clone()) as BoxedPredicate)
+        rc::Rc::new(Box::new(self.clone()) as BoxedPredicate)
     }
 }
 
@@ -62,4 +61,4 @@ impl ToAndPredicate for RcPredicate {
 }
 
 pub type BoxedPredicate = Box<Predicate + 'static>;
-pub type RcPredicate = Rc<BoxedPredicate>;
+pub type RcPredicate = rc::Rc<BoxedPredicate>;

@@ -1,9 +1,8 @@
+use super::super::sql;
+use super::super::expression;
+use super::super::field;
 
-use sql::{ToPredicateValue};
-use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
-
-use expression::{RawExpr};
-use field;
+use super::{ToAbstractPredicate};
 
 #[derive(Clone)]
 pub struct IsNullPredicate<F> {
@@ -12,28 +11,28 @@ pub struct IsNullPredicate<F> {
 }
 
 pub trait ToIsNullPredicate {
-    fn is_null(&self) -> RcPredicate;
-    fn not_null(&self) -> RcPredicate;
+    fn is_null(&self) -> super::RcPredicate;
+    fn not_null(&self) -> super::RcPredicate;
 }
 
-impl<F> Predicate for IsNullPredicate<F> where F: ToPredicateValue {}
+impl<F> super::Predicate for IsNullPredicate<F> where F: sql::ToPredicateValue {}
 
-impl<T> ToIsNullPredicate for field::NamedField<Option<T>> where T: ToPredicateValue + Clone {
-    fn is_null(&self) -> RcPredicate {
+impl<T> ToIsNullPredicate for field::NamedField<Option<T>> where T: sql::ToPredicateValue + Clone {
+    fn is_null(&self) -> super::RcPredicate {
         IsNullPredicate { field: self.clone(), null: true }.upcast()
     }
 
-    fn not_null(&self) -> RcPredicate {
+    fn not_null(&self) -> super::RcPredicate {
         IsNullPredicate { field: self.clone(), null: false }.upcast()
     }
 }
 
-impl ToIsNullPredicate for RawExpr {
-    fn is_null(&self) -> RcPredicate {
+impl ToIsNullPredicate for expression::RawExpr {
+    fn is_null(&self) -> super::RcPredicate {
         IsNullPredicate { field: self.clone(), null: true }.upcast()
     }
 
-    fn not_null(&self) -> RcPredicate {
+    fn not_null(&self) -> super::RcPredicate {
         IsNullPredicate { field: self.clone(), null: false }.upcast()
     }
 }

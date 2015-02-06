@@ -1,36 +1,31 @@
-use insert_query::{
-    InsertQuery, 
-    Insert,
-};
+use super::super::insert_query;
 
-use sql::{SqlContext, ToSql, QueryToSql};
-
-impl<T: Clone, V: ToSql, M: Clone> ToSql for Insert<T, V, M> {
-    fn to_sql(&self, ctx: &mut SqlContext) -> String {
+impl<T: Clone, V: super::ToSql, M: Clone> super::ToSql for insert_query::Insert<T, V, M> {
+    fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         match self {
-            &Insert::DefaultValues => {
+            &insert_query::Insert::DefaultValues => {
                 format!("DEFAULT VALUES")
             },
-            &Insert::Values(ref rows) => {
+            &insert_query::Insert::Values(ref rows) => {
                 let rows_str: Vec<String> = rows.iter().map(|row| { format!("({})", row.to_sql(ctx)) }).collect();
                 format!("VALUES\n    {}", rows_str.connect(",\n    "))
             },
-            &Insert::UntypedValues(ref rows) => {
+            &insert_query::Insert::UntypedValues(ref rows) => {
                 let rows_str: Vec<String> = rows.iter().map(|row| {
                     let values_str: Vec<String> = row.iter().map(|v| v.to_sql(ctx)).collect();
                     format!("({})", values_str.connect(", "))
                 }).collect();
                 format!("VALUES\n    {}", rows_str.connect(",\n    "))    
             },
-            &Insert::FromSelect(ref select) => {
+            &insert_query::Insert::FromSelect(ref select) => {
                 select.to_sql(ctx)
             }
         }
     }
 }
 
-impl<T: Clone, V: Clone+ToSql, M: Clone, RT: Clone, RL: Clone> ToSql for InsertQuery<T, V, M, RT, RL> {
-    fn to_sql(&self, ctx: &mut SqlContext) -> String {
+impl<T: Clone, V: Clone+super::ToSql, M: Clone, RT: Clone, RL: Clone> super::ToSql for insert_query::InsertQuery<T, V, M, RT, RL> {
+    fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         let mut sql = format!("INSERT INTO {}", self.get_into().get_table_name());
 
         let maybe_cols = self.get_cols().as_ref();
@@ -54,4 +49,4 @@ impl<T: Clone, V: Clone+ToSql, M: Clone, RT: Clone, RL: Clone> ToSql for InsertQ
     }
 }
 
-impl<T: Clone, V: Clone+ToSql, M: Clone, RT: Clone, RL: Clone> QueryToSql for InsertQuery<T, V, M, RT, RL> {}
+impl<T: Clone, V: Clone+super::ToSql, M: Clone, RT: Clone, RL: Clone> super::QueryToSql for insert_query::InsertQuery<T, V, M, RT, RL> {}

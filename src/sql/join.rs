@@ -1,68 +1,38 @@
+use super::super::join;
 
-use join::{
-    Join,
-    ConditionedJoinType,
-    UnconditionedJoinType
-};
-
-use join::Join::{
-    ConditionedJoin,
-    UnconditionedJoin,
-};
-
-use join::ConditionedJoinType::{
-    InnerJoin,
-    FullOuterJoin,
-    RightOuterJoin, 
-    LeftOuterJoin,
-    FullJoin,
-    RightJoin,
-    LeftJoin
-};
-
-use join::UnconditionedJoinType::{
-    NaturalJoin,
-    NaturalLeftJoin,
-    NaturalRightJoin,
-    NaturalFullJoin,
-    CrossJoin
-};
-
-use sql::{SqlContext, ToSql};
-
-impl ToSql for ConditionedJoinType {
-    fn to_sql(&self, _ctx: &mut SqlContext) -> String {
+impl super::ToSql for join::ConditionedJoinType {
+    fn to_sql(&self, _ctx: &mut super::SqlContext) -> String {
         match self {
-            &InnerJoin => "INNER JOIN",
-            &FullOuterJoin => "FULL OUTER JOIN",
-            &RightOuterJoin => "RIGHT OUTER JOIN",
-            &LeftOuterJoin => "LEFT OUTER JOIN",
-            &FullJoin => "FULL JOIN",
-            &RightJoin => "RIGHT JOIN",
-            &LeftJoin => "LEFT JOIN",
+            &join::ConditionedJoinType::InnerJoin => "INNER JOIN",
+            &join::ConditionedJoinType::FullOuterJoin => "FULL OUTER JOIN",
+            &join::ConditionedJoinType::RightOuterJoin => "RIGHT OUTER JOIN",
+            &join::ConditionedJoinType::LeftOuterJoin => "LEFT OUTER JOIN",
+            &join::ConditionedJoinType::FullJoin => "FULL JOIN",
+            &join::ConditionedJoinType::RightJoin => "RIGHT JOIN",
+            &join::ConditionedJoinType::LeftJoin => "LEFT JOIN",
         }.to_string()
     }
 }
 
-impl ToSql for UnconditionedJoinType {
-    fn to_sql(&self, _ctx: &mut SqlContext) -> String {
+impl super::ToSql for join::UnconditionedJoinType {
+    fn to_sql(&self, _ctx: &mut super::SqlContext) -> String {
         match self {
-            &NaturalJoin => "NATURAL JOIN",
-            &NaturalLeftJoin => "NATURAL LEFT JOIN",
-            &NaturalRightJoin => "NATURAL RIGHT JOIN",
-            &NaturalFullJoin => "NATURAL FULL JOIN",
-            &CrossJoin => "CROSS JOIN",
+            &join::UnconditionedJoinType::NaturalJoin => "NATURAL JOIN",
+            &join::UnconditionedJoinType::NaturalLeftJoin => "NATURAL LEFT JOIN",
+            &join::UnconditionedJoinType::NaturalRightJoin => "NATURAL RIGHT JOIN",
+            &join::UnconditionedJoinType::NaturalFullJoin => "NATURAL FULL JOIN",
+            &join::UnconditionedJoinType::CrossJoin => "CROSS JOIN",
         }.to_string()
     }
 }
 
-impl ToSql for Join {
-    fn to_sql(&self, ctx: &mut SqlContext) -> String {
+impl super::ToSql for join::Join {
+    fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         match self {
-            &ConditionedJoin{ref join_type, ref from, ref on} => {
+            &join::Join::ConditionedJoin{ref join_type, ref from, ref on} => {
                 format!("{} {} ON {}", join_type.to_sql(ctx), from.as_sql().to_from_sql(ctx), on.to_sql(false, ctx))
             },
-            &UnconditionedJoin{ref join_type, ref from} => {
+            &join::Join::UnconditionedJoin{ref join_type, ref from} => {
                 format!("{} {}", join_type.to_sql(ctx), from.as_sql().to_from_sql(ctx))
             }
         }

@@ -1,11 +1,11 @@
-use serialize::json::Json;
-use time::Timespec;
-use uuid::Uuid;
-use std::rc::Rc;
+use std::rc;
+use serialize::json;
+use time;
+use uuid;
 
-use from::{Table};
-use sql::{ToSql};
-use expression::{UntypedExpression, RcExpression, BoxedExpression};
+use super::from;
+use super::sql;
+use super::expression;
 
 pub trait Field {
     fn name(&self) -> &str;
@@ -15,7 +15,7 @@ pub trait Field {
 }
 
 pub type BoxedField = Box<Field + 'static>;
-pub type RcField = Rc<BoxedField>;
+pub type RcField = rc::Rc<BoxedField>;
 
 #[derive(Clone)]
 pub struct NamedField<T> {
@@ -41,7 +41,7 @@ impl<T: Clone> NamedField<T> {
         }
     }
 
-    pub fn field_of(name: &str, table: &Table) -> NamedField<T> {
+    pub fn field_of(name: &str, table: &from::Table) -> NamedField<T> {
         NamedField { 
             name: name.to_string(), 
             table_name: table.get_table_name().to_string(),
@@ -61,20 +61,20 @@ impl<T: Clone> NamedField<T> {
         field
     }
 
-    pub fn qual_for(&self, table: &Table) -> NamedField<T> {
+    pub fn qual_for(&self, table: &from::Table) -> NamedField<T> {
         let mut field = self.clone();
         field.qual = table.get_table_alias().as_ref().map(|v| v.to_string());
         field
     }
 }
 
-impl<T: Clone> UntypedExpression for NamedField<T> {
-    fn expression_as_sql(&self) -> &ToSql {
+impl<T: Clone> expression::UntypedExpression for NamedField<T> {
+    fn expression_as_sql(&self) -> &sql::ToSql {
         self
     }
 
-    fn upcast_expression(&self) -> RcExpression {
-        Rc::new(Box::new(self.clone()) as BoxedExpression)
+    fn upcast_expression(&self) -> expression::RcExpression {
+        rc::Rc::new(Box::new(self.clone()) as expression::BoxedExpression)
     }
 }
 
@@ -92,7 +92,7 @@ impl<T: Clone> Field for NamedField<T> {
     }
 
     fn upcast_field(&self) -> RcField {
-        Rc::new(Box::new(self.clone()) as BoxedField)
+        rc::Rc::new(Box::new(self.clone()) as BoxedField)
     }
 }
 
@@ -105,9 +105,9 @@ pub type F32Field = NamedField<f32>;
 pub type F64Field = NamedField<f64>;
 pub type StringField = NamedField<String>;
 pub type ByteListField = NamedField<Vec<u8>>;
-pub type JsonField = NamedField<Json>;
-pub type TimespecField = NamedField<Timespec>;
-pub type UuidField = NamedField<Uuid>;
+pub type JsonField = NamedField<json::Json>;
+pub type TimespecField = NamedField<time::Timespec>;
+pub type UuidField = NamedField<uuid::Uuid>;
 
 pub type OptionalBoolField = NamedField<Option<bool>>;
 pub type OptionalI8Field = NamedField<Option<i8>>;
@@ -118,6 +118,6 @@ pub type OptionalF32Field = NamedField<Option<f32>>;
 pub type OptionalF64Field = NamedField<Option<f64>>;
 pub type OptionalStringField = NamedField<Option<String>>;
 pub type OptionalByteListField = NamedField<Option<Vec<u8>>>;
-pub type OptionalJsonField = NamedField<Option<Json>>;
-pub type OptionalTimespecField = NamedField<Option<Timespec>>;
-pub type OptionalUuidField = NamedField<Option<Uuid>>;
+pub type OptionalJsonField = NamedField<Option<json::Json>>;
+pub type OptionalTimespecField = NamedField<Option<time::Timespec>>;
+pub type OptionalUuidField = NamedField<Option<uuid::Uuid>>;

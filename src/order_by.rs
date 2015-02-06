@@ -1,5 +1,4 @@
-
-use expression::{RcExpression, UntypedExpression};
+use expression;
 
 #[derive(Clone)]
 pub enum Order {
@@ -9,26 +8,26 @@ pub enum Order {
 
 #[derive(Clone)]
 pub struct OrderBy {
-    by: RcExpression,
+    by: expression::RcExpression,
     order: Order
 }
 
 impl OrderBy {
-    pub fn by(expression: &UntypedExpression) -> OrderBy {
+    pub fn by(expression: &expression::UntypedExpression) -> OrderBy {
         OrderBy {
             by: expression.upcast_expression(),
             order: Order::Asc
         }
     }
 
-    pub fn reverse_by(expression: &UntypedExpression) -> OrderBy {
+    pub fn reverse_by(expression: &expression::UntypedExpression) -> OrderBy {
         OrderBy {
             by: expression.upcast_expression(),
             order: Order::Desc
         }
     }
 
-    pub fn get_by(&self) -> &RcExpression {
+    pub fn get_by(&self) -> &expression::RcExpression {
         &self.by
     }
 

@@ -1,30 +1,26 @@
-use insert_query::{
-    InsertValue
-};
+use super::super::insert_query;
 
-use sql::{SqlContext, ToSql};
-
-impl<T> ToSql for InsertValue<T> {
-    fn to_sql(&self, ctx: &mut SqlContext) -> String {
+impl<T> super::ToSql for insert_query::InsertValue<T> {
+    fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         match self {
-            &InsertValue::Value{ref expression} => {
+            &insert_query::InsertValue::Value{ref expression} => {
                 expression.expression_as_sql().to_sql(ctx)
             },
-            &InsertValue::Default => "DEFAULT".to_string()
+            &insert_query::InsertValue::Default => "DEFAULT".to_string()
         }
     } 
 }
 
-impl ToSql for ()  {
-    fn to_sql(&self, _ctx: &mut SqlContext) -> String {
+impl super::ToSql for ()  {
+    fn to_sql(&self, _ctx: &mut super::SqlContext) -> String {
         "DEFAULT VALUES".to_string()
     }
 }
 
 macro_rules! to_sql_for_insert_tuple {
     ($fmt:expr, $($t:ident, $var:ident),+) => (
-        impl<$($t,)+> ToSql for ($(InsertValue<$t>),+,)  {
-            fn to_sql(&self, ctx: &mut SqlContext) -> String {
+        impl<$($t,)+> super::ToSql for ($(insert_query::InsertValue<$t>),+,)  {
+            fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
                 let &($(ref $var,)+) = self;
                 format!($fmt, $($var.to_sql(ctx),)+)
             }

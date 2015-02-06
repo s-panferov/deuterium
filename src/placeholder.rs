@@ -1,10 +1,9 @@
-use std::rc::Rc;
+use std::rc;
+use time;
+use serialize::json;
 
-use time::Timespec;
-use serialize::json::Json;
-
-use expression::{ToExpression, UntypedExpression, RcExpression, RawExpr, BoxedExpression};
-use sql::{ToSql};
+use super::expression;
+use super::sql;
 
 #[derive(Clone, Copy)]
 pub struct Placeholder {
@@ -17,20 +16,20 @@ impl Placeholder {
     }
 }
 
-impl UntypedExpression for Placeholder {
-    fn expression_as_sql(&self) -> &ToSql {
+impl expression::UntypedExpression for Placeholder {
+    fn expression_as_sql(&self) -> &sql::ToSql {
         self
     }
 
-    fn upcast_expression(&self) -> RcExpression {
-        Rc::new(Box::new(self.clone()) as BoxedExpression)
+    fn upcast_expression(&self) -> expression::RcExpression {
+        rc::Rc::new(Box::new(self.clone()) as expression::BoxedExpression)
     }
 }
 
-impl ToExpression<bool> for Placeholder {}
-impl ToExpression<f64> for Placeholder {}
-impl ToExpression<String> for Placeholder {}
-impl ToExpression<Vec<u8>> for Placeholder {}
-impl ToExpression<Timespec> for Placeholder {}
-impl ToExpression<Json> for Placeholder {}
-impl ToExpression<RawExpr> for Placeholder {}
+impl expression::ToExpression<bool> for Placeholder {}
+impl expression::ToExpression<f64> for Placeholder {}
+impl expression::ToExpression<String> for Placeholder {}
+impl expression::ToExpression<Vec<u8>> for Placeholder {}
+impl expression::ToExpression<time::Timespec> for Placeholder {}
+impl expression::ToExpression<json::Json> for Placeholder {}
+impl expression::ToExpression<expression::RawExpr> for Placeholder {}

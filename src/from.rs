@@ -1,20 +1,19 @@
+use std::rc;
 
-use std::rc::Rc;
-use sql::{FromToSql};
-use select_query::{SelectQuery, Selectable};
-use insert_query::{InsertQuery, Insertable, InsertValue};
-use update_query::{Updatable};
-use delete_query::{Deletable};
-
-use field::{NamedField, Field};
+use super::sql;
+use super::select_query;
+use super::insert_query;
+use super::update_query;
+use super::delete_query;
+use super::field::{self, Field};
 
 pub trait From { 
-    fn as_sql(&self) -> &FromToSql;
+    fn as_sql(&self) -> &sql::FromToSql;
     fn upcast_from(&self) -> RcFrom;
 }
 
 pub type BoxedFrom = Box<From + 'static>;
-pub type RcFrom = Rc<BoxedFrom>;
+pub type RcFrom = rc::Rc<BoxedFrom>;
 
 pub trait Table {
     fn upcast_table(&self) -> RcTable;
@@ -23,7 +22,7 @@ pub trait Table {
 }
 
 pub type BoxedTable = Box<Table + 'static>;
-pub type RcTable = Rc<BoxedTable>;
+pub type RcTable = rc::Rc<BoxedTable>;
 
 #[derive(Clone)]
 pub struct TableDef {
@@ -31,14 +30,14 @@ pub struct TableDef {
     alias: Option<String>
 }
 
-// FIXME: Remove after all stuff in InsertQuery will be fixed
+// FIXME: Remove after all stuff in insert_query::InsertQuery will be fixed
 macro_rules! insert {
     ($name:ident, $(($t:ident, $arg:ident)),+) => (
         #[doc(hidden)]
-        fn $name<$($t:Clone,)+>(&self, $($arg: &NamedField<$t>,)+) -> InsertQuery<($($t,)+), ($(InsertValue<$t>,)+), (), (), ()> {
+        fn $name<$($t:Clone,)+>(&self, $($arg: &field::NamedField<$t>,)+) -> insert_query::InsertQuery<($($t,)+), ($(insert_query::InsertValue<$t>,)+), (), (), ()> {
             let mut cols = vec![];
             $(cols.push((*$arg).upcast_field());)+
-            InsertQuery::new_with_cols(self, cols)
+            insert_query::InsertQuery::new_with_cols(self, cols)
         }
     )
 }
@@ -59,18 +58,18 @@ impl TableDef {
         table_def
     }
 
-    // FIXME: Remove after all stuff in InsertQuery will be fixed
+    // FIXME: Remove after all stuff in insert_query::InsertQuery will be fixed
     insert!(insert_1, (T0, _t0));
 
     #[doc(hidden)]
-    pub fn insert_1_for_test(&self, name: &NamedField<String>) -> InsertQuery<(String,), (InsertValue<String>,), (), (), ()> {
+    pub fn insert_1_for_test(&self, name: &field::NamedField<String>) -> insert_query::InsertQuery<(String,), (insert_query::InsertValue<String>,), (), (), ()> {
         self.insert_1(name)
     }
 }
 
 impl Table for TableDef {
     fn upcast_table(&self) -> RcTable {
-        Rc::new(Box::new(self.clone()) as BoxedTable)
+        rc::Rc::new(Box::new(self.clone()) as BoxedTable)
     }
 
     fn get_table_name(&self) -> &String {
@@ -83,35 +82,35 @@ impl Table for TableDef {
 }
 
 impl From for TableDef {
-    fn as_sql(&self) -> &FromToSql {
+    fn as_sql(&self) -> &sql::FromToSql {
         self
     }
 
     fn upcast_from(&self) -> RcFrom {
-        Rc::new(Box::new(self.clone()) as BoxedFrom)
+        rc::Rc::new(Box::new(self.clone()) as BoxedFrom)
     }
 }
 
-impl Selectable<()> for TableDef {}
-impl Insertable<()> for TableDef {}
-impl Updatable<()> for TableDef {}
-impl Deletable<()> for TableDef {}
+impl select_query::Selectable<()> for TableDef {}
+impl insert_query::Insertable<()> for TableDef {}
+impl update_query::Updatable<()> for TableDef {}
+impl delete_query::Deletable<()> for TableDef {}
 
 #[derive(Clone)]
 pub struct FromSelect<T, L, M> {
-    pub select: SelectQuery<T, L, M>,
+    pub select: select_query::SelectQuery<T, L, M>,
     pub alias: String 
 }
 
 impl<T: Clone, L: Clone, M: Clone> From for FromSelect<T, L, M> {
-    fn as_sql(&self) -> &FromToSql {
+    fn as_sql(&self) -> &sql::FromToSql {
         self
     }
 
     fn upcast_from(&self) -> RcFrom {
-        Rc::new(Box::new(self.clone()) as BoxedFrom)
+        rc::Rc::new(Box::new(self.clone()) as BoxedFrom)
     }
 }
 
-impl<T: Clone, L: Clone, M: Clone> Selectable<M> for FromSelect<T, L, M> {}
+impl<T: Clone, L: Clone, M: Clone> select_query::Selectable<M> for FromSelect<T, L, M> {}
 

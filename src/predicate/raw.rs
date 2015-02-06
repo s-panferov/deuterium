@@ -1,6 +1,3 @@
-
-use predicate::{Predicate};
-
 #[derive(Clone)]
 pub struct RawPredicate {
     pub content: String
@@ -12,4 +9,4 @@ impl RawPredicate {
     }
 }
 
-impl Predicate for RawPredicate { }
+impl super::Predicate for RawPredicate { }

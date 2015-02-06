@@ -1,13 +1,11 @@
-
-use sql::{ToSql, ToPredicateValue};
-use std::rc::Rc;
-
-use serialize::json::Json;
-use time::Timespec;
-use uuid::Uuid;
+use std::rc;
 use std::mem;
+use serialize::json;
+use time;
+use uuid;
 
-use field;
+use super::sql;
+use super::field;
 
 #[derive(Clone)]
 pub struct RawExpr {
@@ -23,7 +21,7 @@ impl RawExpr {
 }
 
 pub trait UntypedExpression {
-    fn expression_as_sql(&self) -> &ToSql;
+    fn expression_as_sql(&self) -> &sql::ToSql;
     fn upcast_expression(&self) -> RcExpression;
 }
 
@@ -31,19 +29,19 @@ pub trait Expression<T>: UntypedExpression {}
 pub trait ListExpression<T>: UntypedExpression {}
 
 pub type BoxedExpression = Box<UntypedExpression + 'static>;
-pub type RcExpression = Rc<BoxedExpression>;
+pub type RcExpression = rc::Rc<BoxedExpression>;
 
 pub trait PrimitiveType { }
 
 macro_rules! to_expression {
     ($t:ty) => (
         impl UntypedExpression for $t {
-            fn expression_as_sql(&self) -> &ToSql {
+            fn expression_as_sql(&self) -> &sql::ToSql {
                 self
             }
 
             fn upcast_expression(&self) -> RcExpression {
-                Rc::new(Box::new(self.clone()) as BoxedExpression)
+                rc::Rc::new(Box::new(self.clone()) as BoxedExpression)
             }
         }
         
@@ -60,9 +58,9 @@ to_expression!(f32);
 to_expression!(f64);
 to_expression!(String);
 to_expression!(Vec<u8>);
-to_expression!(Json);
-to_expression!(Timespec);
-to_expression!(Uuid);
+to_expression!(json::Json);
+to_expression!(time::Timespec);
+to_expression!(uuid::Uuid);
 to_expression!(RawExpr);
 
 impl PrimitiveType for bool { }
@@ -74,9 +72,9 @@ impl PrimitiveType for f32 { }
 impl PrimitiveType for f64 { }
 impl PrimitiveType for String { }
 impl PrimitiveType for Vec<u8> { }
-impl PrimitiveType for Json { }
-impl PrimitiveType for Timespec { }
-impl PrimitiveType for Uuid { }
+impl PrimitiveType for json::Json { }
+impl PrimitiveType for time::Timespec { }
+impl PrimitiveType for uuid::Uuid { }
 impl PrimitiveType for RawExpr { }
 
 to_expression!(Option<bool>);
@@ -88,9 +86,9 @@ to_expression!(Option<f32>);
 to_expression!(Option<f64>);
 to_expression!(Option<String>);
 to_expression!(Option<Vec<u8>>);
-to_expression!(Option<Json>);
-to_expression!(Option<Timespec>);
-to_expression!(Option<Uuid>);
+to_expression!(Option<json::Json>);
+to_expression!(Option<time::Timespec>);
+to_expression!(Option<uuid::Uuid>);
 to_expression!(Option<RawExpr>);
 
 pub trait ToExpression<T>: UntypedExpression + Sized {
@@ -207,46 +205,46 @@ impl ToExpression<Option<Vec<u8>>> for field::OptionalByteListField {}
 impl ToExpression<Option<Vec<u8>>> for RawExpr {}
 
 //
-// Json
+// json::Json
 //
 
-impl ToExpression<Json> for Json {}
-impl ToExpression<Json> for field::JsonField {}
-impl ToExpression<Json> for RawExpr {}
+impl ToExpression<json::Json> for json::Json {}
+impl ToExpression<json::Json> for field::JsonField {}
+impl ToExpression<json::Json> for RawExpr {}
 
-impl ToExpression<Option<Json>> for Json {}
-impl ToExpression<Option<Json>> for Option<Json> {}
-impl ToExpression<Option<Json>> for field::JsonField {}
-impl ToExpression<Option<Json>> for field::OptionalJsonField {}
-impl ToExpression<Option<Json>> for RawExpr {}
-
-//
-// Timespec
-//
-
-impl ToExpression<Timespec> for Timespec {}
-impl ToExpression<Timespec> for field::TimespecField {}
-impl ToExpression<Timespec> for RawExpr {}
-
-impl ToExpression<Option<Timespec>> for Timespec {}
-impl ToExpression<Option<Timespec>> for Option<Timespec> {}
-impl ToExpression<Option<Timespec>> for field::TimespecField {}
-impl ToExpression<Option<Timespec>> for field::OptionalTimespecField {}
-impl ToExpression<Option<Timespec>> for RawExpr {}
+impl ToExpression<Option<json::Json>> for json::Json {}
+impl ToExpression<Option<json::Json>> for Option<json::Json> {}
+impl ToExpression<Option<json::Json>> for field::JsonField {}
+impl ToExpression<Option<json::Json>> for field::OptionalJsonField {}
+impl ToExpression<Option<json::Json>> for RawExpr {}
 
 //
-// Uuid
+// time::Timespec
 //
 
-impl ToExpression<Uuid> for Uuid {}
-impl ToExpression<Uuid> for field::UuidField {}
-impl ToExpression<Uuid> for RawExpr {}
+impl ToExpression<time::Timespec> for time::Timespec {}
+impl ToExpression<time::Timespec> for field::TimespecField {}
+impl ToExpression<time::Timespec> for RawExpr {}
 
-impl ToExpression<Option<Uuid>> for Uuid {}
-impl ToExpression<Option<Uuid>> for Option<Uuid> {}
-impl ToExpression<Option<Uuid>> for field::UuidField {}
-impl ToExpression<Option<Uuid>> for field::OptionalUuidField {}
-impl ToExpression<Option<Uuid>> for RawExpr {}
+impl ToExpression<Option<time::Timespec>> for time::Timespec {}
+impl ToExpression<Option<time::Timespec>> for Option<time::Timespec> {}
+impl ToExpression<Option<time::Timespec>> for field::TimespecField {}
+impl ToExpression<Option<time::Timespec>> for field::OptionalTimespecField {}
+impl ToExpression<Option<time::Timespec>> for RawExpr {}
+
+//
+// uuid::Uuid
+//
+
+impl ToExpression<uuid::Uuid> for uuid::Uuid {}
+impl ToExpression<uuid::Uuid> for field::UuidField {}
+impl ToExpression<uuid::Uuid> for RawExpr {}
+
+impl ToExpression<Option<uuid::Uuid>> for uuid::Uuid {}
+impl ToExpression<Option<uuid::Uuid>> for Option<uuid::Uuid> {}
+impl ToExpression<Option<uuid::Uuid>> for field::UuidField {}
+impl ToExpression<Option<uuid::Uuid>> for field::OptionalUuidField {}
+impl ToExpression<Option<uuid::Uuid>> for RawExpr {}
 
 impl ToExpression<()> for bool {}
 impl ToExpression<()> for i8 {}
@@ -257,9 +255,9 @@ impl ToExpression<()> for f32 {}
 impl ToExpression<()> for f64 {}
 impl ToExpression<()> for Vec<u8> {}
 impl ToExpression<()> for String {}
-impl ToExpression<()> for Json {}
-impl ToExpression<()> for Timespec {}
-impl ToExpression<()> for Uuid {}
+impl ToExpression<()> for json::Json {}
+impl ToExpression<()> for time::Timespec {}
+impl ToExpression<()> for uuid::Uuid {}
 impl ToExpression<()> for Option<bool> {}
 impl ToExpression<()> for Option<i8> {}
 impl ToExpression<()> for Option<i16> {}
@@ -269,9 +267,9 @@ impl ToExpression<()> for Option<f32> {}
 impl ToExpression<()> for Option<f64> {}
 impl ToExpression<()> for Option<Vec<u8>> {}
 impl ToExpression<()> for Option<String> {}
-impl ToExpression<()> for Option<Json> {}
-impl ToExpression<()> for Option<Timespec> {}
-impl ToExpression<()> for Option<Uuid> {}
+impl ToExpression<()> for Option<json::Json> {}
+impl ToExpression<()> for Option<time::Timespec> {}
+impl ToExpression<()> for Option<uuid::Uuid> {}
 impl ToExpression<()> for field::BoolField {} 
 impl ToExpression<()> for field::I8Field {} 
 impl ToExpression<()> for field::I16Field {} 
@@ -306,9 +304,9 @@ impl ToExpression<RawExpr> for f32 {}
 impl ToExpression<RawExpr> for f64 {}
 impl ToExpression<RawExpr> for Vec<u8> {}
 impl ToExpression<RawExpr> for String {}
-impl ToExpression<RawExpr> for Json {}
-impl ToExpression<RawExpr> for Timespec {}
-impl ToExpression<RawExpr> for Uuid {}
+impl ToExpression<RawExpr> for json::Json {}
+impl ToExpression<RawExpr> for time::Timespec {}
+impl ToExpression<RawExpr> for uuid::Uuid {}
 impl ToExpression<RawExpr> for Option<bool> {}
 impl ToExpression<RawExpr> for Option<i8> {}
 impl ToExpression<RawExpr> for Option<i16> {}
@@ -318,9 +316,9 @@ impl ToExpression<RawExpr> for Option<f32> {}
 impl ToExpression<RawExpr> for Option<f64> {}
 impl ToExpression<RawExpr> for Option<Vec<u8>> {}
 impl ToExpression<RawExpr> for Option<String> {}
-impl ToExpression<RawExpr> for Option<Json> {}
-impl ToExpression<RawExpr> for Option<Timespec> {}
-impl ToExpression<RawExpr> for Option<Uuid> {}
+impl ToExpression<RawExpr> for Option<json::Json> {}
+impl ToExpression<RawExpr> for Option<time::Timespec> {}
+impl ToExpression<RawExpr> for Option<uuid::Uuid> {}
 impl ToExpression<RawExpr> for field::BoolField {} 
 impl ToExpression<RawExpr> for field::I8Field {} 
 impl ToExpression<RawExpr> for field::I16Field {} 
@@ -346,16 +344,16 @@ impl ToExpression<RawExpr> for field::OptionalByteListField {}
 impl ToExpression<RawExpr> for field::OptionalTimespecField {}
 impl ToExpression<RawExpr> for field::OptionalUuidField {}
 
-impl<T> UntypedExpression for Vec<T> where T: UntypedExpression + ToPredicateValue + Clone + 'static {
-    fn expression_as_sql(&self) -> &ToSql {
+impl<T> UntypedExpression for Vec<T> where T: UntypedExpression + sql::ToPredicateValue + Clone + 'static {
+    fn expression_as_sql(&self) -> &sql::ToSql {
         self
     }
 
     fn upcast_expression(&self) -> RcExpression {
-        Rc::new(Box::new(self.clone()) as BoxedExpression)
+        rc::Rc::new(Box::new(self.clone()) as BoxedExpression)
     }
 }
 
-impl<T> ListExpression<T> for Vec<T> where T: UntypedExpression + ToPredicateValue + Clone + 'static {}
-impl<T> ListExpression<Option<T>> for Vec<T> where T: UntypedExpression + ToPredicateValue + Clone + 'static {}
-impl<T> ToListExpression<T> for Vec<T> where T: UntypedExpression + ToPredicateValue + Clone + 'static { }
+impl<T> ListExpression<T> for Vec<T> where T: UntypedExpression + sql::ToPredicateValue + Clone + 'static {}
+impl<T> ListExpression<Option<T>> for Vec<T> where T: UntypedExpression + sql::ToPredicateValue + Clone + 'static {}
+impl<T> ToListExpression<T> for Vec<T> where T: UntypedExpression + sql::ToPredicateValue + Clone + 'static { }

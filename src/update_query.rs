@@ -1,25 +1,22 @@
 use std::mem;
+use std::rc;
 
-use std::rc::Rc;
+use super::select_query;
+use super::insert_query::{self, ToInsertValue};
+use super::from;
+use super::predicate;
+use super::expression;
+use super::sql;
+use super::field;
 
-use select_query::{Queryable, Select, LimitMany, NoResult};
-use insert_query::{ToInsertValue, InsertValue};
-use from::{From, Table, RcTable, RcFrom};
-use predicate::{RcPredicate};
-use expression::{Expression, UntypedExpression, RawExpr, ToExpression};
-use sql::{ToSql, ToPredicateValue};
-use field::{
-    NamedField,
-};
-
-pub trait FieldUpd: ToSql {
+pub trait FieldUpd: sql::ToSql {
     fn upcast_field_update(&self) -> RcFieldUpdate;
 }
 
 #[derive(Clone)]
 pub struct FieldUpdate<F, T> {
     pub field: F,
-    pub value: InsertValue<T>
+    pub value: insert_query::InsertValue<T>
 }
 
 impl<F, T> FieldUpdate<F, T> {
@@ -27,59 +24,61 @@ impl<F, T> FieldUpdate<F, T> {
         &self.field
     }    
 
-    pub fn get_value(&self) -> &InsertValue<T> {
+    pub fn get_value(&self) -> &insert_query::InsertValue<T> {
         &self.value
     }
 }
 
 pub type BoxedFieldUpdate = Box<FieldUpd + 'static>;
-pub type RcFieldUpdate = Rc<BoxedFieldUpdate>;
+pub type RcFieldUpdate = rc::Rc<BoxedFieldUpdate>;
 
-impl<F: Clone + ToPredicateValue + 'static, T: Clone + ToPredicateValue + 'static> FieldUpd for FieldUpdate<F, T> {
+impl<F, T> FieldUpd for FieldUpdate<F, T>
+    where F: Clone + sql::ToPredicateValue + 'static,
+          T: Clone + sql::ToPredicateValue + 'static {
     fn upcast_field_update(&self) -> RcFieldUpdate {
-        Rc::new(Box::new(self.clone()) as BoxedFieldUpdate)
+        rc::Rc::new(Box::new(self.clone()) as BoxedFieldUpdate)
     }
 }
 
 pub trait ToFieldUpdate<F, T> {
-    fn set<B: ToExpression<T>>(&self, val: &B) -> FieldUpdate<F, T>;
+    fn set<B: expression::ToExpression<T>>(&self, val: &B) -> FieldUpdate<F, T>;
     fn set_default(&self) -> FieldUpdate<F, T>;
 }
 
-impl<T> ToFieldUpdate<NamedField<T>, T> for NamedField<T> where T: Clone {
-    fn set<B: ToExpression<T>>(&self, val: &B) -> FieldUpdate<NamedField<T>, T> {
+impl<T> ToFieldUpdate<field::NamedField<T>, T> for field::NamedField<T> where T: Clone {
+    fn set<B: expression::ToExpression<T>>(&self, val: &B) -> FieldUpdate<field::NamedField<T>, T> {
         FieldUpdate {
             field: self.clone(),
-            value: val.as_expr().to_expr_val()
+            value: val.as_expr().to_insert_val()
         }
     }
 
-    fn set_default(&self) -> FieldUpdate<NamedField<T>, T> {
+    fn set_default(&self) -> FieldUpdate<field::NamedField<T>, T> {
         FieldUpdate {
             field: self.clone(),
-            value: InsertValue::Default
-        }
-    }
-}
-
-impl ToFieldUpdate<RawExpr, RawExpr> for RawExpr {
-    fn set<B: ToExpression<RawExpr>>(&self, val: &B) -> FieldUpdate<RawExpr, RawExpr> {
-        FieldUpdate {
-            field: self.clone(),
-            value: val.as_expr().to_expr_val()
-        }
-    }
-
-    fn set_default(&self) -> FieldUpdate<RawExpr, RawExpr> {
-        FieldUpdate {
-            field: self.clone(),
-            value: InsertValue::Default
+            value: insert_query::InsertValue::Default
         }
     }
 }
 
-pub trait Updatable<M>: Table + Sized { 
-    fn update(&self) -> UpdateQuery<(), NoResult, M> {
+impl ToFieldUpdate<expression::RawExpr, expression::RawExpr> for expression::RawExpr {
+    fn set<B: expression::ToExpression<expression::RawExpr>>(&self, val: &B) -> FieldUpdate<expression::RawExpr, expression::RawExpr> {
+        FieldUpdate {
+            field: self.clone(),
+            value: val.as_expr().to_insert_val()
+        }
+    }
+
+    fn set_default(&self) -> FieldUpdate<expression::RawExpr, expression::RawExpr> {
+        FieldUpdate {
+            field: self.clone(),
+            value: insert_query::InsertValue::Default
+        }
+    }
+}
+
+pub trait Updatable<M>: from::Table + Sized { 
+    fn update(&self) -> UpdateQuery<(), select_query::NoResult, M> {
         UpdateQuery::new(self)
     }
 }
@@ -87,16 +86,16 @@ pub trait Updatable<M>: Table + Sized {
 #[derive(Clone)]
 pub struct UpdateQuery<T, L, M> {
     pub only: bool,
-    pub table: RcTable,
+    pub table: from::RcTable,
     pub updates: Vec<RcFieldUpdate>,
-    pub from: Option<Vec<RcFrom>>,
-    pub where_: Option<RcPredicate>,
+    pub from: Option<Vec<from::RcFrom>>,
+    pub where_: Option<predicate::RcPredicate>,
     pub all: bool,
-    pub returning: Option<Select>
+    pub returning: Option<select_query::Select>
 }
 
 impl<T, L, M> UpdateQuery<T, L, M> {
-    pub fn new(table: &Table) -> UpdateQuery<T, L, M> {
+    pub fn new(table: &from::Table) -> UpdateQuery<T, L, M> {
         UpdateQuery {
             only: false,
             table: table.upcast_table(),
@@ -113,7 +112,7 @@ impl<T, L, M> UpdateQuery<T, L, M> {
         self
     }
 
-    pub fn from(mut self, from: &From) -> UpdateQuery<T, L, M> {
+    pub fn from(mut self, from: &from::From) -> UpdateQuery<T, L, M> {
         if self.from.is_none() {
             self.from = Some(vec![])
         }
@@ -136,8 +135,8 @@ impl<T, L, M> UpdateQuery<T, L, M> {
 
 returning_for!(UpdateQuery);
 
-impl<T:Clone, L:Clone, M:Clone> Queryable for UpdateQuery<T, L, M> { 
-    fn get_where(&self) -> &Option<RcPredicate> { &self.where_ }
-    fn set_where(&mut self, predicate: RcPredicate) { self.where_ = Some(predicate); }
+impl<T:Clone, L:Clone, M:Clone> select_query::Queryable for UpdateQuery<T, L, M> { 
+    fn get_where(&self) -> &Option<predicate::RcPredicate> { &self.where_ }
+    fn set_where(&mut self, predicate: predicate::RcPredicate) { self.where_ = Some(predicate); }
     fn unset_where(&mut self) { self.where_ = None; }
 }

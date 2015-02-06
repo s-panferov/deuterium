@@ -1,20 +1,15 @@
-use serialize::json::Json;
-use time::Timespec;
-use uuid::Uuid;
+use serialize::json;
+use time;
+use uuid;
+#[cfg(feature = "postgres")] use postgres;
 
-use sql::{SqlContext, ToSql};
+use expression;
+use field;
 
-
-use expression::{RawExpr};
-use field::{
-    NamedField,
-};
-
-#[cfg(feature = "postgres")]
-use postgres;
+use super::{ToSql};
 
 pub trait ToPredicateValue {
-    fn to_predicate_value(&self, ctx: &mut SqlContext) -> String;
+    fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String;
 }
 
 // Trait to connect Deuterium and rust-postgres
@@ -28,13 +23,13 @@ pub trait AsPostgresValue: postgres::types::ToSql + Sized {
 macro_rules! to_predicate_for_field {
     ($f:ty) => (
         impl ToPredicateValue for $f  {
-            fn to_predicate_value(&self, ctx: &mut SqlContext) -> String { self.to_sql(ctx) }
+            fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String { self.to_sql(ctx) }
         }
     )
 }
 
-impl<T: Clone> ToPredicateValue for NamedField<T> {
-    fn to_predicate_value(&self, ctx: &mut SqlContext) -> String { self.to_sql(ctx) }
+impl<T: Clone> ToPredicateValue for field::NamedField<T> {
+    fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String { self.to_sql(ctx) }
 }
 
 macro_rules! raw_value_to_predicate_value {
@@ -43,7 +38,7 @@ macro_rules! raw_value_to_predicate_value {
         impl AsPostgresValue for $t {}
 
         impl ToPredicateValue for $t { 
-            fn to_predicate_value(&self, ctx: &mut SqlContext) -> String { 
+            fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String { 
                 ctx.hold(Box::new(self.clone()))
             }
         }
@@ -59,23 +54,23 @@ raw_value_to_predicate_value!(f32);
 raw_value_to_predicate_value!(f64);
 raw_value_to_predicate_value!(String);
 raw_value_to_predicate_value!(Vec<u8>);
-raw_value_to_predicate_value!(Json);
-raw_value_to_predicate_value!(Timespec);
-raw_value_to_predicate_value!(Uuid);
+raw_value_to_predicate_value!(json::Json);
+raw_value_to_predicate_value!(time::Timespec);
+raw_value_to_predicate_value!(uuid::Uuid);
 
-impl ToPredicateValue for RawExpr { 
-    fn to_predicate_value(&self, _ctx: &mut SqlContext) -> String { 
+impl ToPredicateValue for expression::RawExpr { 
+    fn to_predicate_value(&self, _ctx: &mut super::SqlContext) -> String { 
         self.content.to_string()
     }
 }
 
 macro_rules! extended_impl {
     ($t:ty) => (
-        impl ToSql for $t { fn to_sql(&self, ctx: &mut SqlContext) -> String { self.to_predicate_value(ctx) } }
-        impl ToSql for Option<$t> { fn to_sql(&self, ctx: &mut SqlContext) -> String { self.to_predicate_value(ctx) } }
+        impl super::ToSql for $t { fn to_sql(&self, ctx: &mut super::SqlContext) -> String { self.to_predicate_value(ctx) } }
+        impl super::ToSql for Option<$t> { fn to_sql(&self, ctx: &mut super::SqlContext) -> String { self.to_predicate_value(ctx) } }
 
         impl ToPredicateValue for Option<$t> { 
-            fn to_predicate_value(&self, ctx: &mut SqlContext) -> String { 
+            fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String { 
                 match self {
                     &Some(ref predicate) => predicate.to_predicate_value(ctx),
                     &None => "NULL".to_string()
@@ -94,22 +89,22 @@ extended_impl!(f32);
 extended_impl!(f64);
 extended_impl!(String);
 extended_impl!(Vec<u8>);
-extended_impl!(Json);
-extended_impl!(Timespec);
-extended_impl!(Uuid);
+extended_impl!(json::Json);
+extended_impl!(time::Timespec);
+extended_impl!(uuid::Uuid);
 
 
-extended_impl!(RawExpr);
+extended_impl!(expression::RawExpr);
 
 impl<T: ToPredicateValue> ToPredicateValue for Vec<T> {
-    fn to_predicate_value(&self, ctx: &mut SqlContext) -> String { 
+    fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String { 
         let values: Vec<String> = self.iter().map(|v| v.to_predicate_value(ctx)).collect();
         values.connect(", ")
     }  
 }
 
-impl<T: ToPredicateValue> ToSql for Vec<T> {
-    fn to_sql(&self, ctx: &mut SqlContext) -> String { 
+impl<T: ToPredicateValue> super::ToSql for Vec<T> {
+    fn to_sql(&self, ctx: &mut super::SqlContext) -> String { 
         self.to_predicate_value(ctx)
     }  
 }
