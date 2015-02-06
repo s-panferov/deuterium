@@ -5,7 +5,7 @@ use std::rc::Rc;
 
 use from::{Table};
 use sql::{ToSql};
-use expression::{Expression, UntypedExpression, RcExpression, BoxedExpression};
+use expression::{UntypedExpression, RcExpression, BoxedExpression};
 
 pub trait Field {
     fn name(&self) -> &str;

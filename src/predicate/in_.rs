@@ -1,6 +1,3 @@
-use time::Timespec;
-use uuid::Uuid;
-
 use predicate::{Predicate, ToAbstractPredicate, RcPredicate};
 use expression::{ToListExpression};
 

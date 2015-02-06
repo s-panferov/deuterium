@@ -3,7 +3,7 @@ use std::mem;
 use from::{Table, RcTable};
 use field::{Field, RcField};
 use select_query::{SelectQuery, LimitMany, Select, NoResult};
-use expression::{RcExpression, Expression, ToExpression, UntypedExpression};
+use expression::{RcExpression, Expression, UntypedExpression};
 
 #[derive(Clone)]
 pub enum InsertValue<T> {
