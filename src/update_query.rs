@@ -61,15 +61,15 @@ impl<T> ToFieldUpdate<field::NamedField<T>, T> for field::NamedField<T> where T:
     }
 }
 
-impl ToFieldUpdate<expression::RawExpr, expression::RawExpr> for expression::RawExpr {
-    fn set<B: expression::ToExpression<expression::RawExpr>>(&self, val: &B) -> FieldUpdate<expression::RawExpr, expression::RawExpr> {
+impl ToFieldUpdate<expression::RawExpression, expression::RawExpression> for expression::RawExpression {
+    fn set<B: expression::ToExpression<expression::RawExpression>>(&self, val: &B) -> FieldUpdate<expression::RawExpression, expression::RawExpression> {
         FieldUpdate {
             field: self.clone(),
             value: val.as_expr().to_insert_val()
         }
     }
 
-    fn set_default(&self) -> FieldUpdate<expression::RawExpr, expression::RawExpr> {
+    fn set_default(&self) -> FieldUpdate<expression::RawExpression, expression::RawExpression> {
         FieldUpdate {
             field: self.clone(),
             value: insert_query::InsertValue::Default

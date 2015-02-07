@@ -24,7 +24,7 @@ impl<T> ToIsPredicate<T> for field::NamedField<T> where T: sql::ToPredicateValue
     }
 }
 
-impl<T> ToIsPredicate<T> for expression::RawExpr where T: sql::ToPredicateValue + Clone {
+impl<T> ToIsPredicate<T> for expression::RawExpression where T: sql::ToPredicateValue + Clone {
     fn is<B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static>(&self, val: B) -> super::SharedPredicate {
         IsPredicate { field: self.clone(), value: val }.upcast()
     }

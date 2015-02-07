@@ -58,7 +58,7 @@ raw_value_to_predicate_value!(json::Json);
 raw_value_to_predicate_value!(time::Timespec);
 raw_value_to_predicate_value!(uuid::Uuid);
 
-impl ToPredicateValue for expression::RawExpr { 
+impl ToPredicateValue for expression::RawExpression { 
     fn to_predicate_value(&self, _ctx: &mut super::SqlContext) -> String { 
         self.content.to_string()
     }
@@ -94,7 +94,7 @@ extended_impl!(time::Timespec);
 extended_impl!(uuid::Uuid);
 
 
-extended_impl!(expression::RawExpr);
+extended_impl!(expression::RawExpression);
 
 impl<T: ToPredicateValue> ToPredicateValue for Vec<T> {
     fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String { 

@@ -27,7 +27,7 @@ impl<T> ToIsNullPredicate for field::NamedField<Option<T>> where T: sql::ToPredi
     }
 }
 
-impl ToIsNullPredicate for expression::RawExpr {
+impl ToIsNullPredicate for expression::RawExpression {
     fn is_null(&self) -> super::SharedPredicate {
         IsNullPredicate { field: self.clone(), null: true }.upcast()
     }

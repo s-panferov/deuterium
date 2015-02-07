@@ -41,4 +41,4 @@ macro_rules! impl_for {
 
 impl_for!(field::StringField, String);
 impl_for!(field::OptionalStringField, Option<String>);
-impl_for!(expression::RawExpr, String);
+impl_for!(expression::RawExpression, String);

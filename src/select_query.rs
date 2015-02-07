@@ -346,7 +346,7 @@ pub trait Selectable<M: Clone>: from::From {
     }
 
     fn exists(&self) -> SelectQuery<(), LimitMany, M> {
-        SelectQuery::new(Select::Only(vec![expression::RawExpr::new("1").upcast_expression()]), self.upcast_from())
+        SelectQuery::new(Select::Only(vec![expression::RawExpression::new("1").upcast_expression()]), self.upcast_from())
     }
 }
 

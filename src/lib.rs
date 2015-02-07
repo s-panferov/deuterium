@@ -105,7 +105,7 @@ pub use expression::{
     UntypedExpression, 
     Expression,
     SharedExpression,
-    RawExpr,
+    RawExpression,
     ListExpression,
     ToExpression,
     ToListExpression

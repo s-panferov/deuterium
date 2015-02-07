@@ -32,4 +32,4 @@ impl expression::ToExpression<String> for Placeholder {}
 impl expression::ToExpression<Vec<u8>> for Placeholder {}
 impl expression::ToExpression<time::Timespec> for Placeholder {}
 impl expression::ToExpression<json::Json> for Placeholder {}
-impl expression::ToExpression<expression::RawExpr> for Placeholder {}
+impl expression::ToExpression<expression::RawExpression> for Placeholder {}

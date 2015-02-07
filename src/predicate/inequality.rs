@@ -82,4 +82,4 @@ impl_for!(field::OptionalF32Field, Option<f32>);
 impl_for!(field::OptionalF64Field, Option<f64>);
 impl_for!(field::OptionalTimespecField, Option<time::Timespec>);
 
-impl_for!(expression::RawExpr, expression::RawExpr);
+impl_for!(expression::RawExpression, expression::RawExpression);

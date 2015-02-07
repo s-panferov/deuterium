@@ -25,7 +25,7 @@ impl<T> ToInPredicate<T> for field::NamedField<T> where T: sql::ToPredicateValue
     }
 }
 
-impl<T> ToInPredicate<T> for expression::RawExpr where T: sql::ToPredicateValue + Clone {
+impl<T> ToInPredicate<T> for expression::RawExpression where T: sql::ToPredicateValue + Clone {
     fn in_<B: expression::ToListExpression<T> + sql::ToPredicateValue + Clone + 'static>(&self, val: B) -> super::SharedPredicate {
         InPredicate { field: self.clone(), values: val }.upcast()
     }
