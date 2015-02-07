@@ -10,7 +10,7 @@ impl<T: Clone> super::ToSql for field::NamedField<T> {
     }
 }
 
-impl super::ToSql for field::RcField {
+impl super::ToSql for field::SharedField {
     fn to_sql(&self, _ctx: &mut super::SqlContext) -> String {
         let ref name = self.name();
         match &self.qual() {

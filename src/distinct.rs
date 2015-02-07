@@ -3,7 +3,7 @@ use super::expression;
 
 #[derive(Clone)]
 pub struct Distinct {
-    pub on: Option<Vec<expression::RcExpression>>
+    pub on: Option<Vec<expression::SharedExpression>>
 }
 
 impl Distinct {

@@ -8,7 +8,7 @@ use super::expression;
 #[derive(Clone)]
 pub enum InsertValue<T> {
     Value {
-        expression: expression::RcExpression
+        expression: expression::SharedExpression
     },
     Default
 }
@@ -43,8 +43,8 @@ pub enum Insert<T, V, M> {
 #[allow(dead_code)]
 #[derive(Clone)]
 pub struct InsertQuery<T, V, M, RT, RL> {
-    into: from::RcTable,
-    cols: Option<Vec<field::RcField>>,
+    into: from::SharedTable,
+    cols: Option<Vec<field::SharedField>>,
     values: Insert<T, V, M>,
     returning: Option<select_query::Select>
 }
@@ -110,7 +110,7 @@ impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT
         }
     }
 
-    pub fn new_with_cols(into: &from::Table, cols: Vec<field::RcField>) -> InsertQuery<T, V, M, RT, RL> {
+    pub fn new_with_cols(into: &from::Table, cols: Vec<field::SharedField>) -> InsertQuery<T, V, M, RT, RL> {
         InsertQuery {
             into: into.upcast_table(),
             cols: Some(cols),
@@ -119,8 +119,8 @@ impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT
         }
     }
 
-    pub fn get_into(&self) -> &from::RcTable { &self.into }
-    pub fn get_cols(&self) -> &Option<Vec<field::RcField>> { &self.cols }
+    pub fn get_into(&self) -> &from::SharedTable { &self.into }
+    pub fn get_cols(&self) -> &Option<Vec<field::SharedField>> { &self.cols }
     pub fn get_values(&self) -> &Insert<T, V, M> { &self.values }
     pub fn get_returning(&self) -> &Option<select_query::Select> { &self.returning }
 

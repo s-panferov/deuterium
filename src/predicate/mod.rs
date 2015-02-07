@@ -39,26 +39,26 @@ pub trait Predicate: sql::PredicateToSql {
 }
 
 pub trait ToAbstractPredicate { 
-    fn upcast(&self) -> RcPredicate;
+    fn upcast(&self) -> SharedPredicate;
 }
 
 impl<T> ToAbstractPredicate for T where T: Predicate + Clone + 'static {
-    fn upcast(&self) -> RcPredicate {
+    fn upcast(&self) -> SharedPredicate {
         rc::Rc::new(Box::new(self.clone()) as BoxedPredicate)
     }
 }
 
-impl ToOrPredicate for RcPredicate {
-    fn or(&self, predicate: RcPredicate) -> RcPredicate {
+impl ToOrPredicate for SharedPredicate {
+    fn or(&self, predicate: SharedPredicate) -> SharedPredicate {
         OrPredicate{ left: self.clone(), right: predicate }.upcast()
     }
 }
 
-impl ToAndPredicate for RcPredicate {
-    fn and(&self, predicate: RcPredicate) -> RcPredicate {
+impl ToAndPredicate for SharedPredicate {
+    fn and(&self, predicate: SharedPredicate) -> SharedPredicate {
         AndPredicate{ left: self.clone(), right: predicate }.upcast()
     }
 }
 
 pub type BoxedPredicate = Box<Predicate + 'static>;
-pub type RcPredicate = rc::Rc<BoxedPredicate>;
+pub type SharedPredicate = rc::Rc<BoxedPredicate>;

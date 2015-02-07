@@ -9,20 +9,20 @@ use super::field::{self, Field};
 
 pub trait From { 
     fn as_sql(&self) -> &sql::FromToSql;
-    fn upcast_from(&self) -> RcFrom;
+    fn upcast_from(&self) -> SharedFrom;
 }
 
 pub type BoxedFrom = Box<From + 'static>;
-pub type RcFrom = rc::Rc<BoxedFrom>;
+pub type SharedFrom = rc::Rc<BoxedFrom>;
 
 pub trait Table {
-    fn upcast_table(&self) -> RcTable;
+    fn upcast_table(&self) -> SharedTable;
     fn get_table_name(&self) -> &String;
     fn get_table_alias(&self) -> &Option<String>;
 }
 
 pub type BoxedTable = Box<Table + 'static>;
-pub type RcTable = rc::Rc<BoxedTable>;
+pub type SharedTable = rc::Rc<BoxedTable>;
 
 #[derive(Clone)]
 pub struct TableDef {
@@ -68,7 +68,7 @@ impl TableDef {
 }
 
 impl Table for TableDef {
-    fn upcast_table(&self) -> RcTable {
+    fn upcast_table(&self) -> SharedTable {
         rc::Rc::new(Box::new(self.clone()) as BoxedTable)
     }
 
@@ -86,7 +86,7 @@ impl From for TableDef {
         self
     }
 
-    fn upcast_from(&self) -> RcFrom {
+    fn upcast_from(&self) -> SharedFrom {
         rc::Rc::new(Box::new(self.clone()) as BoxedFrom)
     }
 }
@@ -107,7 +107,7 @@ impl<T: Clone, L: Clone, M: Clone> From for FromSelect<T, L, M> {
         self
     }
 
-    fn upcast_from(&self) -> RcFrom {
+    fn upcast_from(&self) -> SharedFrom {
         rc::Rc::new(Box::new(self.clone()) as BoxedFrom)
     }
 }

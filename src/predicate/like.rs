@@ -12,10 +12,10 @@ pub struct LikePredicate<F, T> {
 }
 
 pub trait ToLikePredicate<T> {
-    fn like<B>(&self, val: B) -> super::RcPredicate 
+    fn like<B>(&self, val: B) -> super::SharedPredicate 
         where B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 
-    fn ilike<B>(&self, val: B) -> super::RcPredicate
+    fn ilike<B>(&self, val: B) -> super::SharedPredicate
         where B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 }
 
@@ -26,12 +26,12 @@ impl<F, T> super::Predicate for LikePredicate<F, T>
 macro_rules! impl_for {
     ($field:ty, $expr:ty) => (
         impl ToLikePredicate<$expr> for $field {
-            fn like<B>(&self, val: B) -> super::RcPredicate 
+            fn like<B>(&self, val: B) -> super::SharedPredicate 
                 where B: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static {
                 LikePredicate { field: self.clone(), value: val, case_sensitive: true }.upcast()
             }
 
-            fn ilike<B>(&self, val: B) -> super::RcPredicate 
+            fn ilike<B>(&self, val: B) -> super::SharedPredicate 
                 where B: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static {
                 LikePredicate { field: self.clone(), value: val, case_sensitive: false }.upcast()
             } 

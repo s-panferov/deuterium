@@ -33,7 +33,7 @@ macro_rules! agg_func {
                 self
             }
 
-            fn upcast_expression(&self) -> expression::RcExpression {
+            fn upcast_expression(&self) -> expression::SharedExpression {
                 rc::Rc::new(Box::new(self.clone()) as expression::BoxedExpression)
             }
         }
@@ -94,7 +94,7 @@ impl expression::UntypedExpression for CountAll {
         self
     }
 
-    fn upcast_expression(&self) -> expression::RcExpression {
+    fn upcast_expression(&self) -> expression::SharedExpression {
         rc::Rc::new(Box::new(self.clone()) as expression::BoxedExpression)
     }
 }

@@ -21,7 +21,7 @@ impl expression::UntypedExpression for Placeholder {
         self
     }
 
-    fn upcast_expression(&self) -> expression::RcExpression {
+    fn upcast_expression(&self) -> expression::SharedExpression {
         rc::Rc::new(Box::new(self.clone()) as expression::BoxedExpression)
     }
 }

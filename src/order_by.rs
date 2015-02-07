@@ -8,7 +8,7 @@ pub enum Order {
 
 #[derive(Clone)]
 pub struct OrderBy {
-    by: expression::RcExpression,
+    by: expression::SharedExpression,
     order: Order
 }
 
@@ -27,7 +27,7 @@ impl OrderBy {
         }
     }
 
-    pub fn get_by(&self) -> &expression::RcExpression {
+    pub fn get_by(&self) -> &expression::SharedExpression {
         &self.by
     }
 

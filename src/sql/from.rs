@@ -14,7 +14,7 @@ impl FromToSql for from::TableDef {
     }
 }
 
-impl FromToSql for from::RcTable {
+impl FromToSql for from::SharedTable {
     fn to_from_sql(&self, _ctx: &mut super::SqlContext) -> String {
         let name = self.get_table_name();
         match self.get_table_alias() {

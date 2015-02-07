@@ -10,7 +10,7 @@ use super::sql;
 use super::field;
 
 pub trait FieldUpd: sql::ToSql {
-    fn upcast_field_update(&self) -> RcFieldUpdate;
+    fn upcast_field_update(&self) -> SharedFieldUpdate;
 }
 
 #[derive(Clone)]
@@ -30,12 +30,12 @@ impl<F, T> FieldUpdate<F, T> {
 }
 
 pub type BoxedFieldUpdate = Box<FieldUpd + 'static>;
-pub type RcFieldUpdate = rc::Rc<BoxedFieldUpdate>;
+pub type SharedFieldUpdate = rc::Rc<BoxedFieldUpdate>;
 
 impl<F, T> FieldUpd for FieldUpdate<F, T>
     where F: Clone + sql::ToPredicateValue + 'static,
           T: Clone + sql::ToPredicateValue + 'static {
-    fn upcast_field_update(&self) -> RcFieldUpdate {
+    fn upcast_field_update(&self) -> SharedFieldUpdate {
         rc::Rc::new(Box::new(self.clone()) as BoxedFieldUpdate)
     }
 }
@@ -86,10 +86,10 @@ pub trait Updatable<M>: from::Table + Sized {
 #[derive(Clone)]
 pub struct UpdateQuery<T, L, M> {
     pub only: bool,
-    pub table: from::RcTable,
-    pub updates: Vec<RcFieldUpdate>,
-    pub from: Option<Vec<from::RcFrom>>,
-    pub where_: Option<predicate::RcPredicate>,
+    pub table: from::SharedTable,
+    pub updates: Vec<SharedFieldUpdate>,
+    pub from: Option<Vec<from::SharedFrom>>,
+    pub where_: Option<predicate::SharedPredicate>,
     pub all: bool,
     pub returning: Option<select_query::Select>
 }
@@ -136,7 +136,7 @@ impl<T, L, M> UpdateQuery<T, L, M> {
 returning_for!(UpdateQuery);
 
 impl<T:Clone, L:Clone, M:Clone> select_query::Queryable for UpdateQuery<T, L, M> { 
-    fn get_where(&self) -> &Option<predicate::RcPredicate> { &self.where_ }
-    fn set_where(&mut self, predicate: predicate::RcPredicate) { self.where_ = Some(predicate); }
+    fn get_where(&self) -> &Option<predicate::SharedPredicate> { &self.where_ }
+    fn set_where(&mut self, predicate: predicate::SharedPredicate) { self.where_ = Some(predicate); }
     fn unset_where(&mut self) { self.where_ = None; }
 }

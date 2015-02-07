@@ -11,7 +11,7 @@ pub struct IsPredicate<F, T> {
 }
 
 pub trait ToIsPredicate<T> {
-    fn is<B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static>(&self, val: B) -> super::RcPredicate;
+    fn is<B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static>(&self, val: B) -> super::SharedPredicate;
 }
 
 impl<F, T> super::Predicate for IsPredicate<F, T> 
@@ -19,13 +19,13 @@ impl<F, T> super::Predicate for IsPredicate<F, T>
           T: sql::ToPredicateValue { }
 
 impl<T> ToIsPredicate<T> for field::NamedField<T> where T: sql::ToPredicateValue + Clone {
-    fn is<B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static>(&self, val: B) -> super::RcPredicate {
+    fn is<B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static>(&self, val: B) -> super::SharedPredicate {
         IsPredicate { field: self.clone(), value: val }.upcast()
     }
 }
 
 impl<T> ToIsPredicate<T> for expression::RawExpr where T: sql::ToPredicateValue + Clone {
-    fn is<B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static>(&self, val: B) -> super::RcPredicate {
+    fn is<B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static>(&self, val: B) -> super::SharedPredicate {
         IsPredicate { field: self.clone(), value: val }.upcast()
     }
 }

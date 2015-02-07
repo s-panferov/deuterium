@@ -8,6 +8,7 @@ use super::sql;
 use super::field;
 
 #[derive(Clone)]
+/// Non-checking expression with any content you want.
 pub struct RawExpr {
     pub content: String
 }
@@ -22,14 +23,14 @@ impl RawExpr {
 
 pub trait UntypedExpression {
     fn expression_as_sql(&self) -> &sql::ToSql;
-    fn upcast_expression(&self) -> RcExpression;
+    fn upcast_expression(&self) -> SharedExpression;
 }
 
 pub trait Expression<T>: UntypedExpression {}
 pub trait ListExpression<T>: UntypedExpression {}
 
 pub type BoxedExpression = Box<UntypedExpression + 'static>;
-pub type RcExpression = rc::Rc<BoxedExpression>;
+pub type SharedExpression = rc::Rc<BoxedExpression>;
 
 pub trait PrimitiveType { }
 
@@ -40,7 +41,7 @@ macro_rules! to_expression {
                 self
             }
 
-            fn upcast_expression(&self) -> RcExpression {
+            fn upcast_expression(&self) -> SharedExpression {
                 rc::Rc::new(Box::new(self.clone()) as BoxedExpression)
             }
         }
@@ -349,7 +350,7 @@ impl<T> UntypedExpression for Vec<T> where T: UntypedExpression + sql::ToPredica
         self
     }
 
-    fn upcast_expression(&self) -> RcExpression {
+    fn upcast_expression(&self) -> SharedExpression {
         rc::Rc::new(Box::new(self.clone()) as BoxedExpression)
     }
 }

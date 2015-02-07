@@ -11,11 +11,11 @@ pub trait Field {
     fn name(&self) -> &str;
     fn table_name(&self) -> &str;
     fn qual(&self) -> Option<&String>;
-    fn upcast_field(&self) -> RcField;
+    fn upcast_field(&self) -> SharedField;
 }
 
 pub type BoxedField = Box<Field + 'static>;
-pub type RcField = rc::Rc<BoxedField>;
+pub type SharedField = rc::Rc<BoxedField>;
 
 #[derive(Clone)]
 pub struct NamedField<T> {
@@ -73,7 +73,7 @@ impl<T: Clone> expression::UntypedExpression for NamedField<T> {
         self
     }
 
-    fn upcast_expression(&self) -> expression::RcExpression {
+    fn upcast_expression(&self) -> expression::SharedExpression {
         rc::Rc::new(Box::new(self.clone()) as expression::BoxedExpression)
     }
 }
@@ -91,7 +91,7 @@ impl<T: Clone> Field for NamedField<T> {
         self.qual.as_ref()
     }
 
-    fn upcast_field(&self) -> RcField {
+    fn upcast_field(&self) -> SharedField {
         rc::Rc::new(Box::new(self.clone()) as BoxedField)
     }
 }

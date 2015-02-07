@@ -31,7 +31,7 @@ impl<F: value::ToPredicateValue> PredicateToSql for is_null::IsNullPredicate<F> 
     }
 }
 
-impl PredicateToSql for predicate::RcPredicate {
+impl PredicateToSql for predicate::SharedPredicate {
     fn to_sql(&self, negation: bool, ctx: &mut super::SqlContext) -> String {
         (**self).to_sql(negation, ctx)
     }

@@ -2,17 +2,17 @@ use super::{ToAbstractPredicate};
 
 #[derive(Clone)]
 pub struct ExcludePredicate {
-    pub predicate: super::RcPredicate
+    pub predicate: super::SharedPredicate
 }
 
 pub trait ToExcludePredicate {
-    fn exclude(&self) -> super::RcPredicate;
+    fn exclude(&self) -> super::SharedPredicate;
 }
 
 impl super::Predicate for ExcludePredicate {}
 
-impl ToExcludePredicate for super::RcPredicate { 
-    fn exclude(&self) -> super::RcPredicate {
+impl ToExcludePredicate for super::SharedPredicate { 
+    fn exclude(&self) -> super::SharedPredicate {
         ExcludePredicate{predicate: self.clone()}.upcast()
     }
 }

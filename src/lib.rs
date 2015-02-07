@@ -53,7 +53,7 @@ pub use field::{
 
 pub use predicate::{
     Predicate, 
-    RcPredicate, 
+    SharedPredicate, 
     IsPredicate, ToIsPredicate, 
     OrPredicate, ToOrPredicate,
     AndPredicate, ToAndPredicate,
@@ -71,7 +71,7 @@ pub use select_query::{
     Queryable,
     Orderable,
     SelectQuery, 
-    RcSelectQuery, 
+    SharedSelectQuery, 
     ToSelectQuery, 
     Select, 
     NoResult, 
@@ -104,7 +104,7 @@ pub use expression::{
     BoxedExpression, 
     UntypedExpression, 
     Expression,
-    RcExpression,
+    SharedExpression,
     RawExpr,
     ListExpression,
     ToExpression,
@@ -113,7 +113,7 @@ pub use expression::{
 
 pub use sql::{SqlContext, ToSql, QueryToSql, FromToSql, ToPredicateValue};
 #[cfg(feature = "postgres")] pub use sql::{AsPostgresValue};
-pub use from::{TableDef, Table, BoxedTable, RcTable, From, BoxedFrom, RcFrom};
+pub use from::{TableDef, Table, BoxedTable, SharedTable, From, BoxedFrom, SharedFrom};
 
 pub use function::{
     Sum, SumArg,

@@ -21,16 +21,16 @@ pub struct InequalityPredicate<F, T> {
 }
 
 pub trait ToInequalityPredicate<T> {
-    fn lt<B>(&self, val: B) -> super::RcPredicate
+    fn lt<B>(&self, val: B) -> super::SharedPredicate
         where B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 
-    fn lte<B>(&self, val: B) -> super::RcPredicate
+    fn lte<B>(&self, val: B) -> super::SharedPredicate
         where B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 
-    fn gt<B>(&self, val: B) -> super::RcPredicate
+    fn gt<B>(&self, val: B) -> super::SharedPredicate
         where B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 
-    fn gte<B>(&self, val: B) -> super::RcPredicate
+    fn gte<B>(&self, val: B) -> super::SharedPredicate
         where B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 }
 
@@ -42,22 +42,22 @@ macro_rules! impl_for {
     ($field:ty, $expr:ty) => (
 
         impl ToInequalityPredicate<$expr> for $field {
-            fn lt<B>(&self, val: B) -> super::RcPredicate
+            fn lt<B>(&self, val: B) -> super::SharedPredicate
                 where B: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static {
                 InequalityPredicate { field: self.clone(), value: val, inequality: Inequality::LessThan }.upcast()
             }
 
-            fn lte<B>(&self, val: B) -> super::RcPredicate
+            fn lte<B>(&self, val: B) -> super::SharedPredicate
                 where B: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static {
                 InequalityPredicate { field: self.clone(), value: val, inequality: Inequality::LessThanEqual }.upcast()
             }
 
-            fn gt<B>(&self, val: B) -> super::RcPredicate
+            fn gt<B>(&self, val: B) -> super::SharedPredicate
                 where B: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static {
                 InequalityPredicate { field: self.clone(), value: val, inequality: Inequality::GreaterThan }.upcast()
             }
 
-            fn gte<B>(&self, val: B) -> super::RcPredicate
+            fn gte<B>(&self, val: B) -> super::SharedPredicate
                 where B: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static {
                 InequalityPredicate { field: self.clone(), value: val, inequality: Inequality::GreaterThanEqual }.upcast()
             }

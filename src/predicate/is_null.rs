@@ -11,28 +11,28 @@ pub struct IsNullPredicate<F> {
 }
 
 pub trait ToIsNullPredicate {
-    fn is_null(&self) -> super::RcPredicate;
-    fn not_null(&self) -> super::RcPredicate;
+    fn is_null(&self) -> super::SharedPredicate;
+    fn not_null(&self) -> super::SharedPredicate;
 }
 
 impl<F> super::Predicate for IsNullPredicate<F> where F: sql::ToPredicateValue {}
 
 impl<T> ToIsNullPredicate for field::NamedField<Option<T>> where T: sql::ToPredicateValue + Clone {
-    fn is_null(&self) -> super::RcPredicate {
+    fn is_null(&self) -> super::SharedPredicate {
         IsNullPredicate { field: self.clone(), null: true }.upcast()
     }
 
-    fn not_null(&self) -> super::RcPredicate {
+    fn not_null(&self) -> super::SharedPredicate {
         IsNullPredicate { field: self.clone(), null: false }.upcast()
     }
 }
 
 impl ToIsNullPredicate for expression::RawExpr {
-    fn is_null(&self) -> super::RcPredicate {
+    fn is_null(&self) -> super::SharedPredicate {
         IsNullPredicate { field: self.clone(), null: true }.upcast()
     }
 
-    fn not_null(&self) -> super::RcPredicate {
+    fn not_null(&self) -> super::SharedPredicate {
         IsNullPredicate { field: self.clone(), null: false }.upcast()
     }
 }

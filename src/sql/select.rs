@@ -73,7 +73,7 @@ impl<T, L, M> super::ToSql for select_query::SelectQuery<T, L, M> {
 
 impl<T, L, M> super::QueryToSql for select_query::SelectQuery<T, L, M> {}
 
-impl super::ToSql for select_query::RcSelectQuery {
+impl super::ToSql for select_query::SharedSelectQuery {
     fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         (**self).to_sql(ctx)
     }

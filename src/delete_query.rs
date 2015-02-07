@@ -45,9 +45,9 @@ macro_rules! returning_for {
 #[derive(Clone)]
 pub struct DeleteQuery<T, L, M> {
     pub only: bool,
-    pub table: from::RcTable,
-    pub using: Option<Vec<from::RcFrom>>,
-    pub where_: Option<predicate::RcPredicate>,
+    pub table: from::SharedTable,
+    pub using: Option<Vec<from::SharedFrom>>,
+    pub where_: Option<predicate::SharedPredicate>,
     pub all: bool,
     pub returning: Option<select_query::Select>
 }
@@ -88,8 +88,8 @@ impl<T, L, M> DeleteQuery<T, L, M> {
 returning_for!(DeleteQuery);
 
 impl<T:Clone, L:Clone, M:Clone> select_query::Queryable for DeleteQuery<T, L, M> { 
-    fn get_where(&self) -> &Option<predicate::RcPredicate> { &self.where_ }
-    fn set_where(&mut self, predicate: predicate::RcPredicate) { self.where_ = Some(predicate); }
+    fn get_where(&self) -> &Option<predicate::SharedPredicate> { &self.where_ }
+    fn set_where(&mut self, predicate: predicate::SharedPredicate) { self.where_ = Some(predicate); }
     fn unset_where(&mut self) { self.where_ = None; }
 }
 

@@ -2,7 +2,7 @@ use super::expression;
 
 #[derive(Clone)]
 pub struct GroupBy {
-    pub by: Vec<expression::RcExpression>
+    pub by: Vec<expression::SharedExpression>
 }
 
 impl GroupBy {
