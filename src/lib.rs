@@ -36,6 +36,8 @@ mod prelude {
 
 pub use field::{
     Field,
+    BoxedField,
+    SharedField,
     NamedField,
 
     BoolField,
