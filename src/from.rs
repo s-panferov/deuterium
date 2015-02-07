@@ -69,7 +69,7 @@ impl TableDef {
 
 impl Table for TableDef {
     fn upcast_table(&self) -> SharedTable {
-        rc::Rc::new(Box::new(self.clone()) as BoxedTable)
+        rc::Rc::new(Box::new(self.clone()))
     }
 
     fn get_table_name(&self) -> &String {
@@ -87,7 +87,7 @@ impl From for TableDef {
     }
 
     fn upcast_from(&self) -> SharedFrom {
-        rc::Rc::new(Box::new(self.clone()) as BoxedFrom)
+        rc::Rc::new(Box::new(self.clone()))
     }
 }
 
@@ -108,7 +108,7 @@ impl<T: Clone, L: Clone, M: Clone> From for FromSelect<T, L, M> {
     }
 
     fn upcast_from(&self) -> SharedFrom {
-        rc::Rc::new(Box::new(self.clone()) as BoxedFrom)
+        rc::Rc::new(Box::new(self.clone()))
     }
 }
 

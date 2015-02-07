@@ -26,7 +26,7 @@ pub trait ToSelectQuery: sql::ToSql {
 
 impl<T> ToSelectQuery for T where T: AbstractSelectQuery + Clone + 'static {
     fn upcast(&self) -> SharedSelectQuery {
-        rc::Rc::new(Box::new(self.clone()) as BoxedSelectQuery)
+        rc::Rc::new(Box::new(self.clone()))
     }
 }
 

@@ -92,7 +92,7 @@ impl<T: Clone> Field for NamedField<T> {
     }
 
     fn upcast_field(&self) -> SharedField {
-        rc::Rc::new(Box::new(self.clone()) as BoxedField)
+        rc::Rc::new(Box::new(self.clone()))
     }
 }
 

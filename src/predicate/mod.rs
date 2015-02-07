@@ -44,7 +44,7 @@ pub trait ToAbstractPredicate {
 
 impl<T> ToAbstractPredicate for T where T: Predicate + Clone + 'static {
     fn upcast(&self) -> SharedPredicate {
-        rc::Rc::new(Box::new(self.clone()) as BoxedPredicate)
+        rc::Rc::new(Box::new(self.clone()))
     }
 }
 

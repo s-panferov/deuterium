@@ -36,7 +36,7 @@ impl<F, T> FieldUpd for FieldUpdate<F, T>
     where F: Clone + sql::ToPredicateValue + 'static,
           T: Clone + sql::ToPredicateValue + 'static {
     fn upcast_field_update(&self) -> SharedFieldUpdate {
-        rc::Rc::new(Box::new(self.clone()) as BoxedFieldUpdate)
+        rc::Rc::new(Box::new(self.clone()))
     }
 }
 

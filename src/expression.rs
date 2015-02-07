@@ -42,7 +42,7 @@ macro_rules! to_expression {
             }
 
             fn upcast_expression(&self) -> SharedExpression {
-                rc::Rc::new(Box::new(self.clone()) as BoxedExpression)
+                rc::Rc::new(Box::new(self.clone()))
             }
         }
         
@@ -351,7 +351,7 @@ impl<T> UntypedExpression for Vec<T> where T: UntypedExpression + sql::ToPredica
     }
 
     fn upcast_expression(&self) -> SharedExpression {
-        rc::Rc::new(Box::new(self.clone()) as BoxedExpression)
+        rc::Rc::new(Box::new(self.clone()))
     }
 }
 
