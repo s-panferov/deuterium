@@ -21,17 +21,22 @@ impl RawExpression {
     }
 }
 
+/// Intrernal trait for all expressions. Allows some useful casts.
 pub trait UntypedExpression {
     fn expression_as_sql(&self) -> &sql::ToSql;
     fn upcast_expression(&self) -> SharedExpression;
 }
 
-pub trait Expression<T>: UntypedExpression {}
-pub trait ListExpression<T>: UntypedExpression {}
-
 pub type BoxedExpression = Box<UntypedExpression + 'static>;
 pub type SharedExpression = rc::Rc<BoxedExpression>;
 
+/// Trait to indicate that value is an expression with concrete type.
+pub trait Expression<T>: UntypedExpression {}
+
+/// Trait to indicate that value is a LIST expression with concrete type.
+pub trait ListExpression<T>: UntypedExpression {}
+
+/// Trait to indicate that value is a primitive type that SQL adapter supports.
 pub trait PrimitiveType { }
 
 macro_rules! to_expression {
@@ -92,10 +97,14 @@ to_expression!(Option<time::Timespec>);
 to_expression!(Option<uuid::Uuid>);
 to_expression!(Option<RawExpression>);
 
+// This trait is used to indicate that expression can be casted to
+// expression of other type (e.g. numbers).
 pub trait ToExpression<T>: UntypedExpression + Sized {
     fn as_expr(&self) -> &Expression<T> { unsafe{ mem::transmute(self as &UntypedExpression) } }
 }
 
+// This trait is used to indicate that expression can be casted to
+// LIST expression of other type (e.g. list of numbers).
 pub trait ToListExpression<T>: UntypedExpression + Sized {
     fn as_expr(&self) -> &ListExpression<T> { unsafe{ mem::transmute(self as &UntypedExpression) } }
 }
@@ -246,55 +255,6 @@ impl ToExpression<Option<uuid::Uuid>> for Option<uuid::Uuid> {}
 impl ToExpression<Option<uuid::Uuid>> for field::UuidField {}
 impl ToExpression<Option<uuid::Uuid>> for field::OptionalUuidField {}
 impl ToExpression<Option<uuid::Uuid>> for RawExpression {}
-
-impl ToExpression<()> for bool {}
-impl ToExpression<()> for i8 {}
-impl ToExpression<()> for i16 {}
-impl ToExpression<()> for i32 {}
-impl ToExpression<()> for i64 {}
-impl ToExpression<()> for f32 {}
-impl ToExpression<()> for f64 {}
-impl ToExpression<()> for Vec<u8> {}
-impl ToExpression<()> for String {}
-impl ToExpression<()> for json::Json {}
-impl ToExpression<()> for time::Timespec {}
-impl ToExpression<()> for uuid::Uuid {}
-impl ToExpression<()> for Option<bool> {}
-impl ToExpression<()> for Option<i8> {}
-impl ToExpression<()> for Option<i16> {}
-impl ToExpression<()> for Option<i32> {}
-impl ToExpression<()> for Option<i64> {}
-impl ToExpression<()> for Option<f32> {}
-impl ToExpression<()> for Option<f64> {}
-impl ToExpression<()> for Option<Vec<u8>> {}
-impl ToExpression<()> for Option<String> {}
-impl ToExpression<()> for Option<json::Json> {}
-impl ToExpression<()> for Option<time::Timespec> {}
-impl ToExpression<()> for Option<uuid::Uuid> {}
-impl ToExpression<()> for field::BoolField {} 
-impl ToExpression<()> for field::I8Field {} 
-impl ToExpression<()> for field::I16Field {} 
-impl ToExpression<()> for field::I32Field {} 
-impl ToExpression<()> for field::I64Field {} 
-impl ToExpression<()> for field::F32Field {} 
-impl ToExpression<()> for field::F64Field {} 
-impl ToExpression<()> for field::StringField {} 
-impl ToExpression<()> for field::JsonField {} 
-impl ToExpression<()> for field::ByteListField {} 
-impl ToExpression<()> for field::TimespecField {}
-impl ToExpression<()> for field::UuidField {}
-impl ToExpression<()> for field::OptionalBoolField {} 
-impl ToExpression<()> for field::OptionalI8Field {} 
-impl ToExpression<()> for field::OptionalI16Field {} 
-impl ToExpression<()> for field::OptionalI32Field {} 
-impl ToExpression<()> for field::OptionalI64Field {} 
-impl ToExpression<()> for field::OptionalF32Field {} 
-impl ToExpression<()> for field::OptionalF64Field {} 
-impl ToExpression<()> for field::OptionalStringField {} 
-impl ToExpression<()> for field::OptionalJsonField {} 
-impl ToExpression<()> for field::OptionalByteListField {} 
-impl ToExpression<()> for field::OptionalTimespecField {}
-impl ToExpression<()> for field::OptionalUuidField {}
 
 impl ToExpression<RawExpression> for bool {}
 impl ToExpression<RawExpression> for i8 {}
