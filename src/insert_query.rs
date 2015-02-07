@@ -36,7 +36,7 @@ impl<'a, 'b, T> ToInsertValue<T> for &'a (expression::Expression<T> + 'b) {
 pub enum Insert<T, V, M> {
     DefaultValues,
     Values(Vec<V>),
-    UntypedValues(Vec<Vec<InsertValue<()>>>),
+    UntypedValues(Vec<Vec<InsertValue<expression::RawExpression>>>),
     FromSelect(select_query::SelectQuery<T, select_query::LimitMany, M>)
 }
 
@@ -146,7 +146,7 @@ impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT
         }
     }
 
-    pub fn push_untyped(&mut self, values: &[&expression::Expression<()>]) {
+    pub fn push_untyped(&mut self, values: &[&expression::Expression<expression::RawExpression>]) {
         let mut reassign = false;
         match &self.values {
             &Insert::DefaultValues | &Insert::FromSelect(_) => {

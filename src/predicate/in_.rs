@@ -2,12 +2,17 @@ use super::super::expression;
 use super::super::sql;
 use super::super::field;
 
-use super::{ToAbstractPredicate};
+use super::{ToSharedPredicate};
 
 #[derive(Clone)]
 pub struct InPredicate<F, T> {
-    pub field: F,
-    pub values: T
+    field: F,
+    values: T
+}
+
+impl<F, T> InPredicate<F, T> {
+    pub fn get_field(&self) -> &F { &self.field }
+    pub fn get_values(&self) -> &T { &self.values }
 }
 
 pub trait ToInPredicate<T> {
@@ -25,7 +30,7 @@ impl<T> ToInPredicate<T> for field::NamedField<T> where T: sql::ToPredicateValue
     }
 }
 
-impl<T> ToInPredicate<T> for expression::RawExpr where T: sql::ToPredicateValue + Clone {
+impl<T> ToInPredicate<T> for expression::RawExpression where T: sql::ToPredicateValue + Clone {
     fn in_<B: expression::ToListExpression<T> + sql::ToPredicateValue + Clone + 'static>(&self, val: B) -> super::SharedPredicate {
         InPredicate { field: self.clone(), values: val }.upcast()
     }

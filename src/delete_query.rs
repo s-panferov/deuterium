@@ -44,15 +44,23 @@ macro_rules! returning_for {
 
 #[derive(Clone)]
 pub struct DeleteQuery<T, L, M> {
-    pub only: bool,
-    pub table: from::SharedTable,
-    pub using: Option<Vec<from::SharedFrom>>,
-    pub where_: Option<predicate::SharedPredicate>,
-    pub all: bool,
-    pub returning: Option<select_query::Select>
+    only: bool,
+    all: bool,
+    table: from::SharedTable,
+    using: Option<Vec<from::SharedFrom>>,
+    where_: Option<predicate::SharedPredicate>,
+    returning: Option<select_query::Select>
 }
 
 impl<T, L, M> DeleteQuery<T, L, M> {
+
+    pub fn is_only(&self) -> bool { self.only }
+    pub fn is_all(&self) -> bool { self.all }
+    pub fn get_table(&self) -> &from::SharedTable { &self.table }
+    pub fn get_using(&self) -> &Option<Vec<from::SharedFrom>> { &self.using }
+    pub fn get_where(&self) -> &Option<predicate::SharedPredicate> { &self.where_ }
+    pub fn get_returning(&self) -> &Option<select_query::Select> { &self.returning }
+
     pub fn new(table: &from::Table) -> DeleteQuery<T, L, M> {
         DeleteQuery {
             only: false,

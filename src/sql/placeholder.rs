@@ -3,8 +3,8 @@ use super::value::{self, ToPredicateValue};
 
 impl value::ToPredicateValue for placeholder::Placeholder {
     fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String {
-        ctx.expl_indexed_placeholder(self.idx);
-        ctx.adapter().placeholder(self.idx)
+        ctx.expl_indexed_placeholder(self.get_idx());
+        ctx.adapter().placeholder(self.get_idx())
     }
 }
 

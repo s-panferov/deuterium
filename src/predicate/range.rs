@@ -4,7 +4,7 @@ use super::super::sql;
 use super::super::expression;
 use super::super::field;
 
-use super::{ToAbstractPredicate};
+use super::{ToSharedPredicate};
 
 #[derive(Clone, Copy)]
 pub enum InRangeBounds {
@@ -16,10 +16,17 @@ pub enum InRangeBounds {
 
 #[derive(Clone)]
 pub struct InRangePredicate<F, T1, T2> {
-    pub field: F,
-    pub from: T1,
-    pub to: T2,
-    pub bounds: InRangeBounds
+    field: F,
+    from: T1,
+    to: T2,
+    bounds: InRangeBounds
+}
+
+impl<F, T1, T2> InRangePredicate<F, T1, T2> {
+    pub fn get_field(&self) -> &F { &self.field }
+    pub fn get_from(&self) -> &T1 { &self.from }
+    pub fn get_to(&self) -> &T2 { &self.to }
+    pub fn get_bounds(&self) -> &InRangeBounds { &self.bounds }
 }
 
 pub trait ToInRangePredicate<T> {
@@ -95,4 +102,4 @@ impl_for!(field::OptionalF32Field, Option<f32>);
 impl_for!(field::OptionalF64Field, Option<f64>);
 impl_for!(field::OptionalTimespecField, Option<time::Timespec>);
 
-impl_for!(expression::RawExpr, expression::RawExpr);
+impl_for!(expression::RawExpression, expression::RawExpression);

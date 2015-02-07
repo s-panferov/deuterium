@@ -1,6 +1,6 @@
 use time;
 
-use super::{ToAbstractPredicate};
+use super::{ToSharedPredicate};
 use super::super::expression;
 use super::super::field;
 use super::super::sql;
@@ -15,9 +15,15 @@ pub enum Inequality {
 
 #[derive(Clone)]
 pub struct InequalityPredicate<F, T> {
-    pub field: F,
-    pub value: T,
-    pub inequality: Inequality
+    field: F,
+    value: T,
+    inequality: Inequality
+}
+
+impl<F, T> InequalityPredicate<F, T> {
+    pub fn get_field(&self) -> &F { &self.field }
+    pub fn get_value(&self) -> &T { &self.value }
+    pub fn get_inequality(&self) -> &Inequality { &self.inequality }
 }
 
 pub trait ToInequalityPredicate<T> {
@@ -82,4 +88,4 @@ impl_for!(field::OptionalF32Field, Option<f32>);
 impl_for!(field::OptionalF64Field, Option<f64>);
 impl_for!(field::OptionalTimespecField, Option<time::Timespec>);
 
-impl_for!(expression::RawExpr, expression::RawExpr);
+impl_for!(expression::RawExpression, expression::RawExpression);

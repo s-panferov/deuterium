@@ -1,4 +1,4 @@
-use super::{ToAbstractPredicate};
+use super::{ToSharedPredicate};
 
 #[derive(Clone)]
 pub struct ExcludePredicate {
