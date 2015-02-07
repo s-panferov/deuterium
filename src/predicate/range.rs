@@ -4,7 +4,7 @@ use super::super::sql;
 use super::super::expression;
 use super::super::field;
 
-use super::{ToAbstractPredicate};
+use super::{ToSharedPredicate};
 
 #[derive(Clone, Copy)]
 pub enum InRangeBounds {

@@ -1,6 +1,6 @@
 use time;
 
-use super::{ToAbstractPredicate};
+use super::{ToSharedPredicate};
 use super::super::expression;
 use super::super::field;
 use super::super::sql;
