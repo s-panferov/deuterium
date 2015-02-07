@@ -20,4 +20,5 @@ rustc-serialize = "*"
 
 [dependencies.postgres]
 version = "*"
+features = ["uuid"]
 optional = true
