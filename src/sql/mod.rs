@@ -50,8 +50,8 @@ pub type BoxedAdapter = Box<SqlAdapter + 'static>;
 
 #[allow(dead_code)]
 pub struct SqlContext {
-    impl_placeholders: usize,
-    expl_placeholders: usize,
+    impl_placeholders: u8,
+    expl_placeholders: u8,
     placeholder_data: Vec<BoxedValue>,
     adapter: Box<SqlAdapter + 'static>,
 }
@@ -60,8 +60,8 @@ pub struct SqlContext {
 impl SqlContext {
     pub fn new(adapter: Box<SqlAdapter + 'static>) -> SqlContext {
         SqlContext {
-            impl_placeholders: 0,
-            expl_placeholders: 0,
+            impl_placeholders: 0u8,
+            expl_placeholders: 0u8,
             placeholder_data: vec![],
             adapter: adapter,
         }
@@ -74,11 +74,11 @@ impl SqlContext {
         res
     }
 
-    pub fn get_impl_placeholders_count(&self) -> usize {
+    pub fn get_impl_placeholders_count(&self) -> u8 {
         self.impl_placeholders
     }
 
-    pub fn get_expl_placeholders_count(&self) -> usize {
+    pub fn get_expl_placeholders_count(&self) -> u8 {
         self.expl_placeholders
     }
 
@@ -86,7 +86,7 @@ impl SqlContext {
         &self.adapter
     }
 
-    pub fn expl_indexed_placeholder(&mut self, idx: usize) {
+    pub fn expl_indexed_placeholder(&mut self, idx: u8) {
         if idx > self.expl_placeholders { self.expl_placeholders = idx; }
     }
 

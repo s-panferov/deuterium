@@ -3,13 +3,15 @@ use super::expression;
 
 #[derive(Clone)]
 pub struct Distinct {
-    pub on: Option<Vec<expression::SharedExpression>>
+    on: Option<Vec<expression::SharedExpression>>
 }
 
 impl Distinct {
     pub fn new() -> Distinct {
         Distinct { on: None }
     }
+
+    pub fn get_on(&self) -> &Option<Vec<expression::SharedExpression>> { &self.on }
 
     pub fn on(fields: &[&expression::UntypedExpression]) -> Distinct {
         Distinct { on: Some( 

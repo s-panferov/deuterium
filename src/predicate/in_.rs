@@ -6,8 +6,13 @@ use super::{ToSharedPredicate};
 
 #[derive(Clone)]
 pub struct InPredicate<F, T> {
-    pub field: F,
-    pub values: T
+    field: F,
+    values: T
+}
+
+impl<F, T> InPredicate<F, T> {
+    pub fn get_field(&self) -> &F { &self.field }
+    pub fn get_values(&self) -> &T { &self.values }
 }
 
 pub trait ToInPredicate<T> {

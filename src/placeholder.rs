@@ -7,12 +7,16 @@ use super::sql;
 
 #[derive(Clone, Copy)]
 pub struct Placeholder {
-    pub idx: usize
+    idx: u8
 }
 
 impl Placeholder {
-    pub fn new(idx: usize) -> Placeholder {
+    pub fn new(idx: u8) -> Placeholder {
         Placeholder { idx: idx }
+    }
+
+    pub fn get_idx(&self) -> u8 {
+        self.idx
     }
 }
 

@@ -15,9 +15,15 @@ pub enum Inequality {
 
 #[derive(Clone)]
 pub struct InequalityPredicate<F, T> {
-    pub field: F,
-    pub value: T,
-    pub inequality: Inequality
+    field: F,
+    value: T,
+    inequality: Inequality
+}
+
+impl<F, T> InequalityPredicate<F, T> {
+    pub fn get_field(&self) -> &F { &self.field }
+    pub fn get_value(&self) -> &T { &self.value }
+    pub fn get_inequality(&self) -> &Inequality { &self.inequality }
 }
 
 pub trait ToInequalityPredicate<T> {

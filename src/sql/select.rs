@@ -23,48 +23,48 @@ impl<T, L, M> super::ToSql for select_query::SelectQuery<T, L, M> {
     fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         let mut sql = "SELECT".to_string();
 
-        if self.distinct.is_some() {
-            sql = format!("{} {}", sql, self.distinct.as_ref().unwrap().to_sql(ctx));
+        if self.get_distinct().is_some() {
+            sql = format!("{} {}", sql, self.get_distinct().as_ref().unwrap().to_sql(ctx));
         }
 
         sql = format!("{} {} FROM {}", 
             sql,
-            self.select.to_sql(ctx), 
-            self.from.as_sql().to_from_sql(ctx)
+            self.get_select().to_sql(ctx), 
+            self.get_from().as_sql().to_from_sql(ctx)
         );
 
-        if !self.joins.is_empty() {
-            let joins: Vec<String> = self.joins.iter().map(|join| join.to_sql(ctx)).collect();
+        if !self.get_joins().is_empty() {
+            let joins: Vec<String> = self.get_joins().iter().map(|join| join.to_sql(ctx)).collect();
             sql = format!("{} {}", sql, joins.connect(" "))
         }
 
-        if self.where_.is_some() {
-            sql = format!("{} WHERE {}", sql, self.where_.as_ref().unwrap().to_sql(false, ctx));
+        if self.get_where().is_some() {
+            sql = format!("{} WHERE {}", sql, self.get_where().as_ref().unwrap().to_sql(false, ctx));
         }
 
-        if self.group_by.is_some() {
-            sql = format!("{}{}", sql, self.group_by.as_ref().unwrap().to_sql(ctx));
+        if self.get_group_by().is_some() {
+            sql = format!("{}{}", sql, self.get_group_by().as_ref().unwrap().to_sql(ctx));
         }
 
-        if self.having.is_some() {
-            sql = format!("{} HAVING {}", sql, self.having.as_ref().unwrap().to_sql(false, ctx));
+        if self.get_having().is_some() {
+            sql = format!("{} HAVING {}", sql, self.get_having().as_ref().unwrap().to_sql(false, ctx));
         }
 
-        if !self.order_by.is_empty() {
-            let orders: Vec<String> = self.order_by.iter().map(|ord| ord.to_sql(ctx)).collect();
+        if !self.get_order_by().is_empty() {
+            let orders: Vec<String> = self.get_order_by().iter().map(|ord| ord.to_sql(ctx)).collect();
             sql = format!("{} ORDER BY {}", sql, orders.connect(", "))
         }
 
-        if self.limit.is_some() {
-            sql = format!("{} LIMIT {}", sql, self.limit.unwrap())
+        if self.get_limit().is_some() {
+            sql = format!("{} LIMIT {}", sql, self.get_limit().unwrap())
         }
 
-        if self.offset.is_some() {
-            sql = format!("{} OFFSET {}", sql, self.offset.unwrap())
+        if self.get_offset().is_some() {
+            sql = format!("{} OFFSET {}", sql, self.get_offset().unwrap())
         }
 
-        if self.for_.is_some() {
-            sql = format!("{} {}", sql, self.for_.as_ref().unwrap().to_sql(ctx))
+        if self.get_for().is_some() {
+            sql = format!("{} {}", sql, self.get_for().as_ref().unwrap().to_sql(ctx))
         }
 
         sql

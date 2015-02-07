@@ -85,13 +85,24 @@ pub trait Updatable<M>: from::Table + Sized {
 
 #[derive(Clone)]
 pub struct UpdateQuery<T, L, M> {
-    pub only: bool,
-    pub table: from::SharedTable,
-    pub updates: Vec<SharedFieldUpdate>,
-    pub from: Option<Vec<from::SharedFrom>>,
-    pub where_: Option<predicate::SharedPredicate>,
-    pub all: bool,
-    pub returning: Option<select_query::Select>
+    only: bool,
+    table: from::SharedTable,
+    updates: Vec<SharedFieldUpdate>,
+    from: Option<Vec<from::SharedFrom>>,
+    where_: Option<predicate::SharedPredicate>,
+    all: bool,
+    returning: Option<select_query::Select>
+}
+
+impl<T, L, M> UpdateQuery<T, L, M> {
+    pub fn is_only(&self) -> bool { self.only }
+    pub fn is_all(&self) -> bool { self.all }
+
+    pub fn get_table(&self) -> &from::SharedTable { &self.table }
+    pub fn get_updates(&self) -> &Vec<SharedFieldUpdate> { &self.updates }
+    pub fn get_from(&self) -> &Option<Vec<from::SharedFrom>> { &self.from }
+    pub fn get_where(&self) -> &Option<predicate::SharedPredicate> { &self.where_ }
+    pub fn get_returning(&self) -> &Option<select_query::Select> { &self.returning }
 }
 
 impl<T, L, M> UpdateQuery<T, L, M> {

@@ -12,35 +12,35 @@ impl<T, L, M> super::ToSql for update_query::UpdateQuery<T, L, M> {
     fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         let mut sql = "UPDATE".to_string();
 
-        if self.only {
+        if self.is_only() {
             sql = format!("{} ONLY", sql)
         }
 
-        sql = format!("{} {}", sql, self.table.to_from_sql(ctx));
+        sql = format!("{} {}", sql, self.get_table().to_from_sql(ctx));
 
-        let updates_str: Vec<String> = self.updates.iter().map(|upd| upd.to_sql(ctx)).collect();
+        let updates_str: Vec<String> = self.get_updates().iter().map(|upd| upd.to_sql(ctx)).collect();
         sql = format!("{} SET {}", sql, updates_str.connect(", "));
 
-        if self.from.is_some() {
-            let from = self.from.as_ref().unwrap();
+        if self.get_from().is_some() {
+            let from = self.get_from().as_ref().unwrap();
             if !from.is_empty() {
                 let tables_str: Vec<String> = from.iter().map(|v| v.as_sql().to_from_sql(ctx)).collect();
                 sql = format!("{} FROM {}", sql, tables_str.connect(", "))
             }
         }
 
-        match self.where_.as_ref() {
+        match self.get_where().as_ref() {
             Some(predicate) => {
                 sql = format!("{} WHERE {}", sql, predicate.to_sql(false, ctx))
             },
-            None if !self.all => {
+            None if !self.is_all() => {
                 // http://devopsreactions.tumblr.com/post/47352638154/almost-ran-update-without-where
                 sql = format!("{} WHERE true = false", sql)
             },
             _ => ()
         }
 
-        match &self.returning {
+        match self.get_returning() {
             &Some(ref select) => sql = format!("{} RETURNING {}", sql, select.to_sql(ctx)),
             &None => ()
         }

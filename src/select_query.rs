@@ -190,20 +190,39 @@ pub trait Orderable: Clone {
 
 #[derive(Clone)]
 pub struct SelectQuery<T, L, M> {
-    pub distinct: Option<distinct::Distinct>,
-    pub select: Select,
-    pub from: from::SharedFrom,
-    pub joins: Vec<join::Join>,
-    pub where_: Option<predicate::SharedPredicate>,
-    pub group_by: Option<group_by::GroupBy>,
-    pub having: Option<predicate::SharedPredicate>,
-    pub limit: Option<usize>,
-    pub offset: Option<usize>,
-    pub order_by: Vec<order_by::OrderBy>,
-    pub for_: Option<SelectFor>,
+    distinct: Option<distinct::Distinct>,
+    select: Select,
+    from: from::SharedFrom,
+    joins: Vec<join::Join>,
+    where_: Option<predicate::SharedPredicate>,
+    group_by: Option<group_by::GroupBy>,
+    having: Option<predicate::SharedPredicate>,
+    limit: Option<usize>,
+    offset: Option<usize>,
+    order_by: Vec<order_by::OrderBy>,
+    for_: Option<SelectFor>,
 }
 
+impl<T, L, M> SelectQuery<T, L, M> {
+    // GETTERS
+    pub fn get_distinct(&self) -> &Option<distinct::Distinct> { &self.distinct }
+    pub fn get_select(&self) -> &Select { &self.select }
+    pub fn get_from(&self) -> &from::SharedFrom { &self.from }
+    pub fn get_joins(&self) -> &Vec<join::Join> { &self.joins }
+    pub fn get_where(&self) -> &Option<predicate::SharedPredicate> { &self.where_ }
+    pub fn get_group_by(&self) -> &Option<group_by::GroupBy> { &self.group_by }
+    pub fn get_having(&self) -> &Option<predicate::SharedPredicate> { &self.having }
+    pub fn get_limit(&self) -> &Option<usize> { &self.limit }
+    pub fn get_offset(&self) -> &Option<usize> { &self.offset }
+    pub fn get_order_by(&self) -> &Vec<order_by::OrderBy> { &self.order_by }
+    pub fn get_for(&self) -> &Option<SelectFor> { &self.for_ }
+}
+
+
+
 impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
+
+    // METHODS
  
     pub fn new(select: Select, from: from::SharedFrom) -> SelectQuery<T, L, M> {
         SelectQuery {
@@ -230,7 +249,7 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
     }
 
     pub fn group_by(&self, fields: &[&expression::UntypedExpression]) -> SelectQuery<T, L, M> {
-        with_clone!(self, query, query.group_by = Some(group_by::GroupBy::new(fields)))
+        with_clone!(self, query, query.group_by = Some(group_by::GroupBy::by(fields)))
     }
 
     pub fn limit(&self, limit: usize) -> SelectQuery<T, LimitOne, M> {

@@ -6,8 +6,13 @@ use super::{ToSharedPredicate};
 
 #[derive(Clone)]
 pub struct IsPredicate<F, T> {
-    pub field: F,
-    pub value: T
+    field: F,
+    value: T
+}
+
+impl<F, T> IsPredicate<F, T> {
+    pub fn get_field(&self) -> &F { &self.field }
+    pub fn get_value(&self) -> &T { &self.value }
 }
 
 pub trait ToIsPredicate<T> {

@@ -2,7 +2,7 @@ use super::super::distinct;
 
 impl super::ToSql for distinct::Distinct {
     fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
-        match &self.on {
+        match self.get_on() {
             &None => "DISTINCT".to_string(),
             &Some(ref on) if on.is_empty() => "DISTINCT".to_string(),
             &Some(ref on) => {
