@@ -1,11 +1,12 @@
 use std::mem;
+use std::marker;
 
 use super::select_query;
 use super::from;
 use super::predicate;
 use super::expression;
 
-pub trait Deletable<M>: from::Table + Sized { 
+pub trait Deletable<M>: from::Table + marker::PhantomFn<M> + Sized {
     fn delete(&self) -> DeleteQuery<(), select_query::NoResult, M> {
         DeleteQuery::new(self)
     }
@@ -33,7 +34,7 @@ macro_rules! returning_for {
                 self.returning = Some($crate::select_query::Select::All);
                 unsafe{ mem::transmute(self) }
             }
-            
+
             pub fn no_returning(mut self) -> $query<(), $crate::select_query::NoResult, M> {
                 self.returning = None;
                 unsafe{ mem::transmute(self) }
@@ -49,7 +50,11 @@ pub struct DeleteQuery<T, L, M> {
     table: from::SharedTable,
     using: Option<Vec<from::SharedFrom>>,
     where_: Option<predicate::SharedPredicate>,
-    returning: Option<select_query::Select>
+    returning: Option<select_query::Select>,
+
+    _marker_t: marker::PhantomData<T>,
+    _marker_l: marker::PhantomData<L>,
+    _marker_m: marker::PhantomData<M>,
 }
 
 impl<T, L, M> DeleteQuery<T, L, M> {
@@ -68,7 +73,11 @@ impl<T, L, M> DeleteQuery<T, L, M> {
             using: None,
             where_: None,
             all: false,
-            returning: None
+            returning: None,
+
+            _marker_t: marker::PhantomData,
+            _marker_l: marker::PhantomData,
+            _marker_m: marker::PhantomData,
         }
     }
 
@@ -95,7 +104,7 @@ impl<T, L, M> DeleteQuery<T, L, M> {
 
 returning_for!(DeleteQuery);
 
-impl<T:Clone, L:Clone, M:Clone> select_query::Queryable for DeleteQuery<T, L, M> { 
+impl<T:Clone, L:Clone, M:Clone> select_query::Queryable for DeleteQuery<T, L, M> {
     fn get_where(&self) -> &Option<predicate::SharedPredicate> { &self.where_ }
     fn set_where(&mut self, predicate: predicate::SharedPredicate) { self.where_ = Some(predicate); }
     fn unset_where(&mut self) { self.where_ = None; }

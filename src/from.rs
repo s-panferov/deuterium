@@ -7,7 +7,7 @@ use super::update_query;
 use super::delete_query;
 use super::field::{self, Field};
 
-pub trait From { 
+pub trait From {
     fn as_sql(&self) -> &sql::FromToSql;
     fn upcast_from(&self) -> SharedFrom;
 }
@@ -34,7 +34,7 @@ pub struct TableDef {
 macro_rules! insert {
     ($name:ident, $(($t:ident, $arg:ident)),+) => (
         #[doc(hidden)]
-        fn $name<$($t:Clone,)+>(&self, $($arg: &field::NamedField<$t>,)+) -> insert_query::InsertQuery<($($t,)+), ($(insert_query::InsertValue<$t>,)+), (), (), ()> {
+        fn $name<$($t:Clone+ 'static,)+>(&self, $($arg: &field::NamedField<$t>,)+) -> insert_query::InsertQuery<($($t,)+), ($(insert_query::InsertValue<$t>,)+), (), (), ()> {
             let mut cols = vec![];
             $(cols.push((*$arg).upcast_field());)+
             insert_query::InsertQuery::new_with_cols(self, cols)
@@ -99,10 +99,10 @@ impl delete_query::Deletable<()> for TableDef {}
 #[derive(Clone)]
 pub struct FromSelect<T, L, M> {
     pub select: select_query::SelectQuery<T, L, M>,
-    pub alias: String 
+    pub alias: String
 }
 
-impl<T: Clone, L: Clone, M: Clone> From for FromSelect<T, L, M> {
+impl<T: Clone + 'static, L: Clone + 'static, M: Clone + 'static> From for FromSelect<T, L, M> {
     fn as_sql(&self) -> &sql::FromToSql {
         self
     }
@@ -112,5 +112,5 @@ impl<T: Clone, L: Clone, M: Clone> From for FromSelect<T, L, M> {
     }
 }
 
-impl<T: Clone, L: Clone, M: Clone> select_query::Selectable<M> for FromSelect<T, L, M> {}
+impl<T: Clone + 'static, L: Clone + 'static, M: Clone + 'static> select_query::Selectable<M> for FromSelect<T, L, M> {}
 

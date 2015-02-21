@@ -1,4 +1,5 @@
 use std::mem;
+use std::marker;
 
 use super::from;
 use super::field;
@@ -8,7 +9,8 @@ use super::expression;
 #[derive(Clone)]
 pub enum InsertValue<T> {
     Value {
-        expression: expression::SharedExpression
+        expression: expression::SharedExpression,
+        _marker: marker::PhantomData<T>
     },
     Default
 }
@@ -20,7 +22,8 @@ pub trait ToInsertValue<T> {
 impl<T> InsertValue<T> {
     pub fn new(exp: &expression::Expression<T>) -> InsertValue<T> {
         InsertValue::Value {
-            expression: exp.upcast_expression()
+            expression: exp.upcast_expression(),
+            _marker: marker::PhantomData
         }
     }
 }
@@ -28,7 +31,7 @@ impl<T> InsertValue<T> {
 impl<'a, 'b, T> ToInsertValue<T> for &'a (expression::Expression<T> + 'b) {
     fn to_insert_val(&self) -> InsertValue<T> {
         InsertValue::new(*self)
-    }   
+    }
 }
 
 #[allow(dead_code)]
@@ -46,7 +49,10 @@ pub struct InsertQuery<T, V, M, RT, RL> {
     into: from::SharedTable,
     cols: Option<Vec<field::SharedField>>,
     values: Insert<T, V, M>,
-    returning: Option<select_query::Select>
+    returning: Option<select_query::Select>,
+
+    _marker_rt: marker::PhantomData<RT>,
+    _marker_rl: marker::PhantomData<RL>
 }
 
 macro_rules! insert {
@@ -64,7 +70,7 @@ macro_rules! insert {
 
 macro_rules! insertable {
     () => (
-        pub trait Insertable<M: Clone>: from::Table + Sized {   
+        pub trait Insertable<M: Clone>: from::Table + Sized {
             // FIXME: Rewrite after https://github.com/rust-lang/rfcs/issues/376:
             //        Draft RFC: variadic generics
             // insert!(insert_1, (T0, _t0));
@@ -79,7 +85,7 @@ macro_rules! insertable {
             // insert!(insert_10, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8), (T9, _t9));
             // insert!(insert_11, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8), (T9, _t9), (T10, _t10));
             // insert!(insert_12, (T0, _t0), (T1, _t1), (T2, _t2), (T3, _t3), (T4, _t4), (T5, _t5), (T6, _t6), (T7, _t7), (T8, _t8), (T9, _t9), (T10, _t10), (T11, _t11));
-        
+
             fn insert_all(&self) -> InsertQuery<(), (), M, (), ()> {
                  InsertQuery::new(self)
             }
@@ -100,13 +106,16 @@ insertable!();
 
 #[allow(dead_code)]
 impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT, RL> {
-    
+
     pub fn new(into: &from::Table) -> InsertQuery<T, V, M, RT, RL> {
         InsertQuery {
             into: into.upcast_table(),
             cols: None,
             values: Insert::DefaultValues,
-            returning: None
+            returning: None,
+
+            _marker_rt: marker::PhantomData,
+            _marker_rl: marker::PhantomData,
         }
     }
 
@@ -115,7 +124,10 @@ impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT
             into: into.upcast_table(),
             cols: Some(cols),
             values: Insert::DefaultValues,
-            returning: None
+            returning: None,
+
+            _marker_rt: marker::PhantomData,
+            _marker_rl: marker::PhantomData,
         }
     }
 
@@ -195,7 +207,7 @@ impl<T: Clone, V: Clone, M: Clone, RT, RL> InsertQuery<T, V, M, RT, RL> {
         self.returning = Some(select_query::Select::All);
         unsafe{ mem::transmute(self) }
     }
-    
+
     pub fn no_returning(mut self) -> InsertQuery<T, V, M, (), select_query::NoResult> {
         self.returning = None;
         unsafe{ mem::transmute(self) }

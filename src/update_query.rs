@@ -1,5 +1,6 @@
 use std::mem;
 use std::rc;
+use std::marker;
 
 use super::select_query;
 use super::insert_query::{self, ToInsertValue};
@@ -22,7 +23,7 @@ pub struct FieldUpdate<F, T> {
 impl<F, T> FieldUpdate<F, T> {
     pub fn get_field(&self) -> &F {
         &self.field
-    }    
+    }
 
     pub fn get_value(&self) -> &insert_query::InsertValue<T> {
         &self.value
@@ -77,7 +78,7 @@ impl ToFieldUpdate<expression::RawExpression, expression::RawExpression> for exp
     }
 }
 
-pub trait Updatable<M>: from::Table + Sized { 
+pub trait Updatable<M>: from::Table + marker::PhantomFn<M> + Sized {
     fn update(&self) -> UpdateQuery<(), select_query::NoResult, M> {
         UpdateQuery::new(self)
     }
@@ -91,7 +92,11 @@ pub struct UpdateQuery<T, L, M> {
     from: Option<Vec<from::SharedFrom>>,
     where_: Option<predicate::SharedPredicate>,
     all: bool,
-    returning: Option<select_query::Select>
+    returning: Option<select_query::Select>,
+
+    _marker_t: marker::PhantomData<T>,
+    _marker_l: marker::PhantomData<L>,
+    _marker_m: marker::PhantomData<M>
 }
 
 impl<T, L, M> UpdateQuery<T, L, M> {
@@ -114,7 +119,11 @@ impl<T, L, M> UpdateQuery<T, L, M> {
             from: None,
             where_: None,
             all: false,
-            returning: None
+            returning: None,
+
+            _marker_t: marker::PhantomData,
+            _marker_l: marker::PhantomData,
+            _marker_m: marker::PhantomData,
         }
     }
 
@@ -146,7 +155,7 @@ impl<T, L, M> UpdateQuery<T, L, M> {
 
 returning_for!(UpdateQuery);
 
-impl<T:Clone, L:Clone, M:Clone> select_query::Queryable for UpdateQuery<T, L, M> { 
+impl<T:Clone, L:Clone, M:Clone> select_query::Queryable for UpdateQuery<T, L, M> {
     fn get_where(&self) -> &Option<predicate::SharedPredicate> { &self.where_ }
     fn set_where(&mut self, predicate: predicate::SharedPredicate) { self.where_ = Some(predicate); }
     fn unset_where(&mut self) { self.where_ = None; }

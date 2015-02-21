@@ -1,4 +1,4 @@
-
+use std::marker;
 use std::rc;
 use time;
 
@@ -8,7 +8,7 @@ use sql;
 
 macro_rules! agg_func {
     ($foo:ident, $foo_arg:ident, $foo_low:ident) => (
-        pub trait $foo_arg<R: Clone, T: Clone>: Clone + expression::Expression<T> + 'static {
+        pub trait $foo_arg<R: Clone + 'static, T: Clone + 'static>: Clone + expression::Expression<T> + marker::PhantomFn<R> + 'static {
             fn $foo_low(&self) -> $foo<R, T, Self> {
                 $foo::new(self.clone())
             }
@@ -16,19 +16,25 @@ macro_rules! agg_func {
 
         #[derive(Clone)]
         pub struct $foo<R, T, E: $foo_arg<R, T>> {
-            pub expression: E
+            pub expression: E,
+
+            _marker_r: marker::PhantomData<R>,
+            _marker_t: marker::PhantomData<T>,
         }
 
         #[allow(dead_code)]
-        impl<R: Clone, T: Clone, E: $foo_arg<R, T> + 'static> $foo<R, T, E> {
+        impl<R: Clone + 'static, T: Clone + 'static, E: $foo_arg<R, T> + 'static> $foo<R, T, E> {
             pub fn new(expr: E) -> $foo<R, T, E> {
                 $foo {
-                    expression: expr.clone()
+                    expression: expr.clone(),
+
+                    _marker_r: marker::PhantomData,
+                    _marker_t: marker::PhantomData,
                 }
             }
         }
 
-        impl<R: Clone, T: Clone, E: $foo_arg<R, T> + 'static> expression::UntypedExpression for $foo<R, T, E> {
+        impl<R: Clone + 'static, T: Clone + 'static, E: $foo_arg<R, T> + 'static> expression::UntypedExpression for $foo<R, T, E> {
             fn expression_as_sql(&self) -> &sql::ToSql {
                 self
             }
@@ -38,7 +44,7 @@ macro_rules! agg_func {
             }
         }
 
-        impl<R: Clone, T: Clone, E: $foo_arg<R, T>  + 'static> expression::Expression<R> for $foo<R, T, E> { }
+        impl<R: Clone + 'static, T: Clone + 'static, E: $foo_arg<R, T>  + 'static> expression::Expression<R> for $foo<R, T, E> { }
     )
 }
 
@@ -84,7 +90,7 @@ impl AvgArg<f64, f64> for field::F64Field {}
 
 agg_func!(Count, CountArg, count);
 
-impl<T: expression::PrimitiveType + Clone> CountArg<i64, T> for field::NamedField<T> {}
+impl<T: 'static + expression::PrimitiveType + Clone> CountArg<i64, T> for field::NamedField<T> {}
 
 #[derive(Clone, Copy)]
 pub struct CountAll;

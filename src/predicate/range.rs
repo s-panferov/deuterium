@@ -1,4 +1,5 @@
 use time;
+use std::marker;
 
 use super::super::sql;
 use super::super::expression;
@@ -29,53 +30,53 @@ impl<F, T1, T2> InRangePredicate<F, T1, T2> {
     pub fn get_bounds(&self) -> &InRangeBounds { &self.bounds }
 }
 
-pub trait ToInRangePredicate<T> {
-    fn in_range<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate 
+pub trait ToInRangePredicate<T>: marker::PhantomFn<T> {
+    fn in_range<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate
         where B1: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static,
               B2: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 
-    fn in_range_exclude_left<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate 
+    fn in_range_exclude_left<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate
         where B1: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static,
               B2: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 
-    fn in_range_exclude_right<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate 
+    fn in_range_exclude_right<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate
         where B1: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static,
               B2: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 
-    fn in_range_exclude<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate 
+    fn in_range_exclude<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate
         where B1: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static,
               B2: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 }
 
-impl<F, T1, T2> super::Predicate for InRangePredicate<F, T1, T2> 
+impl<F, T1, T2> super::Predicate for InRangePredicate<F, T1, T2>
     where F: sql::ToPredicateValue,
           T1: sql::ToPredicateValue,
-          T2: sql::ToPredicateValue 
+          T2: sql::ToPredicateValue
     { }
 
 macro_rules! impl_for {
     ($field:ty, $expr:ty) => (
 
         impl ToInRangePredicate<$expr> for $field {
-            fn in_range<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate 
+            fn in_range<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate
                 where B1: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static,
                       B2: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static {
                 InRangePredicate { field: self.clone(), from: from, to: to, bounds: InRangeBounds::IncludeBoth }.upcast()
             }
 
-            fn in_range_exclude_left<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate 
+            fn in_range_exclude_left<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate
                 where B1: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static,
                       B2: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static {
                 InRangePredicate { field: self.clone(), from: from, to: to, bounds: InRangeBounds::ExcludeLeft }.upcast()
             }
 
-            fn in_range_exclude_right<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate 
+            fn in_range_exclude_right<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate
                 where B1: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static,
                       B2: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static {
                 InRangePredicate { field: self.clone(), from: from, to: to, bounds: InRangeBounds::ExcludeRight }.upcast()
             }
 
-            fn in_range_exclude<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate 
+            fn in_range_exclude<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate
                 where B1: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static,
                       B2: expression::ToExpression<$expr> + sql::ToPredicateValue + Clone + 'static {
                 InRangePredicate { field: self.clone(), from: from, to: to, bounds: InRangeBounds::ExcludeBoth }.upcast()

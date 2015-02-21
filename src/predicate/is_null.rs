@@ -22,7 +22,7 @@ pub trait ToIsNullPredicate {
 
 impl<F> super::Predicate for IsNullPredicate<F> where F: sql::ToPredicateValue {}
 
-impl<T> ToIsNullPredicate for field::NamedField<Option<T>> where T: sql::ToPredicateValue + Clone {
+impl<T> ToIsNullPredicate for field::NamedField<Option<T>> where T: sql::ToPredicateValue + Clone + 'static {
     fn is_null(&self) -> super::SharedPredicate {
         IsNullPredicate { field: self.clone(), is_null: true }.upcast()
     }

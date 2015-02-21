@@ -1,5 +1,6 @@
 use std::rc;
 use std::mem;
+use std::marker;
 
 use super::from;
 use super::expression::{self, UntypedExpression};
@@ -17,7 +18,7 @@ pub enum Select {
 }
 
 pub trait AbstractSelectQuery: sql::ToSql {
-    
+
 }
 
 pub trait ToSelectQuery: sql::ToSql {
@@ -67,9 +68,9 @@ macro_rules! set_predicate {
 
 macro_rules! predicate_trait {
     (
-        $name:ident, 
-        $getter:ident, 
-        $setter:ident, 
+        $name:ident,
+        $getter:ident,
+        $setter:ident,
         $unset:ident,
         $implicit_and:ident,
         $explicit_and:ident,
@@ -201,6 +202,10 @@ pub struct SelectQuery<T, L, M> {
     offset: Option<usize>,
     order_by: Vec<order_by::OrderBy>,
     for_: Option<SelectFor>,
+
+    _marker_t: marker::PhantomData<T>,
+    _marker_l: marker::PhantomData<L>,
+    _marker_m: marker::PhantomData<M>
 }
 
 impl<T, L, M> SelectQuery<T, L, M> {
@@ -223,7 +228,7 @@ impl<T, L, M> SelectQuery<T, L, M> {
 impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
 
     // METHODS
- 
+
     pub fn new(select: Select, from: from::SharedFrom) -> SelectQuery<T, L, M> {
         SelectQuery {
             distinct: None,
@@ -236,7 +241,11 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
             limit: None,
             offset: None,
             order_by: vec![],
-            for_: None
+            for_: None,
+
+            _marker_t: marker::PhantomData,
+            _marker_l: marker::PhantomData,
+            _marker_m: marker::PhantomData,
         }
     }
 
@@ -278,7 +287,7 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
 
     pub fn for_update(&self) -> SelectQuery<T, L, M> {
         with_clone!(self, query, query.for_ = Some(SelectFor::Update))
-    }    
+    }
 
     pub fn for_update_nowait(&self) -> SelectQuery<T, L, M> {
         with_clone!(self, query, query.for_ = Some(SelectFor::UpdateNoWait))
@@ -323,15 +332,15 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
     pub fn natural_join(&self, from: &from::From) -> SelectQuery<T, L, M> {
         with_clone!(self, query, query.joins.push(join::Join::natural_join(from.upcast_from())))
     }
-    
+
     pub fn natural_left_join(&self, from: &from::From) -> SelectQuery<T, L, M> {
         with_clone!(self, query, query.joins.push(join::Join::natural_left_join(from.upcast_from())))
     }
-    
+
     pub fn natural_right_join(&self, from: &from::From) -> SelectQuery<T, L, M> {
         with_clone!(self, query, query.joins.push(join::Join::natural_right_join(from.upcast_from())))
     }
-    
+
     pub fn natural_full_join(&self, from: &from::From) -> SelectQuery<T, L, M> {
         with_clone!(self, query, query.joins.push(join::Join::natural_full_join(from.upcast_from())))
     }
@@ -369,19 +378,19 @@ pub trait Selectable<M: Clone>: from::From {
     }
 }
 
-impl<T: Clone, L: Clone, M: Clone> Queryable for SelectQuery<T, L, M> { 
+impl<T: Clone, L: Clone, M: Clone> Queryable for SelectQuery<T, L, M> {
     fn get_where(&self) -> &Option<predicate::SharedPredicate> { &self.where_ }
     fn set_where(&mut self, predicate: predicate::SharedPredicate) { self.where_ = Some(predicate); }
     fn unset_where(&mut self) { self.where_ = None; }
 }
 
-impl<T: Clone, L: Clone, M: Clone> HasHaving for SelectQuery<T, L, M> { 
+impl<T: Clone, L: Clone, M: Clone> HasHaving for SelectQuery<T, L, M> {
     fn get_having(&self) -> &Option<predicate::SharedPredicate> { &self.having }
     fn set_having(&mut self, predicate: predicate::SharedPredicate) { self.having = Some(predicate); }
     fn unset_having(&mut self) { self.having = None; }
 }
 
-impl<T: Clone, L: Clone, M: Clone> Orderable for SelectQuery<T, L, M> { 
+impl<T: Clone, L: Clone, M: Clone> Orderable for SelectQuery<T, L, M> {
     fn get_order_by_mut(&mut self) -> &mut Vec<order_by::OrderBy> { &mut self.order_by }
     fn set_order_by(&mut self, order_by: Vec<order_by::OrderBy>) { self.order_by = order_by }
 }
@@ -391,7 +400,7 @@ impl<T: Clone, L: Clone, M: Clone> AbstractSelectQuery for SelectQuery<T, L, M> 
 pub type BoxedSelectQuery = Box<AbstractSelectQuery + 'static>;
 pub type SharedSelectQuery = rc::Rc<BoxedSelectQuery>;
 
-impl<T: Clone, L: Clone, M: Clone> expression::UntypedExpression for SelectQuery<T, L, M> {
+impl<T: Clone + 'static, L: Clone + 'static, M: Clone + 'static> expression::UntypedExpression for SelectQuery<T, L, M> {
     fn expression_as_sql(&self) -> &sql::ToSql {
                 self
     }
@@ -401,8 +410,8 @@ impl<T: Clone, L: Clone, M: Clone> expression::UntypedExpression for SelectQuery
     }
 }
 
-impl<M: Clone, T: Clone> expression::Expression<T> for SelectQuery<(T,), LimitOne, M> { }
-impl<M: Clone, T: Clone> expression::ListExpression<T> for SelectQuery<(T,), LimitMany, M> { }
+impl<M: Clone + 'static, T: Clone + 'static> expression::Expression<T> for SelectQuery<(T,), LimitOne, M> { }
+impl<M: Clone + 'static, T: Clone + 'static> expression::ListExpression<T> for SelectQuery<(T,), LimitMany, M> { }
 
-impl<M: Clone, T: Clone> expression::ToExpression<T> for SelectQuery<(T,), LimitOne, M> { }
-impl<M: Clone, T: Clone> expression::ToListExpression<T> for SelectQuery<(T,), LimitMany, M> { }
+impl<M: Clone + 'static, T: Clone + 'static> expression::ToExpression<T> for SelectQuery<(T,), LimitOne, M> { }
+impl<M: Clone + 'static, T: Clone + 'static> expression::ToListExpression<T> for SelectQuery<(T,), LimitMany, M> { }

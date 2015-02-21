@@ -3,12 +3,12 @@ use super::super::insert_query;
 impl<T> super::ToSql for insert_query::InsertValue<T> {
     fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         match self {
-            &insert_query::InsertValue::Value{ref expression} => {
+            &insert_query::InsertValue::Value{ref expression, ..} => {
                 expression.expression_as_sql().to_sql(ctx)
             },
             &insert_query::InsertValue::Default => "DEFAULT".to_string()
         }
-    } 
+    }
 }
 
 impl super::ToSql for ()  {
