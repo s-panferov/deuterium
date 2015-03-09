@@ -4,7 +4,6 @@ use std::marker;
 use super::select_query;
 use super::from;
 use super::predicate;
-use super::expression;
 
 pub trait Deletable<M>: from::Table + marker::PhantomFn<M> + Sized {
     fn delete(&self) -> DeleteQuery<(), select_query::NoResult, M> {
