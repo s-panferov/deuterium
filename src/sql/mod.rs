@@ -1,4 +1,3 @@
-
 pub use self::predicate::{PredicateToSql};
 pub use self::value::{ToPredicateValue};
 #[cfg(feature = "postgres")] pub use self::value::{AsPostgresValue};
@@ -29,8 +28,8 @@ pub trait QueryToSql: ToSql {
     fn to_final_sql(&self, ctx: &mut SqlContext) -> String {
         let mut sql = format!("{};", self.to_sql(ctx));
         let mut idx = ctx.get_expl_placeholders_count() + 1;
-        for i in range(0, ctx.get_impl_placeholders_count()) {
-            sql = sql.replace(format!("$${}", i).as_slice(), ctx.adapter().placeholder(idx).as_slice());
+        for i in 0..ctx.get_impl_placeholders_count() {
+            sql = sql.replace(&format!("$${}", i), &ctx.adapter().placeholder(idx));
             idx += 1
         }
 

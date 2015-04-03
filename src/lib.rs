@@ -1,9 +1,8 @@
-#![feature(core)]
-#![feature(concat_idents)]
+#![feature(convert, concat_idents)]
 // #![deny(warnings)]
 // #![deny(bad_style)]
 
-extern crate "rustc-serialize" as serialize;
+extern crate rustc_serialize as serialize;
 extern crate time;
 
 #[cfg(feature = "postgres")]
@@ -54,9 +53,9 @@ pub use field::{
 };
 
 pub use predicate::{
-    Predicate, 
-    SharedPredicate, 
-    IsPredicate, ToIsPredicate, 
+    Predicate,
+    SharedPredicate,
+    IsPredicate, ToIsPredicate,
     OrPredicate, ToOrPredicate,
     AndPredicate, ToAndPredicate,
     InPredicate, ToInPredicate,
@@ -72,13 +71,13 @@ pub use select_query::{
     Selectable,
     Queryable,
     Orderable,
-    SelectQuery, 
-    SharedSelectQuery, 
-    ToSelectQuery, 
-    Select, 
-    NoResult, 
-    LimitOne, 
-    LimitTwo, 
+    SelectQuery,
+    SharedSelectQuery,
+    ToSelectQuery,
+    Select,
+    NoResult,
+    LimitOne,
+    LimitTwo,
     LimitMany
 };
 
@@ -92,7 +91,7 @@ pub use update_query::{
 
 pub use insert_query::{
     InsertQuery,
-    Insertable,        
+    Insertable,
     ToInsertValue,
     InsertValue,
 };
@@ -103,8 +102,8 @@ pub use delete_query::{
 };
 
 pub use expression::{
-    BoxedExpression, 
-    UntypedExpression, 
+    BoxedExpression,
+    UntypedExpression,
     Expression,
     SharedExpression,
     RawExpression,
@@ -155,4 +154,3 @@ mod distinct;
 mod group_by;
 mod function;
 mod placeholder;
-
