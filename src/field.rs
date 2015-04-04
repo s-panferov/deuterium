@@ -89,11 +89,11 @@ impl<T: Clone + 'static> expression::UntypedExpression for NamedField<T> {
 
 impl<T: Clone + 'static> Field for NamedField<T> {
     fn name(&self) -> &str {
-        self.name.as_slice()
+        &self.name
     }
 
     fn table_name(&self) -> &str {
-        self.table_name.as_slice()
+        &self.table_name
     }
 
     fn qual(&self) -> Option<&String> {

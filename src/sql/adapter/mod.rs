@@ -2,7 +2,7 @@ pub trait SqlAdapter {
     fn placeholder(&self, idx: u8) -> String;
 }
 
-#[derive(Copy)]
+#[derive(Copy, Clone)]
 pub struct PostgreSqlAdapter;
 
 impl SqlAdapter for PostgreSqlAdapter {
