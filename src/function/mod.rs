@@ -8,7 +8,7 @@ use sql;
 
 macro_rules! agg_func {
     ($foo:ident, $foo_arg:ident, $foo_low:ident) => (
-        pub trait $foo_arg<R: Clone + 'static, T: Clone + 'static>: Clone + expression::Expression<T> + marker::PhantomFn<R> + 'static {
+        pub trait $foo_arg<R: Clone + 'static, T: Clone + 'static>: Clone + expression::Expression<T>+ 'static {
             fn $foo_low(&self) -> $foo<R, T, Self> {
                 $foo::new(self.clone())
             }

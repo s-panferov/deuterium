@@ -1,6 +1,4 @@
 use time;
-use std::marker;
-
 use super::super::sql;
 use super::super::expression;
 use super::super::field;
@@ -30,7 +28,7 @@ impl<F, T1, T2> InRangePredicate<F, T1, T2> {
     pub fn get_bounds(&self) -> &InRangeBounds { &self.bounds }
 }
 
-pub trait ToInRangePredicate<T>: marker::PhantomFn<T> {
+pub trait ToInRangePredicate<T> {
     fn in_range<B1, B2>(&self, from: B1, to: B2) -> super::SharedPredicate
         where B1: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static,
               B2: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;

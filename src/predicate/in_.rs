@@ -1,5 +1,3 @@
-use std::marker;
-
 use super::super::expression;
 use super::super::sql;
 use super::super::field;
@@ -17,7 +15,7 @@ impl<F, T> InPredicate<F, T> {
     pub fn get_values(&self) -> &T { &self.values }
 }
 
-pub trait ToInPredicate<T>: marker::PhantomFn<T> {
+pub trait ToInPredicate<T> {
     fn in_<B>(&self, values: B) -> super::SharedPredicate
         where B: expression::ToListExpression<T> + sql::ToPredicateValue + Clone + 'static;
 }
