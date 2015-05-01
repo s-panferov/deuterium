@@ -13,7 +13,7 @@ macro_rules! agg_to_sql {
         impl<R, T, E> super::ToSql for $foo<R, T, E> where R: Clone, T: Clone, E: $foo_arg<R, T> {
             fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
                 format!($fmt, self.expression.expression_as_sql().to_sql(ctx))
-            }    
+            }
         }
     )
 }
@@ -27,5 +27,5 @@ agg_to_sql!(Count, CountArg, "COUNT({})");
 impl super::ToSql for CountAll {
     fn to_sql(&self, _ctx: &mut super::SqlContext) -> String {
         "COUNT(*)".to_string()
-    }    
+    }
 }

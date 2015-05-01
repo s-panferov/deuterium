@@ -27,9 +27,9 @@ impl<T, L, M> super::ToSql for select_query::SelectQuery<T, L, M> {
             sql = format!("{} {}", sql, self.get_distinct().as_ref().unwrap().to_sql(ctx));
         }
 
-        sql = format!("{} {} FROM {}", 
+        sql = format!("{} {} FROM {}",
             sql,
-            self.get_select().to_sql(ctx), 
+            self.get_select().to_sql(ctx),
             self.get_from().as_sql().to_from_sql(ctx)
         );
 
@@ -92,5 +92,5 @@ impl super::ToSql for select_query::Select {
 }
 
 impl<T, L, M> super::ToPredicateValue for select_query::SelectQuery<T, L, M> {
-    fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String { self.to_sql(ctx) }   
+    fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String { self.to_sql(ctx) }
 }

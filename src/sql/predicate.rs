@@ -90,7 +90,7 @@ impl<F: value::ToPredicateValue, T: value::ToPredicateValue> PredicateToSql for 
 impl<F: value::ToPredicateValue, T1: value::ToPredicateValue, T2: value::ToPredicateValue> PredicateToSql for range::InRangePredicate<F, T1, T2> {
     fn to_sql(&self, negation: bool, ctx: &mut super::SqlContext) -> String {
         let ref name = self.get_field().to_predicate_value(ctx);
-        let from = self.get_from().to_predicate_value(ctx); 
+        let from = self.get_from().to_predicate_value(ctx);
         let to = self.get_to().to_predicate_value(ctx);
         match self.get_bounds() {
             &range::InRangeBounds::IncludeBoth => {

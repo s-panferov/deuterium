@@ -15,7 +15,7 @@ impl<T: Clone, V: super::ToSql, M: Clone> super::ToSql for insert_query::Insert<
                     let values_str: Vec<String> = row.iter().map(|v| v.to_sql(ctx)).collect();
                     format!("({})", values_str.connect(", "))
                 }).collect();
-                format!("VALUES\n    {}", rows_str.connect(",\n    "))    
+                format!("VALUES\n    {}", rows_str.connect(",\n    "))
             },
             &insert_query::Insert::FromSelect(ref select) => {
                 select.to_sql(ctx)

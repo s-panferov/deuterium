@@ -41,7 +41,7 @@ pub trait ToInequalityPredicate<T>: marker::PhantomFn<T> {
         where B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 }
 
-impl<F, T> super::Predicate for InequalityPredicate<F, T> 
+impl<F, T> super::Predicate for InequalityPredicate<F, T>
     where F: sql::ToPredicateValue,
           T: sql::ToPredicateValue { }
 
