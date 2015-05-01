@@ -78,7 +78,7 @@ impl ToFieldUpdate<expression::RawExpression, expression::RawExpression> for exp
     }
 }
 
-pub trait Updatable<M>: from::Table + marker::PhantomFn<M> + Sized {
+pub trait Updatable<M>: from::Table + Sized {
     fn update(&self) -> UpdateQuery<(), select_query::NoResult, M> {
         UpdateQuery::new(self)
     }

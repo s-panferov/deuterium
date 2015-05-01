@@ -1,5 +1,4 @@
 use time;
-use std::marker;
 
 use super::{ToSharedPredicate};
 use super::super::expression;
@@ -27,7 +26,7 @@ impl<F, T> InequalityPredicate<F, T> {
     pub fn get_inequality(&self) -> &Inequality { &self.inequality }
 }
 
-pub trait ToInequalityPredicate<T>: marker::PhantomFn<T> {
+pub trait ToInequalityPredicate<T> {
     fn lt<B>(&self, val: B) -> super::SharedPredicate
         where B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 
@@ -41,7 +40,7 @@ pub trait ToInequalityPredicate<T>: marker::PhantomFn<T> {
         where B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 }
 
-impl<F, T> super::Predicate for InequalityPredicate<F, T> 
+impl<F, T> super::Predicate for InequalityPredicate<F, T>
     where F: sql::ToPredicateValue,
           T: sql::ToPredicateValue { }
 

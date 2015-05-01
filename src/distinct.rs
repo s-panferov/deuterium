@@ -14,8 +14,8 @@ impl Distinct {
     pub fn get_on(&self) -> &Option<Vec<expression::SharedExpression>> { &self.on }
 
     pub fn on(fields: &[&expression::UntypedExpression]) -> Distinct {
-        Distinct { on: Some( 
-            fields.iter().map(|f| f.upcast_expression()).collect() 
+        Distinct { on: Some(
+            fields.iter().map(|f| f.upcast_expression()).collect()
         )}
     }
 }

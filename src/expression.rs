@@ -1,6 +1,5 @@
 use std::rc;
 use std::mem;
-use std::marker;
 use serialize::json;
 use time;
 use uuid;
@@ -32,13 +31,13 @@ pub type BoxedExpression = Box<UntypedExpression + 'static>;
 pub type SharedExpression = rc::Rc<BoxedExpression>;
 
 /// Trait to indicate that value is an expression with concrete type.
-pub trait Expression<T>: UntypedExpression + marker::PhantomFn<T> {}
+pub trait Expression<T>: UntypedExpression {}
 
 /// Trait to indicate that value is a LIST expression with concrete type.
-pub trait ListExpression<T>: UntypedExpression + marker::PhantomFn<T> {}
+pub trait ListExpression<T>: UntypedExpression {}
 
 /// Trait to indicate that value is a primitive type that SQL adapter supports.
-pub trait PrimitiveType: marker::MarkerTrait { }
+pub trait PrimitiveType { }
 
 macro_rules! to_expression {
     ($t:ty) => (

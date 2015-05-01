@@ -34,7 +34,7 @@ pub mod exclude;
 pub mod like;
 pub mod raw;
 
-pub trait Predicate: sql::PredicateToSql { 
+pub trait Predicate: sql::PredicateToSql {
 
 }
 

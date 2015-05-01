@@ -1,5 +1,3 @@
-use std::marker;
-
 use super::super::expression;
 use super::super::field;
 use super::super::sql;
@@ -19,7 +17,7 @@ impl<F, T> LikePredicate<F, T> {
     pub fn is_case_sensitive(&self) -> bool { self.is_case_sensitive }
 }
 
-pub trait ToLikePredicate<T>: marker::PhantomFn<T> {
+pub trait ToLikePredicate<T> {
     fn like<B>(&self, val: B) -> super::SharedPredicate
         where B: expression::ToExpression<T> + sql::ToPredicateValue + Clone + 'static;
 

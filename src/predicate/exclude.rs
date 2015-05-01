@@ -11,7 +11,7 @@ pub trait ToExcludePredicate {
 
 impl super::Predicate for ExcludePredicate {}
 
-impl ToExcludePredicate for super::SharedPredicate { 
+impl ToExcludePredicate for super::SharedPredicate {
     fn exclude(&self) -> super::SharedPredicate {
         ExcludePredicate{predicate: self.clone()}.upcast()
     }

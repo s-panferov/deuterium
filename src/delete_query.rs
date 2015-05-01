@@ -5,7 +5,7 @@ use super::select_query;
 use super::from;
 use super::predicate;
 
-pub trait Deletable<M>: from::Table + marker::PhantomFn<M> + Sized {
+pub trait Deletable<M>: from::Table + Sized {
     fn delete(&self) -> DeleteQuery<(), select_query::NoResult, M> {
         DeleteQuery::new(self)
     }
