@@ -1,5 +1,3 @@
-#![feature(core)]
-
 extern crate deuterium;
 extern crate time;
 
@@ -8,7 +6,7 @@ use deuterium::*;
 #[macro_export]
 macro_rules! assert_sql {
     ($query:expr, $s:expr) => (
-        assert_eq!($query.to_final_sql(&mut SqlContext::new(Box::new(sql::PostgreSqlAdapter))).as_slice(), $s)
+        assert_eq!(&$query.to_final_sql(&mut SqlContext::new(Box::new(sql::PostgreSqlAdapter))), $s)
     )
 }
 
