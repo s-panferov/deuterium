@@ -5,6 +5,7 @@ pub use self::from::{FromToSql};
 pub use self::adapter::{
     SqlAdapter,
     PostgreSqlAdapter,
+    MysqlAdapter,
 };
 
 pub mod delete;
