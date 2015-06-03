@@ -5,6 +5,7 @@ pub use self::from::{FromToSql};
 pub use self::adapter::{
     SqlAdapter,
     PostgreSqlAdapter,
+    MysqlAdapter,
 };
 
 pub mod delete;
@@ -90,6 +91,6 @@ impl SqlContext {
     }
 
     pub fn data(&self) -> &[BoxedValue] {
-        self.placeholder_data.as_slice()
+        &self.placeholder_data
     }
 }
