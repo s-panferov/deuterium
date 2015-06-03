@@ -91,6 +91,6 @@ impl SqlContext {
     }
 
     pub fn data(&self) -> &[BoxedValue] {
-        self.placeholder_data.as_slice()
+        &self.placeholder_data
     }
 }

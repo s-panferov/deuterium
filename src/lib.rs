@@ -1,7 +1,3 @@
-#![feature(convert, concat_idents)]
-// #![deny(warnings)]
-// #![deny(bad_style)]
-
 extern crate rustc_serialize as serialize;
 extern crate time;
 
