@@ -1,6 +1,6 @@
 use std::rc;
 use time;
-use serialize::json;
+use serde_json;
 
 use super::expression;
 use super::sql;
@@ -35,5 +35,5 @@ impl expression::ToExpression<f64> for Placeholder {}
 impl expression::ToExpression<String> for Placeholder {}
 impl expression::ToExpression<Vec<u8>> for Placeholder {}
 impl expression::ToExpression<time::Timespec> for Placeholder {}
-impl expression::ToExpression<json::Json> for Placeholder {}
+impl expression::ToExpression<serde_json::Value> for Placeholder {}
 impl expression::ToExpression<expression::RawExpression> for Placeholder {}

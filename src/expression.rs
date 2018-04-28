@@ -1,6 +1,6 @@
 use std::{fmt, rc};
 use std::mem;
-use serialize::json;
+use serde_json;
 use time;
 use uuid;
 
@@ -64,7 +64,7 @@ to_expression!(f32);
 to_expression!(f64);
 to_expression!(String);
 to_expression!(Vec<u8>);
-to_expression!(json::Json);
+to_expression!(serde_json::Value);
 to_expression!(time::Timespec);
 to_expression!(uuid::Uuid);
 to_expression!(RawExpression);
@@ -78,7 +78,7 @@ impl PrimitiveType for f32 { }
 impl PrimitiveType for f64 { }
 impl PrimitiveType for String { }
 impl PrimitiveType for Vec<u8> { }
-impl PrimitiveType for json::Json { }
+impl PrimitiveType for serde_json::Value { }
 impl PrimitiveType for time::Timespec { }
 impl PrimitiveType for uuid::Uuid { }
 impl PrimitiveType for RawExpression { }
@@ -92,7 +92,7 @@ to_expression!(Option<f32>);
 to_expression!(Option<f64>);
 to_expression!(Option<String>);
 to_expression!(Option<Vec<u8>>);
-to_expression!(Option<json::Json>);
+to_expression!(Option<serde_json::Value>);
 to_expression!(Option<time::Timespec>);
 to_expression!(Option<uuid::Uuid>);
 to_expression!(Option<RawExpression>);
@@ -215,18 +215,18 @@ impl ToExpression<Option<Vec<u8>>> for field::OptionalByteListField {}
 impl ToExpression<Option<Vec<u8>>> for RawExpression {}
 
 //
-// json::Json
+// serde_json::Value
 //
 
-impl ToExpression<json::Json> for json::Json {}
-impl ToExpression<json::Json> for field::JsonField {}
-impl ToExpression<json::Json> for RawExpression {}
+impl ToExpression<serde_json::Value> for serde_json::Value {}
+impl ToExpression<serde_json::Value> for field::JsonField {}
+impl ToExpression<serde_json::Value> for RawExpression {}
 
-impl ToExpression<Option<json::Json>> for json::Json {}
-impl ToExpression<Option<json::Json>> for Option<json::Json> {}
-impl ToExpression<Option<json::Json>> for field::JsonField {}
-impl ToExpression<Option<json::Json>> for field::OptionalJsonField {}
-impl ToExpression<Option<json::Json>> for RawExpression {}
+impl ToExpression<Option<serde_json::Value>> for serde_json::Value {}
+impl ToExpression<Option<serde_json::Value>> for Option<serde_json::Value> {}
+impl ToExpression<Option<serde_json::Value>> for field::JsonField {}
+impl ToExpression<Option<serde_json::Value>> for field::OptionalJsonField {}
+impl ToExpression<Option<serde_json::Value>> for RawExpression {}
 
 //
 // time::Timespec
@@ -265,7 +265,7 @@ impl ToExpression<RawExpression> for f32 {}
 impl ToExpression<RawExpression> for f64 {}
 impl ToExpression<RawExpression> for Vec<u8> {}
 impl ToExpression<RawExpression> for String {}
-impl ToExpression<RawExpression> for json::Json {}
+impl ToExpression<RawExpression> for serde_json::Value {}
 impl ToExpression<RawExpression> for time::Timespec {}
 impl ToExpression<RawExpression> for uuid::Uuid {}
 impl ToExpression<RawExpression> for Option<bool> {}
@@ -277,7 +277,7 @@ impl ToExpression<RawExpression> for Option<f32> {}
 impl ToExpression<RawExpression> for Option<f64> {}
 impl ToExpression<RawExpression> for Option<Vec<u8>> {}
 impl ToExpression<RawExpression> for Option<String> {}
-impl ToExpression<RawExpression> for Option<json::Json> {}
+impl ToExpression<RawExpression> for Option<serde_json::Value> {}
 impl ToExpression<RawExpression> for Option<time::Timespec> {}
 impl ToExpression<RawExpression> for Option<uuid::Uuid> {}
 impl ToExpression<RawExpression> for field::BoolField {}

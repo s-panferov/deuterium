@@ -1,4 +1,4 @@
-use serialize::json;
+use serde_json;
 use time;
 use uuid;
 use std::fmt;
@@ -56,7 +56,7 @@ raw_value_to_predicate_value!(f32);
 raw_value_to_predicate_value!(f64);
 raw_value_to_predicate_value!(String);
 raw_value_to_predicate_value!(Vec<u8>);
-raw_value_to_predicate_value!(json::Json);
+raw_value_to_predicate_value!(serde_json::Value);
 raw_value_to_predicate_value!(time::Timespec);
 raw_value_to_predicate_value!(uuid::Uuid);
 
@@ -91,7 +91,7 @@ extended_impl!(f32);
 extended_impl!(f64);
 extended_impl!(String);
 extended_impl!(Vec<u8>);
-extended_impl!(json::Json);
+extended_impl!(serde_json::Value);
 extended_impl!(time::Timespec);
 extended_impl!(uuid::Uuid);
 

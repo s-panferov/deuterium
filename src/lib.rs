@@ -4,7 +4,7 @@
         unstable_features,
         unused, future_incompatible)]
 
-extern crate rustc_serialize as serialize;
+extern crate serde_json;
 extern crate time;
 
 #[cfg(feature = "postgres")]
