@@ -1,5 +1,5 @@
 use super::super::update_query;
-use super::from::{FromToSql};
+use super::from::FromToSql;
 use super::value;
 
 impl<F: value::ToPredicateValue, T: value::ToPredicateValue> super::ToSql for update_query::FieldUpdate<F, T> {

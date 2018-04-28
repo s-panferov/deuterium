@@ -1,7 +1,7 @@
 
 use super::expression;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Distinct {
     on: Option<Vec<expression::SharedExpression>>
 }

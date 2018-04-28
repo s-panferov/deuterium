@@ -5,7 +5,7 @@ use serialize::json;
 use super::expression;
 use super::sql;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Placeholder {
     idx: u8
 }

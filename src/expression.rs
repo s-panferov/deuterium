@@ -1,4 +1,4 @@
-use std::rc;
+use std::{fmt, rc};
 use std::mem;
 use serialize::json;
 use time;
@@ -7,7 +7,7 @@ use uuid;
 use super::sql;
 use super::field;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 /// Non-checking expression with any content you want.
 pub struct RawExpression {
     pub content: String
@@ -22,7 +22,7 @@ impl RawExpression {
 }
 
 /// Intrernal trait for all expressions. Allows some useful casts.
-pub trait UntypedExpression {
+pub trait UntypedExpression: fmt::Debug {
     fn expression_as_sql(&self) -> &sql::ToSql;
     fn upcast_expression(&self) -> SharedExpression;
 }
@@ -37,7 +37,7 @@ pub trait Expression<T>: UntypedExpression {}
 pub trait ListExpression<T>: UntypedExpression {}
 
 /// Trait to indicate that value is a primitive type that SQL adapter supports.
-pub trait PrimitiveType { }
+pub trait PrimitiveType: fmt::Debug { }
 
 macro_rules! to_expression {
     ($t:ty) => (
@@ -109,8 +109,8 @@ pub trait ToListExpression<T>: UntypedExpression + Sized {
     fn as_expr(&self) -> &ListExpression<T> { unsafe{ mem::transmute(self as &UntypedExpression) } }
 }
 
-impl<T> Expression<T>         for field::NamedField<T>         where T: PrimitiveType + Clone + 'static { }
-impl<T> Expression<Option<T>> for field::NamedField<Option<T>> where T: PrimitiveType + Clone + 'static { }
+impl<T> Expression<T>         for field::NamedField<T>         where T: PrimitiveType + Clone + 'static + fmt::Debug { }
+impl<T> Expression<Option<T>> for field::NamedField<Option<T>> where T: PrimitiveType + Clone + 'static + fmt::Debug { }
 
 //
 // Strings

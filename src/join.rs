@@ -1,8 +1,7 @@
 use super::from;
 use super::predicate;
 
-#[allow(dead_code)]
-#[derive(Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum ConditionedJoinType {
     InnerJoin,
     FullOuterJoin,
@@ -13,8 +12,7 @@ pub enum ConditionedJoinType {
     LeftJoin
 }
 
-#[allow(dead_code)]
-#[derive(Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum UnconditionedJoinType {
     NaturalJoin,
     NaturalLeftJoin,
@@ -23,8 +21,7 @@ pub enum UnconditionedJoinType {
     CrossJoin
 }
 
-#[allow(dead_code)]
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Join {
     ConditionedJoin {
         join_type: ConditionedJoinType,

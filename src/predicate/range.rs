@@ -3,9 +3,9 @@ use super::super::sql;
 use super::super::expression;
 use super::super::field;
 
-use super::{ToSharedPredicate};
+use super::ToSharedPredicate;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum InRangeBounds {
     ExcludeBoth,
     IncludeBoth,
@@ -13,7 +13,7 @@ pub enum InRangeBounds {
     ExcludeLeft
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct InRangePredicate<F, T1, T2> {
     field: F,
     from: T1,

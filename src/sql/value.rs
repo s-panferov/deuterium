@@ -1,14 +1,15 @@
 use serialize::json;
 use time;
 use uuid;
+use std::fmt;
 #[cfg(feature = "postgres")] use postgres;
 
 use expression;
 use field;
 
-use super::{ToSql};
+use super::ToSql;
 
-pub trait ToPredicateValue {
+pub trait ToPredicateValue: fmt::Debug {
     fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String;
 }
 
@@ -20,6 +21,7 @@ pub trait AsPostgresValue: postgres::types::ToSql + Sized {
     }
 }
 
+#[macro_export]
 macro_rules! to_predicate_for_field {
     ($f:ty) => (
         impl ToPredicateValue for $f  {
@@ -28,7 +30,7 @@ macro_rules! to_predicate_for_field {
     )
 }
 
-impl<T: Clone> ToPredicateValue for field::NamedField<T> {
+impl<T: Clone + fmt::Debug> ToPredicateValue for field::NamedField<T> {
     fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String { self.to_sql(ctx) }
 }
 
@@ -66,8 +68,8 @@ impl ToPredicateValue for expression::RawExpression {
 
 macro_rules! extended_impl {
     ($t:ty) => (
-        impl super::ToSql for $t { fn to_sql(&self, ctx: &mut super::SqlContext) -> String { self.to_predicate_value(ctx) } }
-        impl super::ToSql for Option<$t> { fn to_sql(&self, ctx: &mut super::SqlContext) -> String { self.to_predicate_value(ctx) } }
+        impl ToSql for $t { fn to_sql(&self, ctx: &mut super::SqlContext) -> String { self.to_predicate_value(ctx) } }
+        impl ToSql for Option<$t> { fn to_sql(&self, ctx: &mut super::SqlContext) -> String { self.to_predicate_value(ctx) } }
 
         impl ToPredicateValue for Option<$t> {
             fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String {
@@ -99,13 +101,12 @@ extended_impl!(expression::RawExpression);
 impl<T: ToPredicateValue> ToPredicateValue for Vec<T> {
     fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String {
         let values: Vec<String> = self.iter().map(|v| v.to_predicate_value(ctx)).collect();
-        values.connect(", ")
+        values.join(", ")
     }
 }
 
-impl<T: ToPredicateValue> super::ToSql for Vec<T> {
+impl<T: ToPredicateValue> ToSql for Vec<T> {
     fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         self.to_predicate_value(ctx)
     }
 }
-

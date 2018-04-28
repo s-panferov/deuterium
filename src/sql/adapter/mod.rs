@@ -1,8 +1,10 @@
-pub trait SqlAdapter {
+use std::fmt;
+
+pub trait SqlAdapter: fmt::Debug {
     fn placeholder(&self, idx: u8) -> String;
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct PostgreSqlAdapter;
 
 impl SqlAdapter for PostgreSqlAdapter {
@@ -11,7 +13,7 @@ impl SqlAdapter for PostgreSqlAdapter {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct MysqlAdapter;
 
 impl SqlAdapter for MysqlAdapter {

@@ -1,5 +1,5 @@
 use std::marker;
-use std::rc;
+use std::{fmt, rc};
 use time;
 
 use expression;
@@ -22,7 +22,6 @@ macro_rules! agg_func {
             _marker_t: marker::PhantomData<T>,
         }
 
-        #[allow(dead_code)]
         impl<R: Clone + 'static, T: Clone + 'static, E: $foo_arg<R, T> + 'static> $foo<R, T, E> {
             pub fn new(expr: E) -> $foo<R, T, E> {
                 $foo {
@@ -34,7 +33,7 @@ macro_rules! agg_func {
             }
         }
 
-        impl<R: Clone + 'static, T: Clone + 'static, E: $foo_arg<R, T> + 'static> expression::UntypedExpression for $foo<R, T, E> {
+        impl<R: Clone + 'static + fmt::Debug, T: Clone + 'static + fmt::Debug, E: $foo_arg<R, T> + 'static> expression::UntypedExpression for $foo<R, T, E> {
             fn expression_as_sql(&self) -> &sql::ToSql {
                 self
             }
@@ -44,7 +43,7 @@ macro_rules! agg_func {
             }
         }
 
-        impl<R: Clone + 'static, T: Clone + 'static, E: $foo_arg<R, T>  + 'static> expression::Expression<R> for $foo<R, T, E> { }
+        impl<R: Clone + 'static + fmt::Debug, T: Clone + 'static + fmt::Debug, E: $foo_arg<R, T>  + 'static> expression::Expression<R> for $foo<R, T, E> { }
     )
 }
 
@@ -92,7 +91,7 @@ agg_func!(Count, CountArg, count);
 
 impl<T: 'static + expression::PrimitiveType + Clone> CountArg<i64, T> for field::NamedField<T> {}
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct CountAll;
 
 impl expression::UntypedExpression for CountAll {

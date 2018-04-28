@@ -1,7 +1,7 @@
 use super::super::placeholder;
-use super::value::{self, ToPredicateValue};
+use super::value::ToPredicateValue;
 
-impl value::ToPredicateValue for placeholder::Placeholder {
+impl ToPredicateValue for placeholder::Placeholder {
     fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String {
         ctx.expl_indexed_placeholder(self.get_idx());
         ctx.adapter().placeholder(self.get_idx())

@@ -1,11 +1,11 @@
 use time;
 
-use super::{ToSharedPredicate};
+use super::ToSharedPredicate;
 use super::super::expression;
 use super::super::field;
 use super::super::sql;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Inequality {
     LessThan,
     LessThanEqual,
@@ -13,7 +13,7 @@ pub enum Inequality {
     GreaterThanEqual
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct InequalityPredicate<F, T> {
     field: F,
     value: T,

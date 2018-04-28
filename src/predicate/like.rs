@@ -2,9 +2,9 @@ use super::super::expression;
 use super::super::field;
 use super::super::sql;
 
-use super::{ToSharedPredicate};
+use super::ToSharedPredicate;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct LikePredicate<F, T> {
     field: F,
     value: T,

@@ -1,4 +1,4 @@
-use std::rc;
+use std::{fmt, rc};
 
 use super::sql;
 use super::select_query;
@@ -7,7 +7,7 @@ use super::update_query;
 use super::delete_query;
 use super::field::{self, Field};
 
-pub trait From {
+pub trait From: fmt::Debug {
     fn as_sql(&self) -> &sql::FromToSql;
     fn upcast_from(&self) -> SharedFrom;
 }
@@ -15,7 +15,7 @@ pub trait From {
 pub type BoxedFrom = Box<From + 'static>;
 pub type SharedFrom = rc::Rc<BoxedFrom>;
 
-pub trait Table {
+pub trait Table: fmt::Debug {
     fn upcast_table(&self) -> SharedTable;
     fn get_table_name(&self) -> &String;
     fn get_table_alias(&self) -> &Option<String>;
@@ -24,7 +24,7 @@ pub trait Table {
 pub type BoxedTable = Box<Table + 'static>;
 pub type SharedTable = rc::Rc<BoxedTable>;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct TableDef {
     name: String,
     alias: Option<String>
@@ -42,7 +42,6 @@ macro_rules! insert {
     )
 }
 
-#[allow(dead_code)]
 impl TableDef {
     pub fn new(name: &str) -> TableDef {
         TableDef { name: name.to_string(), alias: None }
@@ -96,13 +95,13 @@ impl insert_query::Insertable<()> for TableDef {}
 impl update_query::Updatable<()> for TableDef {}
 impl delete_query::Deletable<()> for TableDef {}
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct FromSelect<T, L, M> {
     pub select: select_query::SelectQuery<T, L, M>,
     pub alias: String
 }
 
-impl<T: Clone + 'static, L: Clone + 'static, M: Clone + 'static> From for FromSelect<T, L, M> {
+impl<T: Clone + 'static + fmt::Debug, L: Clone + 'static + fmt::Debug, M: Clone + 'static + fmt::Debug> From for FromSelect<T, L, M> {
     fn as_sql(&self) -> &sql::FromToSql {
         self
     }
@@ -112,5 +111,5 @@ impl<T: Clone + 'static, L: Clone + 'static, M: Clone + 'static> From for FromSe
     }
 }
 
-impl<T: Clone + 'static, L: Clone + 'static, M: Clone + 'static> select_query::Selectable<M> for FromSelect<T, L, M> {}
+impl<T: Clone + 'static + fmt::Debug, L: Clone + 'static + fmt::Debug, M: Clone + 'static + fmt::Debug> select_query::Selectable<M> for FromSelect<T, L, M> {}
 
