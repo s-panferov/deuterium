@@ -52,7 +52,7 @@ impl<T, L, M> super::ToSql for select_query::SelectQuery<T, L, M> {
 
         if !self.get_order_by().is_empty() {
             let orders: Vec<String> = self.get_order_by().iter().map(|ord| ord.to_sql(ctx)).collect();
-            sql = format!("{} ORDER BY {}", sql, orders.connect(", "))
+            sql = format!("{} ORDER BY {}", sql, orders.join(", "))
         }
 
         if self.get_limit().is_some() {
@@ -84,7 +84,7 @@ impl super::ToSql for select_query::Select {
         match self {
             &select_query::Select::Only(ref fields) => {
                 let defs: Vec<String> = fields.iter().map(|f| f.expression_as_sql().to_sql(ctx)).collect();
-                defs.connect(", ")
+                defs.join(", ")
             },
             &select_query::Select::All => "*".to_string()
         }

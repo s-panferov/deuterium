@@ -19,13 +19,13 @@ impl<T, L, M> super::ToSql for update_query::UpdateQuery<T, L, M> {
         sql = format!("{} {}", sql, self.get_table().to_from_sql(ctx));
 
         let updates_str: Vec<String> = self.get_updates().iter().map(|upd| upd.to_sql(ctx)).collect();
-        sql = format!("{} SET {}", sql, updates_str.connect(", "));
+        sql = format!("{} SET {}", sql, updates_str.join(", "));
 
         if self.get_from().is_some() {
             let from = self.get_from().as_ref().unwrap();
             if !from.is_empty() {
                 let tables_str: Vec<String> = from.iter().map(|v| v.as_sql().to_from_sql(ctx)).collect();
-                sql = format!("{} FROM {}", sql, tables_str.connect(", "))
+                sql = format!("{} FROM {}", sql, tables_str.join(", "))
             }
         }
 
