@@ -1,5 +1,5 @@
 use serde_json;
-use time;
+use chrono;
 use uuid;
 use std::fmt;
 #[cfg(feature = "postgres")] use postgres;
@@ -57,7 +57,7 @@ raw_value_to_predicate_value!(f64);
 raw_value_to_predicate_value!(String);
 raw_value_to_predicate_value!(Vec<u8>);
 raw_value_to_predicate_value!(serde_json::Value);
-raw_value_to_predicate_value!(time::Timespec);
+raw_value_to_predicate_value!(chrono::NaiveDateTime);
 raw_value_to_predicate_value!(uuid::Uuid);
 
 impl ToPredicateValue for expression::RawExpression {
@@ -92,7 +92,7 @@ extended_impl!(f64);
 extended_impl!(String);
 extended_impl!(Vec<u8>);
 extended_impl!(serde_json::Value);
-extended_impl!(time::Timespec);
+extended_impl!(chrono::NaiveDateTime);
 extended_impl!(uuid::Uuid);
 
 

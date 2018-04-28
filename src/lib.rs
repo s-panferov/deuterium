@@ -5,7 +5,7 @@
         unused, future_incompatible)]
 
 extern crate serde_json;
-extern crate time;
+extern crate chrono;
 
 #[cfg(feature = "postgres")]
 extern crate postgres;

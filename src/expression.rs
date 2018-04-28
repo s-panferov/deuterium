@@ -1,7 +1,7 @@
 use std::{fmt, rc};
 use std::mem;
 use serde_json;
-use time;
+use chrono;
 use uuid;
 
 use super::sql;
@@ -65,7 +65,7 @@ to_expression!(f64);
 to_expression!(String);
 to_expression!(Vec<u8>);
 to_expression!(serde_json::Value);
-to_expression!(time::Timespec);
+to_expression!(chrono::NaiveDateTime);
 to_expression!(uuid::Uuid);
 to_expression!(RawExpression);
 
@@ -79,7 +79,7 @@ impl PrimitiveType for f64 { }
 impl PrimitiveType for String { }
 impl PrimitiveType for Vec<u8> { }
 impl PrimitiveType for serde_json::Value { }
-impl PrimitiveType for time::Timespec { }
+impl PrimitiveType for chrono::NaiveDateTime { }
 impl PrimitiveType for uuid::Uuid { }
 impl PrimitiveType for RawExpression { }
 
@@ -93,7 +93,7 @@ to_expression!(Option<f64>);
 to_expression!(Option<String>);
 to_expression!(Option<Vec<u8>>);
 to_expression!(Option<serde_json::Value>);
-to_expression!(Option<time::Timespec>);
+to_expression!(Option<chrono::NaiveDateTime>);
 to_expression!(Option<uuid::Uuid>);
 to_expression!(Option<RawExpression>);
 
@@ -229,18 +229,18 @@ impl ToExpression<Option<serde_json::Value>> for field::OptionalJsonField {}
 impl ToExpression<Option<serde_json::Value>> for RawExpression {}
 
 //
-// time::Timespec
+// chrono::NaiveDateTime
 //
 
-impl ToExpression<time::Timespec> for time::Timespec {}
-impl ToExpression<time::Timespec> for field::TimespecField {}
-impl ToExpression<time::Timespec> for RawExpression {}
+impl ToExpression<chrono::NaiveDateTime> for chrono::NaiveDateTime {}
+impl ToExpression<chrono::NaiveDateTime> for field::TimespecField {}
+impl ToExpression<chrono::NaiveDateTime> for RawExpression {}
 
-impl ToExpression<Option<time::Timespec>> for time::Timespec {}
-impl ToExpression<Option<time::Timespec>> for Option<time::Timespec> {}
-impl ToExpression<Option<time::Timespec>> for field::TimespecField {}
-impl ToExpression<Option<time::Timespec>> for field::OptionalTimespecField {}
-impl ToExpression<Option<time::Timespec>> for RawExpression {}
+impl ToExpression<Option<chrono::NaiveDateTime>> for chrono::NaiveDateTime {}
+impl ToExpression<Option<chrono::NaiveDateTime>> for Option<chrono::NaiveDateTime> {}
+impl ToExpression<Option<chrono::NaiveDateTime>> for field::TimespecField {}
+impl ToExpression<Option<chrono::NaiveDateTime>> for field::OptionalTimespecField {}
+impl ToExpression<Option<chrono::NaiveDateTime>> for RawExpression {}
 
 //
 // uuid::Uuid
@@ -266,7 +266,7 @@ impl ToExpression<RawExpression> for f64 {}
 impl ToExpression<RawExpression> for Vec<u8> {}
 impl ToExpression<RawExpression> for String {}
 impl ToExpression<RawExpression> for serde_json::Value {}
-impl ToExpression<RawExpression> for time::Timespec {}
+impl ToExpression<RawExpression> for chrono::NaiveDateTime {}
 impl ToExpression<RawExpression> for uuid::Uuid {}
 impl ToExpression<RawExpression> for Option<bool> {}
 impl ToExpression<RawExpression> for Option<i8> {}
@@ -278,7 +278,7 @@ impl ToExpression<RawExpression> for Option<f64> {}
 impl ToExpression<RawExpression> for Option<Vec<u8>> {}
 impl ToExpression<RawExpression> for Option<String> {}
 impl ToExpression<RawExpression> for Option<serde_json::Value> {}
-impl ToExpression<RawExpression> for Option<time::Timespec> {}
+impl ToExpression<RawExpression> for Option<chrono::NaiveDateTime> {}
 impl ToExpression<RawExpression> for Option<uuid::Uuid> {}
 impl ToExpression<RawExpression> for field::BoolField {}
 impl ToExpression<RawExpression> for field::I8Field {}

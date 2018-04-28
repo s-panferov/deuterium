@@ -1,7 +1,7 @@
 use std::{fmt, rc};
 use std::marker;
 use serde_json;
-use time;
+use chrono;
 use uuid;
 
 use super::from;
@@ -121,7 +121,7 @@ pub type F64Field = NamedField<f64>;
 pub type StringField = NamedField<String>;
 pub type ByteListField = NamedField<Vec<u8>>;
 pub type JsonField = NamedField<serde_json::Value>;
-pub type TimespecField = NamedField<time::Timespec>;
+pub type TimespecField = NamedField<chrono::NaiveDateTime>;
 pub type UuidField = NamedField<uuid::Uuid>;
 
 pub type OptionalBoolField = NamedField<Option<bool>>;
@@ -134,5 +134,5 @@ pub type OptionalF64Field = NamedField<Option<f64>>;
 pub type OptionalStringField = NamedField<Option<String>>;
 pub type OptionalByteListField = NamedField<Option<Vec<u8>>>;
 pub type OptionalJsonField = NamedField<Option<serde_json::Value>>;
-pub type OptionalTimespecField = NamedField<Option<time::Timespec>>;
+pub type OptionalTimespecField = NamedField<Option<chrono::NaiveDateTime>>;
 pub type OptionalUuidField = NamedField<Option<uuid::Uuid>>;

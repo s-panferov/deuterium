@@ -1,6 +1,6 @@
 use std::marker;
 use std::{fmt, rc};
-use time;
+use chrono;
 
 use expression;
 use field;
@@ -56,7 +56,7 @@ impl MinArg<i64, i64> for field::I64Field {}
 impl MinArg<f32, f32> for field::F32Field {}
 impl MinArg<f64, f64> for field::F64Field {}
 impl MinArg<String, String> for field::StringField {}
-impl MinArg<time::Timespec, time::Timespec> for field::TimespecField {}
+impl MinArg<chrono::NaiveDateTime, chrono::NaiveDateTime> for field::TimespecField {}
 
 agg_func!(Max, MaxArg, max);
 
@@ -67,7 +67,7 @@ impl MaxArg<i64, i64> for field::I64Field {}
 impl MaxArg<f32, f32> for field::F32Field {}
 impl MaxArg<f64, f64> for field::F64Field {}
 impl MaxArg<String, String> for field::StringField {}
-impl MaxArg<time::Timespec, time::Timespec> for field::TimespecField {}
+impl MaxArg<chrono::NaiveDateTime, chrono::NaiveDateTime> for field::TimespecField {}
 
 agg_func!(Sum, SumArg, sum);
 
