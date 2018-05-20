@@ -1,11 +1,11 @@
-use time;
+use chrono;
 
-use super::{ToSharedPredicate};
+use super::ToSharedPredicate;
 use super::super::expression;
 use super::super::field;
 use super::super::sql;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Inequality {
     LessThan,
     LessThanEqual,
@@ -13,7 +13,7 @@ pub enum Inequality {
     GreaterThanEqual
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct InequalityPredicate<F, T> {
     field: F,
     value: T,
@@ -78,7 +78,7 @@ impl_for!(field::I32Field, i32);
 impl_for!(field::I64Field, i64);
 impl_for!(field::F32Field, f32);
 impl_for!(field::F64Field, f64);
-impl_for!(field::TimespecField, time::Timespec);
+impl_for!(field::TimespecField, chrono::NaiveDateTime);
 
 impl_for!(field::OptionalI8Field, Option<i8>);
 impl_for!(field::OptionalI16Field, Option<i16>);
@@ -86,6 +86,6 @@ impl_for!(field::OptionalI32Field, Option<i32>);
 impl_for!(field::OptionalI64Field, Option<i64>);
 impl_for!(field::OptionalF32Field, Option<f32>);
 impl_for!(field::OptionalF64Field, Option<f64>);
-impl_for!(field::OptionalTimespecField, Option<time::Timespec>);
+impl_for!(field::OptionalTimespecField, Option<chrono::NaiveDateTime>);
 
 impl_for!(expression::RawExpression, expression::RawExpression);

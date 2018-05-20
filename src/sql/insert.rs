@@ -8,14 +8,14 @@ impl<T: Clone, V: super::ToSql, M: Clone> super::ToSql for insert_query::Insert<
             },
             &insert_query::Insert::Values(ref rows) => {
                 let rows_str: Vec<String> = rows.iter().map(|row| { format!("({})", row.to_sql(ctx)) }).collect();
-                format!("VALUES\n    {}", rows_str.connect(",\n    "))
+                format!("VALUES\n    {}", rows_str.join(",\n    "))
             },
             &insert_query::Insert::UntypedValues(ref rows) => {
                 let rows_str: Vec<String> = rows.iter().map(|row| {
                     let values_str: Vec<String> = row.iter().map(|v| v.to_sql(ctx)).collect();
-                    format!("({})", values_str.connect(", "))
+                    format!("({})", values_str.join(", "))
                 }).collect();
-                format!("VALUES\n    {}", rows_str.connect(",\n    "))
+                format!("VALUES\n    {}", rows_str.join(",\n    "))
             },
             &insert_query::Insert::FromSelect(ref select) => {
                 select.to_sql(ctx)
@@ -34,7 +34,7 @@ impl<T: Clone, V: Clone+super::ToSql, M: Clone, RT: Clone, RL: Clone> super::ToS
 
             if !cols.is_empty() {
                 let cols_str: Vec<String> = cols.iter().map(|col| col.to_sql(ctx)).collect();
-                sql = format!("{} ({})", sql, cols_str.connect(", "))
+                sql = format!("{} ({})", sql, cols_str.join(", "))
             }
         }
 

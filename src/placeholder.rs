@@ -1,11 +1,11 @@
 use std::rc;
-use time;
-use serialize::json;
+use chrono;
+use serde_json;
 
 use super::expression;
 use super::sql;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Placeholder {
     idx: u8
 }
@@ -34,6 +34,6 @@ impl expression::ToExpression<bool> for Placeholder {}
 impl expression::ToExpression<f64> for Placeholder {}
 impl expression::ToExpression<String> for Placeholder {}
 impl expression::ToExpression<Vec<u8>> for Placeholder {}
-impl expression::ToExpression<time::Timespec> for Placeholder {}
-impl expression::ToExpression<json::Json> for Placeholder {}
+impl expression::ToExpression<chrono::NaiveDateTime> for Placeholder {}
+impl expression::ToExpression<serde_json::Value> for Placeholder {}
 impl expression::ToExpression<expression::RawExpression> for Placeholder {}

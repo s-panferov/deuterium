@@ -1,11 +1,11 @@
-use time;
+use chrono;
 use super::super::sql;
 use super::super::expression;
 use super::super::field;
 
-use super::{ToSharedPredicate};
+use super::ToSharedPredicate;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum InRangeBounds {
     ExcludeBoth,
     IncludeBoth,
@@ -13,7 +13,7 @@ pub enum InRangeBounds {
     ExcludeLeft
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct InRangePredicate<F, T1, T2> {
     field: F,
     from: T1,
@@ -91,7 +91,7 @@ impl_for!(field::I32Field, i32);
 impl_for!(field::I64Field, i64);
 impl_for!(field::F32Field, f32);
 impl_for!(field::F64Field, f64);
-impl_for!(field::TimespecField, time::Timespec);
+impl_for!(field::TimespecField, chrono::NaiveDateTime);
 
 impl_for!(field::OptionalI8Field, Option<i8>);
 impl_for!(field::OptionalI16Field, Option<i16>);
@@ -99,6 +99,6 @@ impl_for!(field::OptionalI32Field, Option<i32>);
 impl_for!(field::OptionalI64Field, Option<i64>);
 impl_for!(field::OptionalF32Field, Option<f32>);
 impl_for!(field::OptionalF64Field, Option<f64>);
-impl_for!(field::OptionalTimespecField, Option<time::Timespec>);
+impl_for!(field::OptionalTimespecField, Option<chrono::NaiveDateTime>);
 
 impl_for!(expression::RawExpression, expression::RawExpression);

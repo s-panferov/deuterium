@@ -1,12 +1,12 @@
 use expression;
 
-#[derive(Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum Order {
     Asc,
     Desc
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct OrderBy {
     by: expression::SharedExpression,
     order: Order

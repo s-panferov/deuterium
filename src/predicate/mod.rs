@@ -1,8 +1,8 @@
-use std::rc;
+use std::{fmt, rc};
 
 use super::sql;
 
-pub use self::raw::{RawPredicate};
+pub use self::raw::RawPredicate;
 pub use self::is::{IsPredicate, ToIsPredicate};
 pub use self::is_null::{IsNullPredicate, ToIsNullPredicate};
 pub use self::or::{OrPredicate, ToOrPredicate};
@@ -23,9 +23,9 @@ pub use self::inequality::{
     Inequality
 };
 
+pub mod or;
 pub mod is;
 pub mod is_null;
-pub mod or;
 pub mod in_;
 pub mod range;
 pub mod and;
@@ -34,9 +34,7 @@ pub mod exclude;
 pub mod like;
 pub mod raw;
 
-pub trait Predicate: sql::PredicateToSql {
-
-}
+pub trait Predicate: sql::PredicateToSql + fmt::Debug {}
 
 pub trait ToSharedPredicate {
     fn upcast(self) -> SharedPredicate;

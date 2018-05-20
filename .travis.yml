@@ -1,5 +1,21 @@
 language: rust
+
+rust:
+  - nightly
+  - beta
+  - stable
+
+cache: cargo
+
+matrix:
+  allow_failures:
+    - rust: nightly
+
+env:
+- ARGS="--no-default-features"
+- ARGS="--features postgres"
+
 script:
-  - cargo build --verbose
-  - cargo test --verbose
+  - cargo build --verbose $ARGS
+  - cargo test --verbose $ARGS
   - cargo doc

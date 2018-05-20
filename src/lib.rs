@@ -1,5 +1,11 @@
-extern crate rustc_serialize as serialize;
-extern crate time;
+#![deny(missing_debug_implementations, missing_copy_implementations,
+        warnings,
+        trivial_numeric_casts,
+        unstable_features,
+        unused, future_incompatible)]
+
+extern crate serde_json;
+extern crate chrono;
 
 #[cfg(feature = "postgres")]
 extern crate postgres;
@@ -46,6 +52,20 @@ pub use field::{
     ByteListField,
     JsonField,
     TimespecField,
+    UuidField,
+
+    OptionalBoolField,
+    OptionalI8Field,
+    OptionalI16Field,
+    OptionalI32Field,
+    OptionalI64Field,
+    OptionalF32Field,
+    OptionalF64Field,
+    OptionalStringField,
+    OptionalByteListField,
+    OptionalJsonField,
+    OptionalTimespecField,
+    OptionalUuidField,
 };
 
 pub use predicate::{
@@ -109,7 +129,7 @@ pub use expression::{
 };
 
 pub use sql::{SqlContext, ToSql, QueryToSql, FromToSql, ToPredicateValue};
-#[cfg(feature = "postgres")] pub use sql::{AsPostgresValue};
+#[cfg(feature = "postgres")] pub use sql::AsPostgresValue;
 pub use from::{TableDef, Table, BoxedTable, SharedTable, From, BoxedFrom, SharedFrom};
 
 pub use function::{
@@ -121,11 +141,9 @@ pub use function::{
     CountAll
 };
 
-pub use placeholder::{
-    Placeholder
-};
+pub use placeholder::Placeholder;
 
-macro_rules! with_clone{
+macro_rules! with_clone {
     ($slf: ident, $v:ident, $ex:expr) => ({
         let mut $v = $slf.clone();
         $ex;
@@ -136,6 +154,7 @@ macro_rules! with_clone{
 mod field;
 mod predicate;
 mod select_query;
+#[macro_use]
 mod insert_query;
 
 #[macro_use]

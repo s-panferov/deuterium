@@ -1,5 +1,5 @@
 extern crate deuterium;
-extern crate time;
+extern crate chrono;
 
 use deuterium::*;
 

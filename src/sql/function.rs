@@ -10,7 +10,7 @@ use function::{
 
 macro_rules! agg_to_sql {
     ($foo:ident, $foo_arg:ident, $fmt:expr) => (
-        impl<R, T, E> super::ToSql for $foo<R, T, E> where R: Clone, T: Clone, E: $foo_arg<R, T> {
+        impl<R, T, E> super::ToSql for $foo<R, T, E> where R: Clone+'static, T: Clone+'static, E: $foo_arg<R, T> {
             fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
                 format!($fmt, self.expression.expression_as_sql().to_sql(ctx))
             }

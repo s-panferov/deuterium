@@ -1,7 +1,7 @@
-pub use self::predicate::{PredicateToSql};
-pub use self::value::{ToPredicateValue};
-#[cfg(feature = "postgres")] pub use self::value::{AsPostgresValue};
-pub use self::from::{FromToSql};
+pub use self::predicate::PredicateToSql;
+pub use self::value::ToPredicateValue;
+#[cfg(feature = "postgres")] pub use self::value::AsPostgresValue;
+pub use self::from::FromToSql;
 pub use self::adapter::{
     SqlAdapter,
     PostgreSqlAdapter,
@@ -48,7 +48,7 @@ pub type BoxedValue = Box<::postgres::types::ToSql + 'static>;
 pub type BoxedValue = Box<ToPredicateValue>;
 pub type BoxedAdapter = Box<SqlAdapter + 'static>;
 
-#[allow(dead_code)]
+#[derive(Debug)]
 pub struct SqlContext {
     impl_placeholders: u8,
     expl_placeholders: u8,
@@ -56,7 +56,6 @@ pub struct SqlContext {
     adapter: Box<SqlAdapter + 'static>,
 }
 
-#[allow(dead_code)]
 impl SqlContext {
     pub fn new(adapter: Box<SqlAdapter + 'static>) -> SqlContext {
         SqlContext {

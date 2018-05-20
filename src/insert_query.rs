@@ -6,7 +6,7 @@ use super::field;
 use super::select_query;
 use super::expression;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum InsertValue<T> {
     Value {
         expression: expression::SharedExpression,
@@ -34,8 +34,7 @@ impl<'a, 'b, T> ToInsertValue<T> for &'a (expression::Expression<T> + 'b) {
     }
 }
 
-#[allow(dead_code)]
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Insert<T, V, M> {
     DefaultValues,
     Values(Vec<V>),
@@ -43,8 +42,7 @@ pub enum Insert<T, V, M> {
     FromSelect(select_query::SelectQuery<T, select_query::LimitMany, M>)
 }
 
-#[allow(dead_code)]
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct InsertQuery<T, V, M, RT, RL> {
     into: from::SharedTable,
     cols: Option<Vec<field::SharedField>>,
@@ -55,6 +53,7 @@ pub struct InsertQuery<T, V, M, RT, RL> {
     _marker_rl: marker::PhantomData<RL>
 }
 
+#[macro_export]
 macro_rules! insert {
     ($name:ident, $(($t:ident, $arg:ident)),+) => (
         // FIXME: Make this public after https://github.com/rust-lang/rust/issues/17635
@@ -104,9 +103,7 @@ macro_rules! insertable {
 
 insertable!();
 
-#[allow(dead_code)]
 impl<T: Clone, V: Clone, M: Clone, RT: Clone, RL: Clone> InsertQuery<T, V, M, RT, RL> {
-
     pub fn new(into: &from::Table) -> InsertQuery<T, V, M, RT, RL> {
         InsertQuery {
             into: into.upcast_table(),

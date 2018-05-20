@@ -1,6 +1,7 @@
 use super::super::from;
 use super::super::select_query;
-use super::{ToSql};
+use super::ToSql;
+use std::fmt;
 
 impl<T, L, M> super::from::FromToSql for from::FromSelect<T, L, M> {
     fn to_from_sql(&self, ctx: &mut super::SqlContext) -> String {
@@ -8,7 +9,7 @@ impl<T, L, M> super::from::FromToSql for from::FromSelect<T, L, M> {
     }
 }
 
-impl super::ToSql for select_query::SelectFor {
+impl ToSql for select_query::SelectFor {
     fn to_sql(&self, _ctx: &mut super::SqlContext) -> String {
         match self {
             &select_query::SelectFor::Update => "FOR UPDATE",
@@ -19,7 +20,7 @@ impl super::ToSql for select_query::SelectFor {
     }
 }
 
-impl<T, L, M> super::ToSql for select_query::SelectQuery<T, L, M> {
+impl<T, L, M> ToSql for select_query::SelectQuery<T, L, M> {
     fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         let mut sql = "SELECT".to_string();
 
@@ -35,7 +36,7 @@ impl<T, L, M> super::ToSql for select_query::SelectQuery<T, L, M> {
 
         if !self.get_joins().is_empty() {
             let joins: Vec<String> = self.get_joins().iter().map(|join| join.to_sql(ctx)).collect();
-            sql = format!("{} {}", sql, joins.connect(" "))
+            sql = format!("{} {}", sql, joins.join(" "))
         }
 
         if self.get_where().is_some() {
@@ -52,7 +53,7 @@ impl<T, L, M> super::ToSql for select_query::SelectQuery<T, L, M> {
 
         if !self.get_order_by().is_empty() {
             let orders: Vec<String> = self.get_order_by().iter().map(|ord| ord.to_sql(ctx)).collect();
-            sql = format!("{} ORDER BY {}", sql, orders.connect(", "))
+            sql = format!("{} ORDER BY {}", sql, orders.join(", "))
         }
 
         if self.get_limit().is_some() {
@@ -73,24 +74,24 @@ impl<T, L, M> super::ToSql for select_query::SelectQuery<T, L, M> {
 
 impl<T, L, M> super::QueryToSql for select_query::SelectQuery<T, L, M> {}
 
-impl super::ToSql for select_query::SharedSelectQuery {
+impl ToSql for select_query::SharedSelectQuery {
     fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         (**self).to_sql(ctx)
     }
 }
 
-impl super::ToSql for select_query::Select {
+impl ToSql for select_query::Select {
     fn to_sql(&self, ctx: &mut super::SqlContext) -> String {
         match self {
             &select_query::Select::Only(ref fields) => {
                 let defs: Vec<String> = fields.iter().map(|f| f.expression_as_sql().to_sql(ctx)).collect();
-                defs.connect(", ")
+                defs.join(", ")
             },
             &select_query::Select::All => "*".to_string()
         }
     }
 }
 
-impl<T, L, M> super::ToPredicateValue for select_query::SelectQuery<T, L, M> {
+impl<T: fmt::Debug, L: fmt::Debug, M: fmt::Debug> super::ToPredicateValue for select_query::SelectQuery<T, L, M> {
     fn to_predicate_value(&self, ctx: &mut super::SqlContext) -> String { self.to_sql(ctx) }
 }

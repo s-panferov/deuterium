@@ -1,7 +1,7 @@
-use std::rc;
+use std::{fmt, rc};
 use std::marker;
-use serialize::json;
-use time;
+use serde_json;
+use chrono;
 use uuid;
 
 use super::from;
@@ -15,20 +15,26 @@ pub trait Field {
     fn upcast_field(&self) -> SharedField;
 }
 
+impl fmt::Debug for Field {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Field: {}", self.name())
+    }
+}
+
 pub type BoxedField = Box<Field + 'static>;
 pub type SharedField = rc::Rc<BoxedField>;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct NamedField<T> {
     pub name: String,
     pub table_name: String,
     pub qual: Option<String>,
 
-    _marker: marker::PhantomData<T>
+    _marker: marker::PhantomData<T>,
 }
 
 impl<T: Clone> NamedField<T> {
-    pub fn new(name: &str, table_name: &str) -> NamedField<T>  {
+    pub fn new(name: &str, table_name: &str) -> NamedField<T> {
         NamedField {
             name: name.to_string(),
             table_name: table_name.to_string(),
@@ -38,7 +44,7 @@ impl<T: Clone> NamedField<T> {
         }
     }
 
-    pub fn new_qual(name: &str, table_name: &str, qual: &str) -> NamedField<T>  {
+    pub fn new_qual(name: &str, table_name: &str, qual: &str) -> NamedField<T> {
         NamedField {
             name: name.to_string(),
             table_name: table_name.to_string(),
@@ -77,7 +83,7 @@ impl<T: Clone> NamedField<T> {
     }
 }
 
-impl<T: Clone + 'static> expression::UntypedExpression for NamedField<T> {
+impl<T: Clone + 'static + fmt::Debug> expression::UntypedExpression for NamedField<T> {
     fn expression_as_sql(&self) -> &sql::ToSql {
         self
     }
@@ -114,8 +120,8 @@ pub type F32Field = NamedField<f32>;
 pub type F64Field = NamedField<f64>;
 pub type StringField = NamedField<String>;
 pub type ByteListField = NamedField<Vec<u8>>;
-pub type JsonField = NamedField<json::Json>;
-pub type TimespecField = NamedField<time::Timespec>;
+pub type JsonField = NamedField<serde_json::Value>;
+pub type TimespecField = NamedField<chrono::NaiveDateTime>;
 pub type UuidField = NamedField<uuid::Uuid>;
 
 pub type OptionalBoolField = NamedField<Option<bool>>;
@@ -127,6 +133,6 @@ pub type OptionalF32Field = NamedField<Option<f32>>;
 pub type OptionalF64Field = NamedField<Option<f64>>;
 pub type OptionalStringField = NamedField<Option<String>>;
 pub type OptionalByteListField = NamedField<Option<Vec<u8>>>;
-pub type OptionalJsonField = NamedField<Option<json::Json>>;
-pub type OptionalTimespecField = NamedField<Option<time::Timespec>>;
+pub type OptionalJsonField = NamedField<Option<serde_json::Value>>;
+pub type OptionalTimespecField = NamedField<Option<chrono::NaiveDateTime>>;
 pub type OptionalUuidField = NamedField<Option<uuid::Uuid>>;

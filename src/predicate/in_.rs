@@ -2,9 +2,9 @@ use super::super::expression;
 use super::super::sql;
 use super::super::field;
 
-use super::{ToSharedPredicate};
+use super::ToSharedPredicate;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct InPredicate<F, T> {
     field: F,
     values: T

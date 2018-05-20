@@ -1,4 +1,3 @@
-
 use deuterium::*;
 
 #[test]

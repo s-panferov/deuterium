@@ -1,6 +1,6 @@
 use std::marker;
-use std::rc;
-use time;
+use std::{fmt, rc};
+use chrono;
 
 use expression;
 use field;
@@ -14,15 +14,14 @@ macro_rules! agg_func {
             }
         }
 
-        #[derive(Clone)]
-        pub struct $foo<R, T, E: $foo_arg<R, T>> {
+        #[derive(Clone, Debug)]
+        pub struct $foo<R: Clone + 'static, T: Clone + 'static, E: $foo_arg<R, T>> {
             pub expression: E,
 
             _marker_r: marker::PhantomData<R>,
             _marker_t: marker::PhantomData<T>,
         }
 
-        #[allow(dead_code)]
         impl<R: Clone + 'static, T: Clone + 'static, E: $foo_arg<R, T> + 'static> $foo<R, T, E> {
             pub fn new(expr: E) -> $foo<R, T, E> {
                 $foo {
@@ -34,7 +33,7 @@ macro_rules! agg_func {
             }
         }
 
-        impl<R: Clone + 'static, T: Clone + 'static, E: $foo_arg<R, T> + 'static> expression::UntypedExpression for $foo<R, T, E> {
+        impl<R: Clone + 'static + fmt::Debug, T: Clone + 'static + fmt::Debug, E: $foo_arg<R, T> + 'static> expression::UntypedExpression for $foo<R, T, E> {
             fn expression_as_sql(&self) -> &sql::ToSql {
                 self
             }
@@ -44,7 +43,7 @@ macro_rules! agg_func {
             }
         }
 
-        impl<R: Clone + 'static, T: Clone + 'static, E: $foo_arg<R, T>  + 'static> expression::Expression<R> for $foo<R, T, E> { }
+        impl<R: Clone + 'static + fmt::Debug, T: Clone + 'static + fmt::Debug, E: $foo_arg<R, T>  + 'static> expression::Expression<R> for $foo<R, T, E> { }
     )
 }
 
@@ -57,7 +56,7 @@ impl MinArg<i64, i64> for field::I64Field {}
 impl MinArg<f32, f32> for field::F32Field {}
 impl MinArg<f64, f64> for field::F64Field {}
 impl MinArg<String, String> for field::StringField {}
-impl MinArg<time::Timespec, time::Timespec> for field::TimespecField {}
+impl MinArg<chrono::NaiveDateTime, chrono::NaiveDateTime> for field::TimespecField {}
 
 agg_func!(Max, MaxArg, max);
 
@@ -68,7 +67,7 @@ impl MaxArg<i64, i64> for field::I64Field {}
 impl MaxArg<f32, f32> for field::F32Field {}
 impl MaxArg<f64, f64> for field::F64Field {}
 impl MaxArg<String, String> for field::StringField {}
-impl MaxArg<time::Timespec, time::Timespec> for field::TimespecField {}
+impl MaxArg<chrono::NaiveDateTime, chrono::NaiveDateTime> for field::TimespecField {}
 
 agg_func!(Sum, SumArg, sum);
 
@@ -92,7 +91,7 @@ agg_func!(Count, CountArg, count);
 
 impl<T: 'static + expression::PrimitiveType + Clone> CountArg<i64, T> for field::NamedField<T> {}
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct CountAll;
 
 impl expression::UntypedExpression for CountAll {

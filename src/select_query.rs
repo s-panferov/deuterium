@@ -1,4 +1,4 @@
-use std::rc;
+use std::{fmt, rc};
 use std::mem;
 use std::marker;
 
@@ -11,7 +11,7 @@ use super::join;
 use super::distinct;
 use super::group_by;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Select {
     Only(Vec<expression::SharedExpression>),
     All
@@ -31,7 +31,7 @@ impl<T> ToSelectQuery for T where T: AbstractSelectQuery + Clone + 'static {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum SelectFor {
     Update,
     UpdateNoWait,
@@ -39,16 +39,16 @@ pub enum SelectFor {
     ShareNoWait
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct LimitOne;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct LimitTwo;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct LimitMany;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct NoResult;
 
 macro_rules! set_predicate {
@@ -82,7 +82,7 @@ macro_rules! predicate_trait {
 
         pub trait $name: Clone {
             fn $getter(&self) -> &Option<predicate::SharedPredicate>;
-            fn $setter(&mut self, predicate::SharedPredicate);
+            fn $setter(&mut self, predicate: predicate::SharedPredicate);
             fn $unset(&mut self);
 
             fn $implicit_and(&self, predicate: predicate::SharedPredicate) -> Self {
@@ -141,45 +141,45 @@ predicate_trait!(
 
 pub trait Orderable: Clone {
     fn get_order_by_mut(&mut self) -> &mut Vec<order_by::OrderBy>;
-    fn set_order_by(&mut self, Vec<order_by::OrderBy>);
+    fn set_order_by(&mut self, order_by: Vec<order_by::OrderBy>);
 
-    fn order_by(&self, field: &expression::UntypedExpression) -> Self {
+    fn order_by(&self, field: &UntypedExpression) -> Self {
         with_clone!(self, query, query.set_order_by(
             vec![order_by::OrderBy::by(field)]
         ))
     }
 
-    fn order_by_fields(&self, fields: &[&expression::UntypedExpression]) -> Self {
+    fn order_by_fields(&self, fields: &[&UntypedExpression]) -> Self {
         with_clone!(self, query, query.set_order_by(
             fields.iter().map(|f| order_by::OrderBy::by(*f)).collect()
         ))
     }
 
-    fn reverse_by(&self, field: &expression::UntypedExpression) -> Self {
+    fn reverse_by(&self, field: &UntypedExpression) -> Self {
         with_clone!(self, query, query.set_order_by(
             vec![order_by::OrderBy::reverse_by(field)]
         ))
     }
 
-    fn reverse_by_fields(&self, fields: &[&expression::UntypedExpression]) -> Self {
+    fn reverse_by_fields(&self, fields: &[&UntypedExpression]) -> Self {
         with_clone!(self, query, query.set_order_by(
             fields.iter().map(|f| order_by::OrderBy::reverse_by(*f)).collect()
         ))
     }
 
-    fn order_append(&self, field: &expression::UntypedExpression) -> Self {
+    fn order_append(&self, field: &UntypedExpression) -> Self {
         with_clone!(self, query, query.get_order_by_mut().push(order_by::OrderBy::by(field)))
     }
 
-    fn order_prepend(&self, field: &expression::UntypedExpression) -> Self {
+    fn order_prepend(&self, field: &UntypedExpression) -> Self {
         with_clone!(self, query, query.get_order_by_mut().insert(0, order_by::OrderBy::by(field)))
     }
 
-    fn reverse_append(&self, field: &expression::UntypedExpression) -> Self {
+    fn reverse_append(&self, field: &UntypedExpression) -> Self {
         with_clone!(self, query, query.get_order_by_mut().push(order_by::OrderBy::reverse_by(field)))
     }
 
-    fn reverse_prepend(&self, field: &expression::UntypedExpression) -> Self {
+    fn reverse_prepend(&self, field: &UntypedExpression) -> Self {
         with_clone!(self, query, query.get_order_by_mut().insert(0, order_by::OrderBy::reverse_by(field)))
     }
 
@@ -189,7 +189,7 @@ pub trait Orderable: Clone {
 
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct SelectQuery<T, L, M> {
     distinct: Option<distinct::Distinct>,
     select: Select,
@@ -253,11 +253,11 @@ impl<T: Clone, L: Clone, M: Clone> SelectQuery<T, L, M> {
         with_clone!(self, query, query.distinct = Some(distinct::Distinct::new()))
     }
 
-    pub fn distinct_on(&self, fields: &[&expression::UntypedExpression]) -> SelectQuery<T, L, M> {
+    pub fn distinct_on(&self, fields: &[&UntypedExpression]) -> SelectQuery<T, L, M> {
         with_clone!(self, query, query.distinct = Some(distinct::Distinct::on(fields)))
     }
 
-    pub fn group_by(&self, fields: &[&expression::UntypedExpression]) -> SelectQuery<T, L, M> {
+    pub fn group_by(&self, fields: &[&UntypedExpression]) -> SelectQuery<T, L, M> {
         with_clone!(self, query, query.group_by = Some(group_by::GroupBy::by(fields)))
     }
 
@@ -365,7 +365,7 @@ pub trait Selectable<M: Clone>: from::From {
         SelectQuery::new(Select::Only(vec![field1.upcast_expression(), field2.upcast_expression()]), self.upcast_from())
     }
 
-    fn select(&self, fields: &[&expression::UntypedExpression]) -> SelectQuery<(), LimitMany, M> {
+    fn select(&self, fields: &[&UntypedExpression]) -> SelectQuery<(), LimitMany, M> {
         SelectQuery::new(Select::Only(fields.iter().map(|f| f.upcast_expression()).collect()), self.upcast_from())
     }
 
@@ -400,7 +400,7 @@ impl<T: Clone, L: Clone, M: Clone> AbstractSelectQuery for SelectQuery<T, L, M> 
 pub type BoxedSelectQuery = Box<AbstractSelectQuery + 'static>;
 pub type SharedSelectQuery = rc::Rc<BoxedSelectQuery>;
 
-impl<T: Clone + 'static, L: Clone + 'static, M: Clone + 'static> expression::UntypedExpression for SelectQuery<T, L, M> {
+impl<T: Clone + 'static + fmt::Debug, L: Clone + 'static + fmt::Debug, M: Clone + 'static + fmt::Debug> UntypedExpression for SelectQuery<T, L, M> {
     fn expression_as_sql(&self) -> &sql::ToSql {
                 self
     }
@@ -410,8 +410,8 @@ impl<T: Clone + 'static, L: Clone + 'static, M: Clone + 'static> expression::Unt
     }
 }
 
-impl<M: Clone + 'static, T: Clone + 'static> expression::Expression<T> for SelectQuery<(T,), LimitOne, M> { }
-impl<M: Clone + 'static, T: Clone + 'static> expression::ListExpression<T> for SelectQuery<(T,), LimitMany, M> { }
+impl<M: Clone + 'static + fmt::Debug, T: Clone + 'static + fmt::Debug> expression::Expression<T> for SelectQuery<(T,), LimitOne, M> { }
+impl<M: Clone + 'static + fmt::Debug, T: Clone + 'static + fmt::Debug> expression::ListExpression<T> for SelectQuery<(T,), LimitMany, M> { }
 
-impl<M: Clone + 'static, T: Clone + 'static> expression::ToExpression<T> for SelectQuery<(T,), LimitOne, M> { }
-impl<M: Clone + 'static, T: Clone + 'static> expression::ToListExpression<T> for SelectQuery<(T,), LimitMany, M> { }
+impl<M: Clone + 'static + fmt::Debug, T: Clone + 'static + fmt::Debug> expression::ToExpression<T> for SelectQuery<(T,), LimitOne, M> { }
+impl<M: Clone + 'static + fmt::Debug, T: Clone + 'static + fmt::Debug> expression::ToListExpression<T> for SelectQuery<(T,), LimitMany, M> { }

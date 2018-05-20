@@ -42,7 +42,7 @@ macro_rules! returning_for {
     )
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct DeleteQuery<T, L, M> {
     only: bool,
     all: bool,

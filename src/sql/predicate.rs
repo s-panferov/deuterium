@@ -14,7 +14,7 @@ use super::super::predicate::{
 use super::value::{self};
 
 pub trait PredicateToSql {
-    fn to_sql(&self, bool, &mut super::SqlContext) -> String;
+    fn to_sql(&self, negation: bool, context: &mut super::SqlContext) -> String;
 }
 
 impl<F: value::ToPredicateValue, T: value::ToPredicateValue> PredicateToSql for is::IsPredicate<F, T> {

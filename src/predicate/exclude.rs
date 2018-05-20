@@ -1,6 +1,6 @@
-use super::{ToSharedPredicate};
+use super::ToSharedPredicate;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ExcludePredicate {
     pub predicate: super::SharedPredicate
 }

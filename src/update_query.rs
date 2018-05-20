@@ -1,6 +1,7 @@
 use std::mem;
 use std::rc;
 use std::marker;
+use std::fmt;
 
 use super::select_query;
 use super::insert_query::{self, ToInsertValue};
@@ -10,17 +11,17 @@ use super::expression;
 use super::sql;
 use super::field;
 
-pub trait FieldUpd: sql::ToSql {
+pub trait FieldUpd: sql::ToSql + fmt::Debug {
     fn upcast_field_update(&self) -> SharedFieldUpdate;
 }
 
-#[derive(Clone)]
-pub struct FieldUpdate<F, T> {
+#[derive(Clone, Debug)]
+pub struct FieldUpdate<F, T: fmt::Debug> {
     pub field: F,
     pub value: insert_query::InsertValue<T>
 }
 
-impl<F, T> FieldUpdate<F, T> {
+impl<F, T: fmt::Debug> FieldUpdate<F, T> {
     pub fn get_field(&self) -> &F {
         &self.field
     }
@@ -30,8 +31,8 @@ impl<F, T> FieldUpdate<F, T> {
     }
 }
 
-pub type BoxedFieldUpdate = Box<FieldUpd + 'static>;
-pub type SharedFieldUpdate = rc::Rc<BoxedFieldUpdate>;
+type BoxedFieldUpdate = Box<FieldUpd + 'static>;
+type SharedFieldUpdate = rc::Rc<BoxedFieldUpdate>;
 
 impl<F, T> FieldUpd for FieldUpdate<F, T>
     where F: Clone + sql::ToPredicateValue + 'static,
@@ -41,12 +42,12 @@ impl<F, T> FieldUpd for FieldUpdate<F, T>
     }
 }
 
-pub trait ToFieldUpdate<F, T> {
+pub trait ToFieldUpdate<F, T: fmt::Debug> {
     fn set<B: expression::ToExpression<T>>(&self, val: &B) -> FieldUpdate<F, T>;
     fn set_default(&self) -> FieldUpdate<F, T>;
 }
 
-impl<T> ToFieldUpdate<field::NamedField<T>, T> for field::NamedField<T> where T: Clone {
+impl<T> ToFieldUpdate<field::NamedField<T>, T> for field::NamedField<T> where T: Clone + fmt::Debug {
     fn set<B: expression::ToExpression<T>>(&self, val: &B) -> FieldUpdate<field::NamedField<T>, T> {
         FieldUpdate {
             field: self.clone(),
@@ -84,7 +85,7 @@ pub trait Updatable<M>: from::Table + Sized {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct UpdateQuery<T, L, M> {
     only: bool,
     table: from::SharedTable,
